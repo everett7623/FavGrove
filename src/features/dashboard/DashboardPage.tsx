@@ -192,7 +192,7 @@ export default function DashboardPage() {
           {recentActivities.length > 0 ? (
             recentActivities.map((activity) => (
               <div key={activity.id} className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm">
-                <span>{activity.message}</span>
+                <span>{activity.messageKey ? t(activity.messageKey, activity.messageValues) : activity.message}</span>
                 <span className="shrink-0 text-xs text-slate-500">{new Date(activity.createdAt).toLocaleString()}</span>
               </div>
             ))

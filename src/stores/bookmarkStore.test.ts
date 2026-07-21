@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { STORAGE_KEYS } from '../shared/constants/storage';
-import i18n from '../shared/i18n';
 import { BackupRecord, BookmarkNode, RecentActivity } from '../shared/types';
 import { storageService } from '../services/storageService';
 import { bookmarkService } from '../services/bookmarkService';
@@ -50,15 +49,24 @@ describe('bookmarkStore', () => {
   });
 
   it('records recent activity for bookmark actions', async () => {
-    const message = i18n.t('activity.deletedBookmarks', { count: 2, suffix: 's' });
-    await useBookmarkStore.getState().addActivity({ type: 'delete', message });
+    await useBookmarkStore.getState().addActivity({
+      type: 'delete',
+      messageKey: 'activity.deletedBookmarks',
+      messageValues: { count: 2, suffix: 's' }
+    });
 
-    expect(useBookmarkStore.getState().recentActivities[0].message).toBe(message);
+    expect(useBookmarkStore.getState().recentActivities[0]).toMatchObject({
+      messageKey: 'activity.deletedBookmarks',
+      messageValues: { count: 2, suffix: 's' }
+    });
 
     const stored = await storageService.get<RecentActivity[]>(STORAGE_KEYS.recentActivities);
     expect(stored.success).toBe(true);
     if (stored.success) {
-      expect(stored.data?.data[0].message).toBe(message);
+      expect(stored.data?.data[0]).toMatchObject({
+        messageKey: 'activity.deletedBookmarks',
+        messageValues: { count: 2, suffix: 's' }
+      });
     }
   });
 

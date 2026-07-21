@@ -734,12 +734,13 @@ Status:
 - English route smoke checks pass through Playwright
 - Chinese primary route smoke checks pass through Playwright
 - Route loading and beta status labels use shared locale resources
+- Recent Activity persists translation keys and values so current-session messages follow language changes
 
 Acceptance:
 
 - English and Chinese locale files have identical key sets
 - No user-facing English strings remain hardcoded in React components, with direct production JSX copy covered by an AST regression test
-- Recent Activity messages render in the selected language
+- Recent Activity messages render in the selected language, including after a live language change
 - Service and Worker errors are mapped to localized user-facing messages
 - English and Chinese manual route checks pass
 
@@ -956,6 +957,7 @@ Reviewed against the current implementation on 2026-06-06.
 - Implemented: batch move, batch delete, and batch tag editing.
 - Implemented: tags and tag filtering.
 - Implemented: drag/drop move and bookmark ordering.
+- Implemented: responsive Manager columns avoid page-level overflow and keep title/actions visible on narrow screens.
 
 ## Import / Export
 
@@ -978,6 +980,7 @@ Reviewed against the current implementation on 2026-06-06.
 - English and Chinese resources are configured.
 - English and Chinese locale key parity is covered by a unit test.
 - Recent Activity, service errors, Scanner, Manager, Import/Export, Settings, and Dashboard additions use locale keys.
+- Local English and Chinese visual QA passes across all primary routes at desktop and 390px widths.
 - Current localization still needs final human visual copy review before stable store release.
 
 END

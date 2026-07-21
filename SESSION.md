@@ -15,7 +15,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - P0 Foundation is complete and verified.
 - Dashboard statistics are implemented.
 - Search history is persisted locally and capped to the latest 10 terms.
-- Recent Activity records bookmark loading, search, and delete actions.
+- Recent Activity stores bookmark-action translation keys and values, so current-session entries rerender when the language changes while legacy message records remain readable.
 - Scanner worker currently handles:
   - Duplicate bookmark detection by exact URL.
   - Duplicate folder detection by parent/title grouping.
@@ -185,7 +185,7 @@ Latest verification:
 - Vitest: passed, 26 test files and 100 tests.
 - Vite production extension build, validation, and permission audit: passed.
 - Isolated installed Chrome and Edge production `dist/` verification: passed.
-- Playwright E2E: passed, 11 tests.
+- Playwright E2E: passed, 12 tests.
 - Release packaging: passed.
 - Release archive inspection: passed.
 - Production extension validation: passed.
@@ -229,6 +229,7 @@ Latest verification:
 - On 2026-07-22, dependency hardening upgraded CRXJS to `2.7.1`, Vitest to `3.2.7`, and safe transitive packages without changing Vite 5. A clean install, production audit, lint, type checking, 107 Vitest tests, benchmark, production build, Chrome/Edge verification, 11 E2E tests, and release packaging passed.
 - On 2026-07-22, Vite development/preview loopback and CORS hardening passed lint, TypeScript strict checking, 31 Vitest files with 112 tests, production build validation, and 11 E2E tests. README test counts now match the current suite.
 - On 2026-07-22, the post-hardening `0.2.0` candidate was rebuilt and reverified in isolated Chrome `150.0.7871.125` and Edge `150.0.4078.83` profiles. Both browsers loaded the enabled MV3 extension, service worker, six primary routes, disabled AI state, and zero pre-confirmation external requests. Release packaging and archive verification produced a 320,972-byte ZIP with matching SHA-256 `e25549d37d7701f070fcdac41a4f49ef8c7992cf895ef8b80e89cd6d61298412`.
+- On 2026-07-22, local English/Chinese desktop and 390px visual QA fixed Manager page overflow, made the narrow table prioritize title/actions, and made Recent Activity follow live language changes. ESLint, TypeScript strict checking, 31 Vitest files with 112 tests, production extension validation, permission audit, isolated installed Chrome/Edge verification, and 12 Playwright E2E tests passed. Verified packaging produced a 321,078-byte ZIP with SHA-256 `ee1a8c7665c561e17ad02b7b72e8ffea1ccdcfeb00287a4d4be7703314e69c9e`; final human-visible Chrome/Edge checks remain open.
 
 ## Notes
 

@@ -26,8 +26,10 @@
 - [x] English and Chinese locale key sets match.
 - [x] Production React markup rejects static English JSX copy through an AST regression test.
 - [x] Recent Activity and error messages follow locale keys.
+- [x] Recent Activity generated in the current session follows live language changes.
 - [x] English primary route smoke checks pass.
 - [x] Chinese primary route smoke checks pass.
+- [x] Local English and Chinese desktop/390px visual QA has no page-level horizontal overflow.
 - [ ] Final human visual copy review is complete in both languages.
 
 ## Manifest Review

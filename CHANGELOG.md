@@ -22,6 +22,8 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 
 ### Changed
 
+- Recent Activity now stores translation keys and interpolation values so existing session entries immediately follow language changes, while retaining legacy message compatibility.
+- Manager table columns now stay within desktop layouts and prioritize title/actions on narrow screens without page-level horizontal overflow.
 - Updated CRXJS to `2.7.1`, Vitest to `3.2.7`, and vulnerable transitive development dependencies while retaining the approved Vite 5 stack.
 - Browser release verification now installs `dist/` through the supported DevTools extension API in isolated Chrome and Edge profiles, then requires the real MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
 - Export now serializes only the selected format in a Web Worker, with immediate busy feedback instead of generating all five formats on the options-page main thread.

@@ -316,7 +316,7 @@ export default function ManagerPage() {
         </div>
       </section>
 
-      <section className="flex min-h-0 flex-col rounded-lg border bg-white shadow-sm dark:bg-slate-950">
+      <section className="flex min-h-0 min-w-0 flex-col rounded-lg border bg-white shadow-sm dark:bg-slate-950">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b p-4">
           <div>
             <h2 className="font-semibold">{t('manager.bookmarkList')}</h2>
@@ -388,7 +388,7 @@ export default function ManagerPage() {
           </div>
         </div>
 
-        <div className="grid h-10 grid-cols-[44px_minmax(180px,1fr)_minmax(220px,1.2fr)_minmax(140px,0.7fr)_120px] items-center border-b px-4 text-xs font-semibold uppercase text-slate-500">
+        <div className="grid h-10 grid-cols-[36px_minmax(120px,1fr)_80px] items-center border-b px-4 text-xs font-semibold uppercase text-slate-500 md:grid-cols-[36px_minmax(120px,1fr)_minmax(150px,1.2fr)_minmax(96px,0.7fr)_80px]">
           <SelectAllCheckbox
             checked={allVisibleSelected}
             indeterminate={someVisibleSelected}
@@ -397,8 +397,8 @@ export default function ManagerPage() {
             onChange={toggleAllVisible}
           />
           <span>{t('manager.columns.title')}</span>
-          <span>{t('manager.columns.url')}</span>
-          <span>{t('manager.columns.folder')}</span>
+          <span className="hidden md:block">{t('manager.columns.url')}</span>
+          <span className="hidden md:block">{t('manager.columns.folder')}</span>
           <span>{t('manager.columns.actions')}</span>
         </div>
 
@@ -564,18 +564,18 @@ function BookmarkRow({
       onDragStart={() => onDragStart(bookmark.id)}
       onDragOver={(event) => event.preventDefault()}
       onDrop={() => onDropBefore(bookmark.id)}
-      className="absolute grid w-full grid-cols-[44px_minmax(180px,1fr)_minmax(220px,1.2fr)_minmax(140px,0.7fr)_120px] items-center gap-2 border-b px-4 text-sm dark:border-slate-800"
+      className="absolute grid w-full grid-cols-[36px_minmax(120px,1fr)_80px] items-center gap-2 border-b px-4 text-sm md:grid-cols-[36px_minmax(120px,1fr)_minmax(150px,1.2fr)_minmax(96px,0.7fr)_80px] dark:border-slate-800"
       style={{ height: rowHeight, transform: `translateY(${offsetTop}px)` }}
     >
       <input type="checkbox" checked={selected} onChange={(event) => onSelectedChange(bookmark.id, event.target.checked)} aria-label={t('manager.selectAria', { title: bookmark.title || t('manager.untitled') })} />
-      <span className="min-w-0 truncate font-medium">
+      <a href={bookmark.url} target="_blank" rel="noreferrer" className="min-w-0 truncate font-medium hover:text-indigo-600">
         {bookmark.title || t('manager.untitled')}
         {bookmark.tags && bookmark.tags.length > 0 ? <span className="ml-2 text-xs font-normal text-indigo-500">#{bookmark.tags.join(' #')}</span> : null}
-      </span>
-      <a href={bookmark.url} target="_blank" rel="noreferrer" className="min-w-0 truncate text-slate-500 hover:text-indigo-600">
+      </a>
+      <a href={bookmark.url} target="_blank" rel="noreferrer" className="hidden min-w-0 truncate text-slate-500 hover:text-indigo-600 md:block">
         {bookmark.url}
       </a>
-      <span className="min-w-0 truncate text-xs text-slate-500">{bookmark.path?.slice(0, -1).join(' / ')}</span>
+      <span className="hidden min-w-0 truncate text-xs text-slate-500 md:block">{bookmark.path?.slice(0, -1).join(' / ')}</span>
       <span className="flex items-center gap-1">
         <button type="button" onClick={() => onRename(bookmark)} className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-900" aria-label={t('manager.renameAria', { title: bookmark.title || t('manager.untitled') })}>
           <Edit3 size={15} />

@@ -23,7 +23,7 @@ Last updated: 2026-07-22
 - Chrome bookmark and storage APIs are wrapped in services instead of React components.
 - Dashboard shows total bookmarks, total folders, duplicate count, invalid count, persisted last 10 search terms, and recent activity.
 - Search history persists locally.
-- Recent Activity records bookmark loading, search, and delete actions.
+- Recent Activity records bookmark actions as translation keys and values, so current-session entries follow language changes while legacy stored messages remain readable.
 - Scanner uses workers for duplicate bookmark groups, duplicate folder groups, empty folder scans, and broken-link checks.
 - Broken-link checks support optional host permission, timeout handling, retry handling, HEAD/GET fallback, concurrency control, and progress updates.
 - Cross-origin HTTPS checks are routed through the Manifest V3 background service worker instead of the options-page Worker.
@@ -48,6 +48,7 @@ Last updated: 2026-07-22
 - New installations default to eight global link-check workers while retaining the per-host safety cap.
 - Scanner cache loading now uses the persisted cache-duration setting.
 - Manager has folder filtering, virtualized bookmark list rendering, batch delete with backup creation, bookmark rename, folder rename, bookmark move, folder move, drag/drop move to folder, drag/drop bookmark ordering, undo delete, local tags, and tag filtering.
+- Manager keeps its table within the page at desktop widths and uses a title/actions mobile column set below the `md` breakpoint.
 - Scanner duplicate-folder results support merging into the first folder in each group.
 - Folder merge moves all source children, preserves duplicate bookmarks, removes source folders, and creates a backup first.
 - Duplicate bookmark results support keeping the oldest entry and deleting the remaining copies with backup and undo support.
@@ -208,6 +209,7 @@ Additional verification in this Codex session on 2026-07-08:
 - On 2026-07-22, CRXJS `2.7.1`, Vitest `3.2.7`, and safe transitive security updates passed a clean `npm ci`, zero-vulnerability production audit, ESLint, TypeScript strict checking, 29 Vitest files with 107 tests, the performance benchmark, production build validation, installed Chrome/Edge verification, 11 Playwright E2E tests, and verified release packaging.
 - On 2026-07-22, Vite development-server loopback/CORS hardening passed ESLint, TypeScript strict checking, 31 Vitest files with 112 tests, production extension build validation, and 11 Playwright E2E tests; the production dependency audit policy remained clean.
 - On 2026-07-22, the post-hardening `0.2.0` release candidate passed a fresh production build, extension validation, permission audit, isolated installed Chrome `150.0.7871.125` and Edge `150.0.4078.83` verification, and release archive content/checksum validation. The generated 320,972-byte ZIP has SHA-256 `e25549d37d7701f070fcdac41a4f49ef8c7992cf895ef8b80e89cd6d61298412`.
+- On 2026-07-22, local English/Chinese visual QA across six primary routes at desktop and 390px widths fixed Manager page overflow and stale-language Recent Activity copy. ESLint, TypeScript strict checking, 31 Vitest files with 112 tests, production extension validation, permission audit, isolated installed Chrome/Edge verification, and 12 Playwright E2E tests passed. Verified packaging produced a 321,078-byte ZIP with SHA-256 `ee1a8c7665c561e17ad02b7b72e8ffea1ccdcfeb00287a4d4be7703314e69c9e`; final human-visible Chrome/Edge extension checks remain open.
 
 ## Release Decision
 

@@ -38,10 +38,27 @@ export interface BookmarkStats {
 
 export type ActivityType = 'load' | 'search' | 'delete' | 'rename' | 'move' | 'merge' | 'tag' | 'undo' | 'import' | 'restore' | 'scan' | 'export' | 'settings';
 
+export type ActivityMessageKey =
+  | 'activity.loadedBookmarks'
+  | 'activity.searched'
+  | 'activity.deletedBookmarks'
+  | 'activity.renamedBookmark'
+  | 'activity.updatedBookmarkUrl'
+  | 'activity.movedItems'
+  | 'activity.reorderedBookmark'
+  | 'activity.restoredBookmarks'
+  | 'activity.updatedBookmarkTags'
+  | 'activity.addedBookmarkTags'
+  | 'activity.removedBookmarkTags'
+  | 'activity.importedBookmarks'
+  | 'activity.mergedFolders';
+
 export interface RecentActivity {
   id: string;
   type: ActivityType;
-  message: string;
+  message?: string;
+  messageKey?: ActivityMessageKey;
+  messageValues?: Record<string, string | number>;
   createdAt: number;
 }
 

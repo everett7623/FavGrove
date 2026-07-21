@@ -10,7 +10,7 @@
   [![Release](https://img.shields.io/github/v/release/everett7623/FavGrove?include_prereleases&label=beta)](https://github.com/everett7623/FavGrove/releases)
   [![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4)](manifest.json)
   [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)](tsconfig.json)
-  [![Tests](https://img.shields.io/badge/tests-112%20Vitest%20%2B%2011%20E2E-success)](#quality)
+  [![Tests](https://img.shields.io/badge/tests-112%20Vitest%20%2B%2012%20E2E-success)](#quality)
   [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 </div>
 
@@ -107,7 +107,7 @@ The `v0.2.0` beta candidate currently passes:
 - ESLint with zero errors and zero warnings.
 - TypeScript strict type checking.
 - 112 Vitest unit, component, and release-tool tests.
-- 11 Playwright end-to-end flows.
+- 12 Playwright end-to-end flows.
 - Production extension validation.
 - Permission audit for the release manifest and privacy copy.
 - Positive isolated Chrome and Edge `dist/` load checks through the supported DevTools extension API, including the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.

@@ -44,6 +44,31 @@ test('renders manager controls for search, tags, move, undo, and delete', async 
   await expect(page.getByRole('button', { name: /Delete selected/ })).toBeDisabled();
 });
 
+test('keeps the manager inside a 1280px desktop viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto('/#/manager');
+  await expect(page.getByRole('heading', { name: 'Bookmark list' })).toBeVisible();
+
+  const viewport = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  }));
+
+  expect(viewport.scrollWidth).toBe(viewport.clientWidth);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByText('Actions', { exact: true })).toBeVisible();
+  await expect(page.getByText('URL', { exact: true })).toBeHidden();
+  await expect(page.getByRole('link', { name: 'GitHub', exact: true })).toBeVisible();
+
+  const narrowViewport = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  }));
+
+  expect(narrowViewport.scrollWidth).toBe(narrowViewport.clientWidth);
+});
+
 test('checks primary routes in Chinese localization', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Settings' }).click();
@@ -55,6 +80,7 @@ test('checks primary routes in Chinese localization', async ({ page }) => {
   await page.getByRole('link', { name: '仪表盘' }).click();
   await expect(page.getByRole('heading', { name: '仪表盘' })).toBeVisible();
   await expect(page.getByRole('heading', { name: '快捷操作' })).toBeVisible();
+  await expect(page.getByText('Loaded 4 bookmarks')).toHaveCount(0);
 
   await page.getByRole('link', { name: '扫描检测' }).click();
   await expect(page.getByRole('heading', { name: '扫描检测' })).toBeVisible();

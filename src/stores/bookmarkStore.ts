@@ -149,7 +149,8 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     });
     await get().addActivity({
       type: 'load',
-      message: i18n.t('activity.loadedBookmarks', { count: calculateBookmarkStats(bookmarks).totalBookmarks })
+      messageKey: 'activity.loadedBookmarks',
+      messageValues: { count: calculateBookmarkStats(bookmarks).totalBookmarks }
     });
   },
   loadBackups: async () => {
@@ -178,7 +179,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     const trimmed = query.trim();
     if (trimmed) {
       await saveSearchHistory(nextSearches);
-      await get().addActivity({ type: 'search', message: i18n.t('activity.searched', { query: trimmed }) });
+      await get().addActivity({ type: 'search', messageKey: 'activity.searched', messageValues: { query: trimmed } });
     }
   },
   deleteBookmarks: async (ids) => {
@@ -211,7 +212,11 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
         mutating: false
       };
     });
-    await get().addActivity({ type: 'delete', message: i18n.t('activity.deletedBookmarks', { count: ids.length, suffix: ids.length === 1 ? '' : 's' }) });
+    await get().addActivity({
+      type: 'delete',
+      messageKey: 'activity.deletedBookmarks',
+      messageValues: { count: ids.length, suffix: ids.length === 1 ? '' : 's' }
+    });
   },
   renameBookmark: async (id, title) => {
     const normalized = title.trim();
@@ -225,7 +230,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }
 
     set((state) => ({ ...applyBookmarks(updateBookmarkNodeTitle(state.bookmarks, id, normalized), state.searchQuery, state.tagsByBookmarkId, state.tagFilter), mutating: false }));
-    await get().addActivity({ type: 'rename', message: i18n.t('activity.renamedBookmark', { title: normalized }) });
+    await get().addActivity({ type: 'rename', messageKey: 'activity.renamedBookmark', messageValues: { title: normalized } });
   },
   updateBookmarkUrl: async (id, url) => {
     const normalized = url.trim();
@@ -245,7 +250,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       ...applyBookmarks(updateBookmarkNodeUrl(state.bookmarks, id, normalized), state.searchQuery, state.tagsByBookmarkId, state.tagFilter),
       mutating: false
     }));
-    await get().addActivity({ type: 'rename', message: i18n.t('activity.updatedBookmarkUrl', { url: normalized }) });
+    await get().addActivity({ type: 'rename', messageKey: 'activity.updatedBookmarkUrl', messageValues: { url: normalized } });
   },
   moveBookmarks: async (ids, parentId) => {
     const movableIds = ids.filter((id) => id !== parentId && !isDescendantNode(get().bookmarks, id, parentId));
@@ -259,7 +264,11 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }
 
     set((state) => ({ ...applyBookmarks(moveBookmarkNodes(state.bookmarks, new Set(movableIds), parentId), state.searchQuery, state.tagsByBookmarkId, state.tagFilter), mutating: false }));
-    await get().addActivity({ type: 'move', message: i18n.t('activity.movedItems', { count: movableIds.length, suffix: movableIds.length === 1 ? '' : 's' }) });
+    await get().addActivity({
+      type: 'move',
+      messageKey: 'activity.movedItems',
+      messageValues: { count: movableIds.length, suffix: movableIds.length === 1 ? '' : 's' }
+    });
   },
   renameFolder: async (id, title) => {
     await get().renameBookmark(id, title);
@@ -292,7 +301,11 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       backups: refreshedBackups,
       mutating: false
     }));
-    await get().addActivity({ type: 'merge', message: i18n.t('activity.mergedFolders', { count: validSourceIds.length, suffix: validSourceIds.length === 1 ? '' : 's' }) });
+    await get().addActivity({
+      type: 'merge',
+      messageKey: 'activity.mergedFolders',
+      messageValues: { count: validSourceIds.length, suffix: validSourceIds.length === 1 ? '' : 's' }
+    });
   },
   reorderBookmarkBefore: async (id, beforeId) => {
     if (id === beforeId) return;
@@ -311,7 +324,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       const movedTree = source?.parentId === target.parentId || !target.parentId ? state.bookmarks : moveBookmarkNodes(state.bookmarks, new Set([id]), target.parentId);
       return { ...applyBookmarks(reorderNodeBefore(movedTree, id, beforeId), state.searchQuery, state.tagsByBookmarkId, state.tagFilter), mutating: false };
     });
-    await get().addActivity({ type: 'move', message: i18n.t('activity.reorderedBookmark') });
+    await get().addActivity({ type: 'move', messageKey: 'activity.reorderedBookmark' });
   },
   undoLastDelete: async () => {
     const snapshot = get().lastDeletedSnapshot;
@@ -331,10 +344,11 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }));
     await get().addActivity({
       type: 'undo',
-      message: i18n.t('activity.restoredBookmarks', {
+      messageKey: 'activity.restoredBookmarks',
+      messageValues: {
         count: snapshot.deletedBookmarks.length,
         suffix: snapshot.deletedBookmarks.length === 1 ? '' : 's'
-      })
+      }
     });
   },
   setBookmarkTags: async (id, tags) => {
@@ -345,7 +359,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       ...applyBookmarks(state.bookmarks, state.searchQuery, tagsByBookmarkId, state.tagFilter)
     }));
     await saveTags(tagsByBookmarkId);
-    await get().addActivity({ type: 'tag', message: i18n.t('activity.updatedBookmarkTags') });
+    await get().addActivity({ type: 'tag', messageKey: 'activity.updatedBookmarkTags' });
   },
   updateBookmarkTags: async (ids, tags, mode) => {
     const normalizedTags = [...new Set(tags.map((tag) => tag.trim()).filter(Boolean))].slice(0, 8);
@@ -369,7 +383,8 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     await saveTags(tagsByBookmarkId);
     await get().addActivity({
       type: 'tag',
-      message: i18n.t(mode === 'add' ? 'activity.addedBookmarkTags' : 'activity.removedBookmarkTags', { count: uniqueIds.length })
+      messageKey: mode === 'add' ? 'activity.addedBookmarkTags' : 'activity.removedBookmarkTags',
+      messageValues: { count: uniqueIds.length }
     });
   },
   setTagFilter: (tag) => {
@@ -410,7 +425,11 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
         mutating: false
       };
     });
-    await get().addActivity({ type: 'import', message: i18n.t('activity.importedBookmarks', { count: items.length, suffix: items.length === 1 ? '' : 's' }) });
+    await get().addActivity({
+      type: 'import',
+      messageKey: 'activity.importedBookmarks',
+      messageValues: { count: items.length, suffix: items.length === 1 ? '' : 's' }
+    });
   },
   restoreBackup: async (id) => {
     const target = get().backups.find((backup) => backup.id === id);
@@ -441,10 +460,11 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }));
     await get().addActivity({
       type: 'restore',
-      message: i18n.t('activity.restoredBookmarks', {
+      messageKey: 'activity.restoredBookmarks',
+      messageValues: {
         count: restored.data,
         suffix: restored.data === 1 ? '' : 's'
-      })
+      }
     });
   },
   deleteBackup: async (id) => {
