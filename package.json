@@ -17,6 +17,7 @@
     "validate:extension": "node scripts/validate-extension-build.mjs",
     "audit:permissions": "node scripts/audit-permissions.mjs",
     "check:browsers": "node scripts/check-browsers.mjs",
+    "check:browsers:visible": "node scripts/run-browser-clickthrough.mjs",
     "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",
     "package:release": "node scripts/package-release.mjs"
   },

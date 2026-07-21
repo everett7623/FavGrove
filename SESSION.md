@@ -1,6 +1,6 @@
 # Current Session
 
-Date: 2026-07-21
+Date: 2026-07-22
 
 ## Working On
 
@@ -128,11 +128,12 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - 10,000-bookmark structural scan and pinyin search benchmarks are covered by `npm run benchmark:performance`.
 - Store listing copy, promotional SVG sources, and 1280x800 page screenshots now live under `store/`.
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles, then verifies the enabled extension metadata, MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
+- `npm run check:browsers:visible -- chrome|edge` launches one official browser at a time with an isolated temporary profile for the final click-through pass, then removes that profile when the browser closes.
 - A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
 - Release packaging now writes `release/favgrove-v0.2.0.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
 - Manifest required permissions are now limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after a source audit found no `chrome.tabs` usage.
 - `npm run audit:permissions` verifies the manifest permission boundary and `PRIVACY.md` permission copy.
-- Visible browser click-through steps are prepared in `docs/release/browser-clickthrough.md`; the final human-visible Chrome and Edge results still need to be recorded before store submission.
+- Visible browser click-through steps and an isolated visible runner are prepared in `docs/release/browser-clickthrough.md`; the final human-visible Chrome and Edge results still need to be recorded before store submission.
 - Full destructive replacement restore is deferred by `docs/decisions/restore-strategy.md`; the current recovery flow is additive, backup-protected, path-mapped, and service-boundary scoped.
 - GitHub pre-release metadata, store submission fields, and post-beta AI guardrails are prepared in `docs/release/github-prerelease-v0.2.0.md`, `store/submission-fields.md`, and `docs/roadmap/post-beta-ai.md`.
 - Link checking now treats ambiguous 4xx responses, including 404, authentication, proxy, and rate-limit responses, as requiring manual verification; only HTTP 410 is automatically classified as confirmed broken.

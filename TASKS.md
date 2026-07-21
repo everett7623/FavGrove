@@ -802,12 +802,14 @@ Visible Browser Click-Through Preparation
 Status:
 
 - Checklist prepared
+- Isolated visible Chrome/Edge runner implemented
 - Final human-visible Chrome and Edge pass remains required before store submission
 
 Acceptance:
 
 - `docs/release/browser-clickthrough.md` lists required visible Chrome and Edge checks
 - `npm run check:browsers` continues to verify real `dist/` loading in isolated installed Chrome and Edge profiles
+- `npm run check:browsers:visible -- chrome|edge` launches production `dist/` in an isolated temporary profile and cleans it up after the visible pass
 - Manual results are recorded with browser versions before portal submission
 
 ---

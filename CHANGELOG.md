@@ -8,6 +8,7 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 
 - Added a Windows GitHub Actions workflow that runs the release quality gates, real Chrome/Edge extension loading, E2E tests, and release packaging on pushes and pull requests.
 - Added an automatically generated SHA-256 checksum file for each packaged release ZIP.
+- Added an isolated visible Chrome/Edge runner for the final production-extension click-through checklist.
 - Added optional, read-only AI bookmark-library analysis with user-provided Chat Completions endpoints, explicit request preview, privacy modes, cancellation, and structured evidence validation.
 - Improved OpenAI-compatible provider handling with base-URL completion, exact resolved endpoint previews, text-part response support, per-finding evidence filtering, and actionable contract errors.
 - Added a localized in-app notice when Chrome or Edge has downloaded a newer store version, with an explicit action to reload FavGrove and apply it.

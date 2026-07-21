@@ -9,6 +9,15 @@ npm run build:extension
 npm run check:browsers
 ```
 
+For the isolated visible pass, launch one browser at a time and close its window when the checklist is complete:
+
+```bash
+npm run check:browsers:visible -- chrome
+npm run check:browsers:visible -- edge
+```
+
+The visible runner uses a temporary browser profile, loads `dist/` through the DevTools extension API, and removes the profile after the browser closes. It does not use or modify the normal Chrome or Edge profile.
+
 Load only:
 
 ```text
