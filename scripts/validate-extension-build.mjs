@@ -1,9 +1,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { assertReleaseVersionConsistency } from './release-version.mjs';
 
-const distDir = resolve(process.cwd(), 'dist');
+const root = process.cwd();
+const distDir = resolve(root, 'dist');
 const manifestPath = resolve(distDir, 'manifest.json');
-const sourceLicensePath = resolve(process.cwd(), 'LICENSE');
+const sourceManifestPath = resolve(root, 'manifest.json');
+const packagePath = resolve(root, 'package.json');
+const packageLockPath = resolve(root, 'package-lock.json');
+const sourceLicensePath = resolve(root, 'LICENSE');
 const builtLicensePath = resolve(distDir, 'LICENSE');
 
 if (!existsSync(manifestPath)) {
@@ -22,6 +27,18 @@ const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
 if (manifest.manifest_version !== 3) {
   throw new Error('Built extension must use Manifest V3.');
 }
+
+const sourceManifest = JSON.parse(readFileSync(sourceManifestPath, 'utf8'));
+const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+const packageLock = JSON.parse(readFileSync(packageLockPath, 'utf8'));
+const versions = {
+  'package.json': packageJson.version,
+  'package-lock.json': packageLock.version,
+  'package-lock.json packages[""]': packageLock.packages?.['']?.version,
+  'manifest.json': sourceManifest.version,
+  'dist/manifest.json': manifest.version
+};
+assertReleaseVersionConsistency(versions);
 
 const expectedPermissions = ['alarms', 'bookmarks', 'storage'];
 const permissions = manifest.permissions ?? [];

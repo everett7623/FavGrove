@@ -751,10 +751,11 @@ Status:
 
 - Version policy documented in `VERSIONING.md`
 - Current development version is `0.2.0`
+- Build and package gates enforce matching semantic versions across package metadata, source Manifest, and production `dist/`
 
 Acceptance:
 
-- `package.json`, `manifest.json`, UI footer, and release filename use the same version
+- `package.json`, `package-lock.json`, `manifest.json`, built Manifest, UI footer, and release filename use the same version
 - Git tags use `v<version>`
 - Pre-release status is marked in GitHub or store metadata
 - Stable `1.0.0` is not published until all release gates pass

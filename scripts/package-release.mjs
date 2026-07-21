@@ -2,10 +2,14 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { basename, resolve } from 'node:path';
+import { assertReleaseVersionConsistency } from './release-version.mjs';
 
 const root = process.cwd();
 const distDir = resolve(root, 'dist');
 const manifestPath = resolve(distDir, 'manifest.json');
+const sourceManifestPath = resolve(root, 'manifest.json');
+const packagePath = resolve(root, 'package.json');
+const packageLockPath = resolve(root, 'package-lock.json');
 const sourceLicensePath = resolve(root, 'LICENSE');
 const builtLicensePath = resolve(distDir, 'LICENSE');
 
@@ -27,6 +31,23 @@ if (!readFileSync(sourceLicensePath).equals(readFileSync(builtLicensePath))) {
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
 if (manifest.manifest_version !== 3 || typeof manifest.version !== 'string') {
   console.error('The built manifest is invalid or is not Manifest V3.');
+  process.exit(1);
+}
+
+const sourceManifest = JSON.parse(readFileSync(sourceManifestPath, 'utf8'));
+const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+const packageLock = JSON.parse(readFileSync(packageLockPath, 'utf8'));
+const versions = {
+  'package.json': packageJson.version,
+  'package-lock.json': packageLock.version,
+  'package-lock.json packages[""]': packageLock.packages?.['']?.version,
+  'manifest.json': sourceManifest.version,
+  'dist/manifest.json': manifest.version
+};
+try {
+  assertReleaseVersionConsistency(versions);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 }
 

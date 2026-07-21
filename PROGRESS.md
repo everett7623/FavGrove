@@ -103,6 +103,7 @@ Last updated: 2026-07-22
 - `npm run check:browsers:visible -- chrome|edge` provides the final human click-through pass with one official browser at a time, an isolated temporary profile, production `dist/`, and automatic profile cleanup after the window closes.
 - `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
 - `npm run package:release` creates both the versioned ZIP and a matching SHA-256 checksum file for GitHub pre-release verification.
+- Production build validation and release packaging reject non-`x.y.z` or mismatched versions across `package.json`, `package-lock.json`, source `manifest.json`, and `dist/manifest.json`.
 - Manifest required permissions are limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after confirming no `chrome.tabs` usage.
 - `npm run audit:permissions` validates the manifest permission boundary and permission documentation in `PRIVACY.md`.
 - Visible Chrome and Edge click-through steps and an isolated visible runner are prepared in `docs/release/browser-clickthrough.md`.

@@ -31,6 +31,7 @@
 
 - [x] Manifest version is `3`.
 - [x] `package.json` and `manifest.json` versions match.
+- [x] Build and package gates enforce matching `x.y.z` versions in package metadata, source Manifest, and built Manifest.
 - [x] No popup page is configured.
 - [x] Options page opens in a full browser tab.
 - [x] Required permissions have a documented user-facing purpose.
