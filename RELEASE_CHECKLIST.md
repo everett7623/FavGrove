@@ -14,6 +14,8 @@
 - [x] `npm run check:browsers`
 - [x] `npm run capture:store-screenshots`
 - [x] `npm run package:release`
+- [x] Windows GitHub Actions quality workflow is configured for the release gates.
+- [ ] The quality workflow passes on the pushed `0.2.0` beta commit.
 
 ## Localization
 

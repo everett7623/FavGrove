@@ -99,6 +99,7 @@ Last updated: 2026-07-21
 - 10,000-bookmark structural scan, pinyin search, and selected-format export performance benchmarks are covered by `npm run benchmark:performance`.
 - Store listing copy, promotional SVG sources, and 1280x800 screenshots are available under `store/`.
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles and verifies enabled extension metadata, the MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
+- `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
 - Manifest required permissions are limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after confirming no `chrome.tabs` usage.
 - `npm run audit:permissions` validates the manifest permission boundary and permission documentation in `PRIVACY.md`.
 - Visible Chrome and Edge click-through steps are prepared in `docs/release/browser-clickthrough.md`.
@@ -117,6 +118,7 @@ Last updated: 2026-07-21
 - The full post-beta roadmap is not implemented; the completion percentage above applies only to the `0.2.0` beta scope.
 - Visible Chrome and Edge click-through checks from `dist/` remain open.
 - Store portal submission fields and GitHub pre-release metadata are prepared locally but not finalized in the portals.
+- The new GitHub Actions quality workflow is locally reviewed but has not run remotely because the current commits have not been pushed.
 - A visible live-provider compatibility check remains open because FavGrove intentionally bundles no provider endpoint, model, or credential; automated success/failure/cancellation coverage uses a simulated compatible provider.
 - Full destructive replacement restore remains a deferred post-beta feature and is not part of the current release path.
 

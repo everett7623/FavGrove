@@ -707,6 +707,7 @@ Release Build
 Status:
 
 - Implemented
+- Windows GitHub Actions release-gate workflow implemented locally; first remote run pending push
 
 Acceptance:
 
@@ -714,6 +715,7 @@ Acceptance:
 - `npm run package:release` creates the versioned ZIP artifact
 - `npm run check:browsers` verifies enabled extension metadata, the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests in isolated installed Chrome/Edge profiles
 - Visible unpacked-extension loading is recorded separately in official Chrome and Edge
+- `.github/workflows/quality.yml` runs lint, type checking, tests, production validation, browser checks, E2E, and release packaging on Windows
 
 ---
 

@@ -113,6 +113,8 @@ The `v0.2.0` beta candidate currently passes:
 - Positive isolated Chrome and Edge `dist/` load checks through the supported DevTools extension API, including the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
 - Release ZIP packaging.
 
+The Windows [quality workflow](.github/workflows/quality.yml) runs these gates on pushes, pull requests, and manual dispatches. Its first remote run will occur after the current beta commits are pushed.
+
 ## Architecture
 
 ```text
