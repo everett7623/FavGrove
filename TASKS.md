@@ -697,7 +697,7 @@ Chrome Store Package
 Status:
 
 - Production package tooling implemented
-- Chrome and Edge headless `dist/` load checks implemented
+- Positive isolated installed Chrome/Edge `dist/` verification through the supported DevTools extension API implemented
 - Store portal upload is not performed from this repository
 
 TASK-804
@@ -712,7 +712,8 @@ Acceptance:
 
 - `npm run build:extension` validates production extension output
 - `npm run package:release` creates the versioned ZIP artifact
-- `npm run check:browsers` verifies Chrome and Edge can load `dist/`
+- `npm run check:browsers` verifies enabled extension metadata, the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests in isolated installed Chrome/Edge profiles
+- Visible unpacked-extension loading is recorded separately in official Chrome and Edge
 
 ---
 
@@ -803,7 +804,7 @@ Status:
 Acceptance:
 
 - `docs/release/browser-clickthrough.md` lists required visible Chrome and Edge checks
-- `npm run check:browsers` continues to verify headless `dist/` loading
+- `npm run check:browsers` continues to verify real `dist/` loading in isolated installed Chrome and Edge profiles
 - Manual results are recorded with browser versions before portal submission
 
 ---

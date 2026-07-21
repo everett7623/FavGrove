@@ -1,6 +1,6 @@
 # Browser Click-Through Checklist
 
-Use this checklist for the final visible Chrome and Edge pass. Automated headless loading is still covered by `npm run check:browsers`; this document captures the human-visible workflow that must be recorded before store submission.
+Use this checklist for the final visible Chrome and Edge pass. `npm run check:browsers` installs and loads the production extension through the supported DevTools extension API in isolated official Chrome and Edge profiles. This document records the human-visible workflows that automation cannot close before store submission.
 
 ## Build Under Test
 
@@ -21,8 +21,8 @@ Do not load the project root or `.crx-dev`.
 
 | Date | Browser | Version | Tester | Result | Notes |
 |---|---|---|---|---|---|
-| Pending | Chrome | Pending | Pending | Pending |  |
-| Pending | Edge | Pending | Pending | Pending |  |
+| 2026-07-21 | Chrome | 150.0.7871.125 | Codex automated visible smoke | Partial pass | `dist/` enabled; MV3 worker, six routes, AI off, zero external requests, and zero page errors verified. Toolbar click, permission prompts, destructive flows, and restart persistence remain manual. |
+| 2026-07-21 | Edge | 150.0.4078.83 | Codex automated visible smoke | Partial pass | `dist/` enabled; MV3 worker, six routes, AI off, zero external requests, and zero page errors verified. Toolbar click, permission prompts, destructive flows, and restart persistence remain manual. |
 
 ## Required Checks
 

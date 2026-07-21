@@ -1,63 +1,96 @@
+import { chromium } from '@playwright/test';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
 import { findBrowserExecutable } from './browser-paths.mjs';
 
 const root = process.cwd();
 const distDir = path.join(root, 'dist');
 const manifestPath = path.join(distDir, 'manifest.json');
-
-function runBrowser(name, executable) {
-  const profileDir = mkdtempSync(path.join(tmpdir(), `favgrove-${name}-`));
-  const args = [
-    '--headless=new',
-    '--disable-gpu',
-    '--no-first-run',
-    '--no-default-browser-check',
-    `--user-data-dir=${profileDir}`,
-    `--disable-extensions-except=${distDir}`,
-    `--load-extension=${distDir}`,
-    '--dump-dom',
-    'about:blank'
-  ];
-
-  return new Promise((resolve, reject) => {
-    const child = spawn(executable, args, { stdio: ['ignore', 'pipe', 'pipe'] });
-    const timer = setTimeout(() => {
-      child.kill('SIGKILL');
-      reject(new Error(`${name} did not finish the extension load check within 20 seconds.`));
-    }, 20_000);
-
-    child.on('error', (error) => {
-      clearTimeout(timer);
-      rmSync(profileDir, { recursive: true, force: true });
-      reject(error);
-    });
-
-    child.on('exit', (code) => {
-      clearTimeout(timer);
-      rmSync(profileDir, { recursive: true, force: true });
-      if (code === 0) resolve();
-      else reject(new Error(`${name} exited with code ${code}.`));
-    });
-  });
-}
+const routes = ['/', '/scanner', '/manager', '/import-export', '/ai-analysis', '/settings'];
 
 if (!existsSync(manifestPath)) {
   throw new Error('dist/manifest.json is missing. Run npm run build:extension first.');
 }
 
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-if (manifest.manifest_version !== 3 || !manifest.options_ui?.open_in_tab) {
+if (manifest.manifest_version !== 3 || !manifest.options_ui?.open_in_tab || !manifest.options_ui.page) {
   throw new Error('dist manifest is not the expected Manifest V3 options-page extension.');
+}
+
+async function verifyBrowser(name, executablePath) {
+  const tempRoot = path.resolve(tmpdir());
+  const profileDir = mkdtempSync(path.join(tempRoot, `favgrove-${name}-`));
+  const resolvedProfileDir = path.resolve(profileDir);
+  if (!resolvedProfileDir.startsWith(`${tempRoot}${path.sep}`)) {
+    throw new Error('Refusing to use an unsafe temporary browser profile path.');
+  }
+
+  let context;
+  try {
+    // Chrome 137+ removed unpacked-extension command-line loading from branded builds.
+    // The Extensions CDP domain is the supported automation path when unsafe debugging is explicitly enabled.
+    context = await chromium.launchPersistentContext(profileDir, {
+      executablePath,
+      headless: true,
+      ignoreDefaultArgs: ['--disable-extensions'],
+      args: ['--enable-unsafe-extension-debugging']
+    });
+
+    const browser = context.browser();
+    if (!browser) throw new Error(`Unable to inspect the ${name} browser process.`);
+    const session = await browser.newBrowserCDPSession();
+    const { id: extensionId } = await session.send('Extensions.loadUnpacked', { path: distDir });
+    const extensionInfo = (await session.send('Extensions.getExtensions')).extensions.find((item) => item.id === extensionId);
+    if (!extensionInfo?.enabled || extensionInfo.name !== manifest.name || extensionInfo.version !== manifest.version) {
+      throw new Error(`${name} did not register the expected enabled extension: ${JSON.stringify(extensionInfo)}`);
+    }
+
+    const pageErrors = [];
+    const externalRequests = [];
+    const page = await context.newPage();
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('request', (request) => {
+      const url = request.url();
+      if (!url.startsWith(`chrome-extension://${extensionId}/`) && !url.startsWith('data:')) externalRequests.push(url);
+    });
+
+    for (const route of routes) {
+      await page.goto(`chrome-extension://${extensionId}/${manifest.options_ui.page}#${route}`, { waitUntil: 'domcontentloaded' });
+      await page.locator('main').waitFor({ state: 'visible', timeout: 10_000 });
+    }
+
+    let worker = context.serviceWorkers().find((item) => new URL(item.url()).host === extensionId);
+    if (!worker) {
+      worker = await context.waitForEvent('serviceworker', {
+        timeout: 15_000,
+        predicate: (item) => new URL(item.url()).host === extensionId
+      });
+    }
+
+    await page.goto(`chrome-extension://${extensionId}/${manifest.options_ui.page}#/ai-analysis`, { waitUntil: 'domcontentloaded' });
+    const aiCheckboxes = page.locator('input[type=checkbox]');
+    if ((await aiCheckboxes.count()) !== 1 || (await aiCheckboxes.isChecked())) {
+      throw new Error(`${name} did not render AI analysis disabled by default.`);
+    }
+    if (externalRequests.length) throw new Error(`${name} made unexpected external requests: ${[...new Set(externalRequests)].join(', ')}`);
+    if (pageErrors.length) throw new Error(`${name} options-page error: ${pageErrors.join('; ')}`);
+
+    console.log(
+      `Verified ${name} ${browser.version()}: FavGrove ${extensionInfo.version}, MV3 service worker, ${routes.length} routes, AI disabled, no external requests.`
+    );
+    console.log(`Verified ${name} service worker: ${worker.url()}`);
+  } finally {
+    await context?.close().catch(() => undefined);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    rmSync(resolvedProfileDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  }
 }
 
 for (const name of ['chrome', 'edge']) {
   const executable = findBrowserExecutable(name);
-  if (!executable) throw new Error(`Unable to find ${name} executable for browser check.`);
-  console.log(`Checking ${name}: ${executable}`);
-  await runBrowser(name, executable);
+  if (!executable) throw new Error(`Unable to find an installed ${name} executable.`);
+  await verifyBrowser(name, executable);
 }
 
-console.log('Chrome and Edge accepted the production dist/ extension in headless load checks.');
+console.log('Chrome and Edge loaded the production dist/ extension successfully in isolated profiles.');

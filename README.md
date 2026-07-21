@@ -110,7 +110,7 @@ The `v0.2.0` beta candidate currently passes:
 - 11 Playwright end-to-end flows.
 - Production extension validation.
 - Permission audit for the release manifest and privacy copy.
-- Chrome and Edge headless `dist/` load checks.
+- Positive isolated Chrome and Edge `dist/` load checks through the supported DevTools extension API, including the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
 - Release ZIP packaging.
 
 ## Architecture

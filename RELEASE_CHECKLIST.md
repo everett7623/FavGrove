@@ -45,11 +45,11 @@
 
 ## Manual Extension Checks
 
-- [x] Chrome and Edge accept `dist/` in headless extension load checks.
+- [x] Isolated installed Chrome and Edge profiles load `dist/` through the supported DevTools extension API with the MV3 service worker, all primary routes, AI disabled, and no pre-confirmation external requests.
 - [x] Visible Chrome and Edge click-through checklist is prepared in `docs/release/browser-clickthrough.md`.
 - [ ] Load `dist/` as an unpacked extension without manifest warnings in visible Chrome and Edge.
 - [ ] Clicking the extension action opens the full-screen options page.
-- [ ] Dashboard, Scanner, Manager, Import / Export, AI Analysis, and Settings routes open.
+- [x] Dashboard, Scanner, Manager, Import / Export, AI Analysis, and Settings routes open.
 - [ ] Broken-link permission is requested only after starting a scan.
 - [ ] AI endpoint permission is requested only after opt-in, local preview, and explicit confirmation.
 - [ ] AI domain-only mode sends no bookmark titles, paths, tags, URL queries, or URL fragments.

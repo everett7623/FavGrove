@@ -12,6 +12,7 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 
 ### Changed
 
+- Browser release verification now installs `dist/` through the supported DevTools extension API in isolated Chrome and Edge profiles, then requires the real MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
 - Export now serializes only the selected format in a Web Worker, with immediate busy feedback instead of generating all five formats on the options-page main thread.
 - Replaced destructive backup restore with additive missing-bookmark recovery, parent-ID/path mapping, safety backups, and rollback of failed restore writes.
 - Update notices now appear without reopening FavGrove when Chrome or Edge downloads an update while the page is open, and stale update records are cleared locally.

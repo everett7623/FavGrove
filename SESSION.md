@@ -127,7 +127,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Scanner now supports deleting one detected empty folder with confirmation, backup creation, structure refresh, and scan-cache refresh.
 - 10,000-bookmark structural scan and pinyin search benchmarks are covered by `npm run benchmark:performance`.
 - Store listing copy, promotional SVG sources, and 1280x800 page screenshots now live under `store/`.
-- `npm run check:browsers` verifies Chrome and Edge can load the production `dist/` extension in headless mode.
+- `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles, then verifies the enabled extension metadata, MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
 - Manifest required permissions are now limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after a source audit found no `chrome.tabs` usage.
 - `npm run audit:permissions` verifies the manifest permission boundary and `PRIVACY.md` permission copy.
 - Visible browser click-through steps are prepared in `docs/release/browser-clickthrough.md`; the final human-visible Chrome and Edge results still need to be recorded before store submission.
@@ -175,7 +175,7 @@ Latest verification:
 - TypeScript strict check: passed.
 - Vitest: passed, 26 test files and 100 tests.
 - Vite production extension build, validation, and permission audit: passed.
-- Chrome and Edge headless `dist/` load checks: passed.
+- Isolated installed Chrome and Edge production `dist/` verification: passed.
 - Playwright E2E: passed, 11 tests.
 - Release packaging: passed.
 - Release archive inspection: passed.
@@ -215,7 +215,7 @@ Latest verification:
 - On 2026-07-16, requested-format export moved to a dedicated Worker with import/export busy feedback; ESLint, TypeScript, 21 Vitest files with 83 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 9 Playwright E2E tests passed. A Chrome 10,000-bookmark CSV run completed in 105 ms with no observed Long Task.
 - On 2026-07-16, the first read-only AI analysis milestone passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 97 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. The rebuilt `dist/` includes the AI preprocessing Worker and analysis route; a live-provider check still requires user-owned credentials.
 - On 2026-07-16, the OpenAI-compatible endpoint follow-up passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. A credential-free real-endpoint probe confirmed the Chat Completions and Bearer-auth transport contract; an authenticated rerun with the rebuilt extension remains open.
-- On 2026-07-21, the current compatibility candidate was reverified with ESLint at 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the focused 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, 11 Playwright E2E tests, and release ZIP packaging. The public repository, privacy policy, and Issues support URLs were also verified as anonymously accessible.
+- On 2026-07-21, the current compatibility candidate was reverified with ESLint at 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the focused 10,000-bookmark benchmark, production extension validation and permission audit, 11 Playwright E2E tests, and release ZIP packaging. A follow-up audit found that the old browser script only checked branded-browser exit codes after Chrome removed unpacked-extension command-line loading; the gate now installs `dist/` through the supported DevTools extension API and positively verifies it in isolated installed Chrome 150 and Edge 150 profiles. The public repository, privacy policy, and Issues support URLs were also verified as anonymously accessible.
 
 ## Notes
 
