@@ -922,6 +922,7 @@ Status:
 Acceptance:
 
 - `npm run audit:dependencies` uses the npm registry and fails on high or critical production vulnerabilities
+- The audit policy fails when a new development package, advisory ID, or severity escalation appears
 - Windows CI runs the production dependency audit before build and test gates
 - `docs/security/dependency-audit.md` records the current production and development audit boundary
 - Vite-major migration is not performed without a separate compatibility plan and approval

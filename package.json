@@ -12,7 +12,7 @@
     "test": "vitest run",
     "benchmark:performance": "vitest run src/shared/utils/performance.test.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
-    "audit:dependencies": "npm audit --omit=dev --audit-level=high --registry=https://registry.npmjs.org",
+    "audit:dependencies": "node scripts/audit-dependencies.mjs",
     "build": "vite build",
     "build:extension": "npm run build && npm run validate:extension && npm run audit:permissions",
     "validate:extension": "node scripts/validate-extension-build.mjs",

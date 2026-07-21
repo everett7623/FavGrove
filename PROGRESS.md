@@ -102,7 +102,7 @@ Last updated: 2026-07-22
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles and verifies enabled extension metadata, the MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
 - `npm run check:browsers:visible -- chrome|edge` provides the final human click-through pass with one official browser at a time, an isolated temporary profile, production `dist/`, and automatic profile cleanup after the window closes.
 - `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
-- `npm run audit:dependencies` and Windows CI now gate production dependencies at high severity; the full development audit has only the Vite 5/esbuild findings documented in `docs/security/dependency-audit.md`.
+- `npm run audit:dependencies` and Windows CI now gate production dependencies and reject any development advisory outside the documented Vite 5/esbuild policy.
 - `npm run package:release` creates both the versioned ZIP and a matching SHA-256 checksum file for GitHub pre-release verification.
 - Release ZIP entries use stable path ordering and normalized timestamps; rebuilding identical `dist/` content reproduces the same archive SHA-256.
 - Release packaging reopens the generated ZIP and verifies its complete entry set against `dist/` by path, order, length, timestamp, and content hash before writing the checksum file.

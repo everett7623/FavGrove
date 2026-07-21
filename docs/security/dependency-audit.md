@@ -10,6 +10,8 @@ npm run audit:dependencies
 
 The command uses the npm registry directly because the configured mirror does not implement the npm security-advisories endpoint. The production audit currently covers 26 packages and reports zero info, low, moderate, high, or critical vulnerabilities.
 
+The audit also reads the full development report. It permits only the explicitly documented Vite 5/esbuild advisory IDs below; any new package, advisory ID, or severity escalation fails the command.
+
 The full development-tool audit currently reports two findings:
 
 - Vite `5.4.21` and its esbuild `0.21.5` dependency are affected by advisories fixed only by a newer Vite major line.
@@ -17,7 +19,7 @@ The full development-tool audit currently reports two findings:
 
 The development audit no longer reports the earlier CRXJS/Rollup, Vitest, `brace-expansion`, `form-data`, or `js-yaml` findings. CRXJS is `2.7.1`, Vitest is `3.2.7`, and the patched transitive versions are locked in `package-lock.json`.
 
-The remaining findings affect local build/test tooling, not the bundled production extension. Do not expose the Vite development server or run Vitest UI against untrusted projects. CI runs the production-only audit as a release gate; the full development audit remains an informational migration item until the fixed Vite major line is approved.
+The remaining findings affect local build/test tooling, not the bundled production extension. Do not expose the Vite development server or run Vitest UI against untrusted projects. CI runs this production and development-policy audit as a release gate; the two documented Vite 5 findings remain an informational migration item until the fixed Vite major line is approved.
 
 Relevant advisories:
 
