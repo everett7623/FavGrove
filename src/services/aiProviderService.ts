@@ -9,7 +9,7 @@ const activeRequests = new Map<string, AbortController>();
 function systemPrompt(language: string): string {
   return `You analyze bookmark-library metadata. Return only one JSON object using this exact contract:
 {"schemaVersion":1,"summary":"string","topics":[{"label":"string","count":0,"confidence":0.0,"evidence":["string"]}],"suggestions":[{"type":"folder|tag|organization|review","title":"string","rationale":"string","confidence":0.0,"evidence":["string"]}],"warnings":["string"]}.
-All confidence values must be between 0 and 1. Every evidence string must exactly equal one hostname, folder aggregate value, or item ref present in the request. Do not invent visited-page content. Do not suggest automatic destructive actions. Respond in ${language === 'zh_CN' ? 'Simplified Chinese' : 'English'}.`;
+All confidence values must be between 0 and 1. Every evidence string must exactly equal one hostname, folder aggregate value, or item ref present in the request. Omit a finding when no request evidence supports it. Do not invent visited-page content. Do not suggest automatic destructive actions. Respond in ${language === 'zh_CN' ? 'Simplified Chinese' : 'English'}.`;
 }
 
 function providerMessage(value: unknown): string | null {
@@ -27,7 +27,13 @@ function completionContent(value: unknown): string | null {
   const message = (choices[0] as Record<string, unknown>).message;
   if (!message || typeof message !== 'object') return null;
   const content = (message as Record<string, unknown>).content;
-  return typeof content === 'string' ? content : null;
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return null;
+  const text = content
+    .map((part) => (part && typeof part === 'object' ? (part as Record<string, unknown>).text : null))
+    .filter((part): part is string => typeof part === 'string')
+    .join('');
+  return text || null;
 }
 
 async function readProviderBody(response: Response): Promise<unknown> {
@@ -60,14 +66,38 @@ async function readProviderBody(response: Response): Promise<unknown> {
   }
 }
 
-function hasValidEvidence(result: AiAnalysisResult, request: AiProviderRequest): boolean {
-  const allowed = new Set([
+function validateEvidence(result: AiAnalysisResult, request: AiProviderRequest): Result<AiAnalysisResult> {
+  const allowed = new Map([
     ...request.payload.items.map((item) => item.ref),
     ...request.payload.aggregate.topDomains.map((item) => item.value),
     ...request.payload.aggregate.topFolders.map((item) => item.value)
-  ]);
-  const findings = [...result.topics, ...result.suggestions];
-  return result.topics.every((topic) => topic.count <= request.payload.scope.bookmarkCount) && findings.every((finding) => finding.evidence.every((item) => allowed.has(item)));
+  ].map((item) => [item.toLowerCase(), item] as const));
+  let removed = 0;
+  const cleanEvidence = (evidence: string[]) => [...new Set(evidence.map((item) => allowed.get(item.trim().toLowerCase())).filter((item): item is string => Boolean(item)))];
+  const topics = result.topics.flatMap((topic) => {
+    const evidence = cleanEvidence(topic.evidence);
+    if (!evidence.length || topic.count > request.payload.scope.bookmarkCount) {
+      removed += 1;
+      return [];
+    }
+    return [{ ...topic, evidence }];
+  });
+  const suggestions = result.suggestions.flatMap((suggestion) => {
+    const evidence = cleanEvidence(suggestion.evidence);
+    if (!evidence.length) {
+      removed += 1;
+      return [];
+    }
+    return [{ ...suggestion, evidence }];
+  });
+  const originalCount = result.topics.length + result.suggestions.length;
+  if (originalCount > 0 && topics.length + suggestions.length === 0) {
+    return { success: false, error: i18n.t('ai.errors.invalidEvidence') };
+  }
+  const warnings = removed
+    ? [...result.warnings.slice(0, 11), i18n.t('ai.providerWarnings.filteredEvidence', { count: removed })]
+    : result.warnings;
+  return { success: true, data: { ...result, topics, suggestions, warnings } };
 }
 
 export const aiProviderService = {
@@ -99,10 +129,11 @@ export const aiProviderService = {
         const detail = providerMessage(body);
         return { success: false, error: detail ? `${detail} (HTTP ${response.status})` : `${i18n.t('ai.errors.providerFailed')} (HTTP ${response.status})` };
       }
+      if (body === null) return { success: false, error: i18n.t('ai.errors.invalidResponse') };
       const content = completionContent(body);
-      if (!content) return { success: false, error: i18n.t('ai.errors.invalidResponse') };
-      const parsed = parseAiAnalysisResponse(content, i18n.t('ai.errors.invalidResponse'));
-      return parsed.success && hasValidEvidence(parsed.data, request) ? parsed : { success: false, error: i18n.t('ai.errors.invalidResponse') };
+      if (!content) return { success: false, error: i18n.t('ai.errors.missingResponseContent') };
+      const parsed = parseAiAnalysisResponse(content, i18n.t('ai.errors.invalidResponseSchema'));
+      return parsed.success ? validateEvidence(parsed.data, request) : parsed;
     } catch (error) {
       if (controller.signal.aborted) {
         return { success: false, error: controller.signal.reason === 'timeout' ? i18n.t('ai.errors.timedOut') : i18n.t('ai.errors.cancelled') };

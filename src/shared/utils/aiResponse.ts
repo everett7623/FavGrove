@@ -15,7 +15,7 @@ function readConfidence(value: unknown): number | null {
 function readEvidence(value: unknown): string[] | null {
   if (!Array.isArray(value)) return null;
   const evidence = value.map((item) => readString(item, 240));
-  return evidence.length > 0 && evidence.every((item): item is string => item !== null) ? evidence.slice(0, 8) : null;
+  return evidence.every((item): item is string => item !== null) ? evidence.slice(0, 8) : null;
 }
 
 function readTopic(value: unknown): AiAnalysisTopic | null {

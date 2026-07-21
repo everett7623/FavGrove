@@ -122,9 +122,9 @@ The current active stream is release readiness plus comprehensive improvement.
 The near-term priorities are:
 
 1. Run and record final visible Chrome and Edge click-through checks from `dist/`.
-2. Confirm the public privacy policy URL and copy the prepared submission fields into the store portals.
+2. Copy the verified public privacy policy and support URLs with the prepared submission fields into the store portals.
 3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.0.md`.
 4. Keep destructive full replacement restore deferred unless a separate safety design is approved.
-5. After release gates close, start the read-only AI analysis milestone defined by `TASK-705` and `.codex/tasks/ai-analysis-integration-2026-07-15.md`.
+5. After release gates close, choose the next post-beta task; the read-only `TASK-705` milestone is implemented, while automatic AI recommendations and mutations remain deferred.
 
 Always re-check `SESSION.md` and `PROGRESS.md` before choosing the next task.

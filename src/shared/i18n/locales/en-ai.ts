@@ -7,8 +7,9 @@ export const enAi = {
     enabled: 'Enable AI analysis',
     enabledDescription: 'FavGrove never starts an AI request until you preview and confirm it.',
     disabledNotice: 'AI analysis is off. Enable it to configure a user-provided endpoint.',
-    endpoint: 'Chat Completions endpoint',
-    endpointPlaceholder: 'https://provider.example/v1/chat/completions',
+    endpoint: 'OpenAI-compatible base URL or Chat Completions endpoint',
+    endpointPlaceholder: 'https://provider.example/v1',
+    endpointDescription: 'An origin or /v1 base URL is completed automatically. Custom full paths are kept unchanged.',
     model: 'Model',
     modelPlaceholder: 'provider-model-name',
     apiKey: 'API key (optional for local endpoints)',
@@ -24,7 +25,7 @@ export const enAi = {
     preparing: 'Preparing locally...',
     previewTitle: 'Request preview',
     previewDescription: 'Review exactly what will be sent before granting endpoint access.',
-    endpointOrigin: 'Destination',
+    resolvedEndpoint: 'Resolved request URL',
     selectedScope: 'Selected scope',
     detectedCount: '{{count}} bookmarks analyzed locally',
     includedCount: '{{count}} item samples included',
@@ -48,13 +49,19 @@ export const enAi = {
     emptyTopics: 'No topics returned.',
     emptySuggestions: 'No suggestions returned.',
     suggestionTypes: { folder: 'Folder', tag: 'Tag', organization: 'Organization', review: 'Review' },
+    providerWarnings: {
+      filteredEvidence: '{{count}} unsupported AI finding(s) were removed because their evidence did not match the request preview.'
+    },
     errors: {
-      invalidEndpoint: 'Enter a valid HTTP or HTTPS Chat Completions endpoint without embedded credentials.',
+      invalidEndpoint: 'Enter a valid HTTP or HTTPS OpenAI-compatible base URL or Chat Completions endpoint without embedded credentials.',
       missingModel: 'Enter the provider model name.',
       permissionDenied: 'Endpoint access was not granted.',
       preprocessFailed: 'Unable to prepare bookmark metadata for analysis.',
       providerFailed: 'The AI provider request failed.',
-      invalidResponse: 'The provider returned an invalid structured analysis.',
+      invalidResponse: 'The provider returned unreadable, empty, or oversized JSON.',
+      missingResponseContent: 'The response is missing choices[0].message.content. Confirm that this is a Chat Completions-compatible endpoint.',
+      invalidResponseSchema: 'The model did not return the required structured analysis JSON. Try a model that follows JSON instructions.',
+      invalidEvidence: 'None of the returned findings referenced evidence from the request preview.',
       timedOut: 'The AI request timed out after 60 seconds.',
       cancelled: 'The AI request was cancelled.'
     }

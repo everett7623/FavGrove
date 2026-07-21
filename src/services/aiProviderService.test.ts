@@ -44,10 +44,36 @@ describe('AI provider service', () => {
     expect(JSON.parse(String(init.body))).toMatchObject({ model: 'test-model', stream: false });
   });
 
-  it('rejects evidence that was not present in the request', async () => {
+  it('filters unsupported findings while preserving supported findings', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify({ ...analysis, topics: [{ ...analysis.topics[0], evidence: ['invented.test'] }] }) } }] }), { status: 200 })));
     const result = await aiProviderService.run(request('invalid-evidence'));
-    expect(result.success).toBe(false);
+    expect(result).toMatchObject({ success: true, data: { topics: [], suggestions: analysis.suggestions } });
+    if (result.success) expect(result.data.warnings).toHaveLength(1);
+  });
+
+  it('rejects a result when none of its findings have request evidence', async () => {
+    const unsupported = {
+      ...analysis,
+      topics: [{ ...analysis.topics[0], evidence: ['invented.test'] }],
+      suggestions: [{ ...analysis.suggestions[0], evidence: [] }]
+    };
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(unsupported) } }] }), { status: 200 })));
+    const result = await aiProviderService.run(request('no-valid-evidence'));
+    expect(result).toMatchObject({ success: false });
+  });
+
+  it('accepts compatible text-part message content', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: [{ type: 'text', text: JSON.stringify(analysis) }] } }] }), { status: 200 }))
+    );
+    await expect(aiProviderService.run(request('text-parts'))).resolves.toEqual({ success: true, data: analysis });
+  });
+
+  it('identifies a response without Chat Completions message content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: null } }] }), { status: 200 })));
+    const result = await aiProviderService.run(request('missing-content'));
+    expect(result).toMatchObject({ success: false, error: expect.stringContaining('choices[0].message.content') });
   });
 
   it('rejects oversized provider responses before parsing them', async () => {

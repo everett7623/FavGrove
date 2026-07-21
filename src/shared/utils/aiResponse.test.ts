@@ -15,13 +15,11 @@ describe('AI response validation', () => {
     expect(result).toEqual({ success: true, data: valid });
   });
 
-  it('rejects invalid schema and confidence values', () => {
+  it('rejects invalid schema and confidence values while leaving evidence checks to the provider boundary', () => {
     expect(parseAiAnalysisResponse(JSON.stringify({ ...valid, schemaVersion: 2 }), 'invalid')).toEqual({ success: false, error: 'invalid' });
     expect(
       parseAiAnalysisResponse(JSON.stringify({ ...valid, topics: [{ ...valid.topics[0], confidence: 4 }] }), 'invalid')
     ).toEqual({ success: false, error: 'invalid' });
-    expect(
-      parseAiAnalysisResponse(JSON.stringify({ ...valid, suggestions: [{ ...valid.suggestions[0], evidence: [] }] }), 'invalid')
-    ).toEqual({ success: false, error: 'invalid' });
+    expect(parseAiAnalysisResponse(JSON.stringify({ ...valid, suggestions: [{ ...valid.suggestions[0], evidence: [] }] }), 'invalid')).toMatchObject({ success: true });
   });
 });

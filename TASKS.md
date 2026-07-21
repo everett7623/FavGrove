@@ -866,7 +866,7 @@ FavGrove Brand Migration
 Status:
 
 - Implemented for the `0.2.0` beta candidate
-- Remote GitHub repository rename remains a separate external operation
+- GitHub repository rename to `everett7623/FavGrove` completed on 2026-07-15
 
 Acceptance:
 

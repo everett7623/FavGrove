@@ -1,6 +1,6 @@
 # PROGRESS
 
-Last updated: 2026-07-16
+Last updated: 2026-07-21
 
 ## Current Project Completion
 
@@ -105,9 +105,11 @@ Last updated: 2026-07-16
 - Full destructive replacement restore is deferred by `docs/decisions/restore-strategy.md`; additive, path-mapped missing-bookmark recovery is the current release path.
 - GitHub pre-release metadata is prepared in `docs/release/github-prerelease-v0.2.0.md`.
 - Store portal submission fields are prepared in `store/submission-fields.md`.
+- The public repository, privacy policy, and Issues support URLs were verified as anonymously accessible on 2026-07-21.
 - Post-beta AI and local recommendation guardrails are documented in `docs/roadmap/post-beta-ai.md`.
 - `TASK-705` and `.codex/tasks/ai-analysis-integration-2026-07-15.md` define the first model-backed milestone as opt-in, read-only bookmark-library analysis with explicit provider, privacy, schema, cancellation, and large-library acceptance gates.
 - AI Analysis now supports disabled-by-default opt-in, whole-library or folder scope, domain-only or metadata privacy modes, Web Worker preprocessing, exact request preview, user-provided Chat Completions endpoints/models, transient API keys/results, 60-second timeout, cancellation, strict response/evidence validation, and read-only results.
+- OpenAI-compatible endpoint handling accepts an origin or `/v1` base URL, previews the exact resolved request URL, supports string and text-part response content, filters unsupported findings individually, and reports distinct content/schema/evidence failures without retaining raw responses.
 - AI payloads remove URL queries and fragments, cap metadata samples at 200, and keep full-scope aggregate counts for at least 10,000 bookmarks.
 
 ## Not Completed
@@ -191,12 +193,14 @@ Additional verification in this Codex session on 2026-07-08:
 - On 2026-07-16, non-destructive missing-bookmark recovery passed ESLint with 0 warnings, TypeScript strict checking, 21 Vitest files with 82 tests, production extension build validation and permission audit, Chrome/Edge headless load checks, and 8 Playwright E2E tests.
 - On 2026-07-16, requested-format export moved to a dedicated Worker with import/export busy feedback; ESLint, TypeScript, 83 Vitest tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 9 Playwright E2E tests passed. A Chrome 10,000-bookmark CSV run completed in 105 ms with no observed Long Task.
 - On 2026-07-16, the optional read-only AI analysis milestone passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 97 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. Automated provider checks cover opt-in, privacy redaction, exact preview, success, cancellation, failure, and untrusted-response rejection; a live-provider check remains open.
+- On 2026-07-16, OpenAI-compatible endpoint normalization and response diagnostics passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. A credential-free probe confirmed that the reported real endpoint recognizes Chat Completions and Bearer authentication; the rebuilt extension still needs an authenticated user rerun.
+- On 2026-07-21, the current AI provider compatibility candidate was reverified with ESLint at 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the focused 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, 11 Playwright E2E tests, and release ZIP packaging.
 
 ## Release Decision
 
 - GitHub source push: suitable as a `0.2.0` FavGrove beta candidate after reviewing and committing the current working tree.
 - Chrome Web Store / Edge Add-ons stable publication: not ready.
-- Current release blockers include visible browser click-through checks, public privacy/support URL confirmation, GitHub pre-release creation, and final store portal submission.
+- Current release blockers include visible browser click-through checks, an authenticated live-provider compatibility check, GitHub pre-release creation, and final store portal submission. The public privacy and support URLs are accessible and ready to enter in the portals.
 - Do not label the current build `1.0.0`.
 
 Required standards:
@@ -210,7 +214,7 @@ Required standards:
 ## Next Stage Development Plan
 
 1. Run and record final visible Chrome and Edge click-through checks from `dist/`.
-2. Confirm public privacy policy and support URLs in the store portals.
+2. Copy the verified public privacy policy and support URLs into the store portals.
 3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.0.md`.
 4. Upload the verified release ZIP only after the visible browser pass is recorded.
 5. Run a disposable live-provider AI check with user-owned credentials and record the result without storing the key.

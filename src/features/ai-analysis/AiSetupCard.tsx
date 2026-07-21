@@ -56,6 +56,7 @@ export function AiSetupCard({ settings, setSettings, apiKey, setApiKey, folders,
             className={inputClassName}
             disabled={!settings.enabled || busy}
           />
+          <span className="mt-1 block text-xs font-normal text-slate-500">{t('ai.endpointDescription')}</span>
         </label>
         <label className="text-sm font-medium">
           {t('ai.model')}

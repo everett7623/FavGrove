@@ -61,7 +61,7 @@
 - [x] Store description is current.
 - [x] Store portal submission field worksheet is prepared in `store/submission-fields.md`.
 - [x] GitHub pre-release draft metadata is prepared in `docs/release/github-prerelease-v0.2.0.md`.
-- [ ] Privacy policy URL is publicly accessible.
+- [x] Privacy policy URL is publicly accessible.
 - [x] 1280x800 or 640x400 screenshots are prepared.
 - [x] 440x280 promotional tile is prepared if required.
 - [x] 128x128 store icon is prepared.

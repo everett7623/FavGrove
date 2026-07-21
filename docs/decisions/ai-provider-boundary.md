@@ -8,6 +8,11 @@ FavGrove implements its first model-backed feature through a user-provided
 OpenAI-compatible Chat Completions endpoint and model name. FavGrove does not
 select a provider, bundle a provider SDK, ship a shared key, or operate a proxy.
 
+Users may enter an origin, an `/v1` base URL, or a full Chat Completions path.
+Only the unambiguous origin and `/v1` forms are completed automatically;
+custom paths remain unchanged, and the exact resolved URL is shown before the
+request is confirmed.
+
 The user explicitly requested implementation before the previously planned
 post-release sequence was complete. The privacy, permission, schema, and test
 gates remain mandatory and are implemented with the feature.
@@ -52,8 +57,10 @@ The versioned response schema contains:
 
 Responses are parsed from untrusted JSON, capped at 1 MB before parsing, field-length bounded, type checked, and
 validated so evidence must match a hostname, folder value, or item reference in
-the request. Every returned topic or suggestion must include at least one valid
-evidence value. Model output has no path to Chrome bookmark mutation APIs.
+the request. Standard string content and compatible text-part arrays are
+accepted. Findings without valid request evidence are removed individually;
+if no returned finding remains supported, the response is rejected. Model
+output has no path to Chrome bookmark mutation APIs.
 
 ## Runtime Behavior
 

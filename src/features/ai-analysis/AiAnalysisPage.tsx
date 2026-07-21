@@ -47,7 +47,7 @@ export default function AiAnalysisPage() {
     setConfigError(null);
     if (!endpoint) return setConfigError(t('ai.errors.invalidEndpoint'));
     if (!settings.model.trim()) return setConfigError(t('ai.errors.missingModel'));
-    const saved = await aiSettingsService.save(settings);
+    const saved = await aiSettingsService.save({ ...settings, endpoint: endpoint.toString() });
     if (!saved.success) return setConfigError(saved.error);
     setSettings(saved.data);
     const folder = scopeId === 'all' ? null : folders.find((item) => item.id === scopeId);
@@ -76,7 +76,7 @@ export default function AiAnalysisPage() {
 
       {configError || taskError ? <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">{configError ?? taskError}</div> : null}
       {status === 'cancelled' ? <div className="rounded-md border bg-slate-100 p-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">{t('ai.cancelled')}</div> : null}
-      {preview && endpoint ? <AiPreviewCard preview={preview} endpointOrigin={endpoint.origin} model={settings.model} status={status} onRun={handleRun} onCancel={cancel} /> : null}
+      {preview && endpoint ? <AiPreviewCard preview={preview} endpointUrl={endpoint.toString()} model={settings.model} status={status} onRun={handleRun} onCancel={cancel} /> : null}
       {result ? <AiResults result={result} /> : null}
     </div>
   );

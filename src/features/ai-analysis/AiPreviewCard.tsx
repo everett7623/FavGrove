@@ -5,14 +5,14 @@ import { Button } from '../../shared/components/ui/Button';
 
 interface AiPreviewCardProps {
   preview: AiAnalysisPreview;
-  endpointOrigin: string;
+  endpointUrl: string;
   model: string;
   status: AiTaskStatus;
   onRun: () => void;
   onCancel: () => void;
 }
 
-export function AiPreviewCard({ preview, endpointOrigin, model, status, onRun, onCancel }: AiPreviewCardProps) {
+export function AiPreviewCard({ preview, endpointUrl, model, status, onRun, onCancel }: AiPreviewCardProps) {
   const { t } = useTranslation();
   const running = status === 'running';
 
@@ -25,7 +25,7 @@ export function AiPreviewCard({ preview, endpointOrigin, model, status, onRun, o
       <p className="mt-1 text-sm text-slate-500">{t('ai.previewDescription')}</p>
 
       <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-        <div><dt className="text-slate-500">{t('ai.endpointOrigin')}</dt><dd className="mt-1 break-all font-medium">{endpointOrigin}</dd></div>
+        <div><dt className="text-slate-500">{t('ai.resolvedEndpoint')}</dt><dd className="mt-1 break-all font-medium">{endpointUrl}</dd></div>
         <div><dt className="text-slate-500">{t('ai.model')}</dt><dd className="mt-1 break-all font-medium">{model}</dd></div>
         <div><dt className="text-slate-500">{t('ai.selectedScope')}</dt><dd className="mt-1 font-medium">{preview.scopeLabel}</dd></div>
         <div><dt className="text-slate-500">{t('ai.fields')}</dt><dd className="mt-1 font-medium">{preview.fields.map((field) => t(`ai.fieldLabels.${field}`)).join(', ')}</dd></div>

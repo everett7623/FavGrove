@@ -15,7 +15,10 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('AI analysis service', () => {
   it('validates endpoint protocols and embedded credentials', () => {
-    expect(parseAiEndpoint(settings.endpoint)?.origin).toBe('https://provider.test');
+    expect(parseAiEndpoint(settings.endpoint)?.toString()).toBe('https://provider.test/v1/chat/completions');
+    expect(parseAiEndpoint('https://provider.test')?.toString()).toBe('https://provider.test/v1/chat/completions');
+    expect(parseAiEndpoint('https://provider.test/v1/')?.toString()).toBe('https://provider.test/v1/chat/completions');
+    expect(parseAiEndpoint('https://provider.test/custom/')?.toString()).toBe('https://provider.test/custom');
     expect(parseAiEndpoint('ftp://provider.test/model')).toBeNull();
     expect(parseAiEndpoint('https://user:pass@provider.test/model')).toBeNull();
   });
@@ -25,10 +28,10 @@ describe('AI analysis service', () => {
     const sendMessage = vi.fn().mockResolvedValue({ success: true, data: analysis });
     vi.stubGlobal('chrome', { permissions: { request: requestPermission }, runtime: { id: 'extension-id', sendMessage } });
 
-    const result = await aiAnalysisService.run(settings, 'temporary-key', 'en', preview, new AbortController().signal);
+    const result = await aiAnalysisService.run({ ...settings, endpoint: 'https://provider.test/v1' }, 'temporary-key', 'en', preview, new AbortController().signal);
     expect(result).toEqual({ success: true, data: analysis });
     expect(requestPermission).toHaveBeenCalledWith({ origins: ['https://provider.test/*'] });
-    expect(sendMessage).toHaveBeenCalledWith(expect.objectContaining({ type: 'run-ai-analysis', apiKey: 'temporary-key', model: 'test-model' }));
+    expect(sendMessage).toHaveBeenCalledWith(expect.objectContaining({ type: 'run-ai-analysis', endpoint: 'https://provider.test/v1/chat/completions', apiKey: 'temporary-key', model: 'test-model' }));
   });
 
   it('does not contact the provider when permission is denied', async () => {

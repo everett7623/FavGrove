@@ -10,7 +10,7 @@
   [![Release](https://img.shields.io/github/v/release/everett7623/FavGrove?include_prereleases&label=beta)](https://github.com/everett7623/FavGrove/releases)
   [![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4)](manifest.json)
   [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)](tsconfig.json)
-  [![Tests](https://img.shields.io/badge/tests-97%20Vitest%20%2B%2011%20E2E-success)](#quality)
+  [![Tests](https://img.shields.io/badge/tests-100%20Vitest%20%2B%2011%20E2E-success)](#quality)
   [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 </div>
 
@@ -40,7 +40,7 @@ Browser bookmark managers become difficult to use once a collection grows into t
 | Export | HTML, JSON, CSV, TXT, and OPML |
 | Settings | Theme, language, scanner, cache, automatic scan, backup retention, and non-destructive missing-bookmark recovery |
 | Updates | Browser-managed Chrome/Edge store updates with an in-app reload notice when a new version is ready |
-| AI analysis | Disabled by default; whole-library or folder analysis through a user-provided compatible endpoint, request preview, URL redaction, cancellation, and read-only structured results |
+| AI analysis | Disabled by default; whole-library or folder analysis through a user-provided compatible base URL or endpoint, resolved request preview, URL redaction, cancellation, and read-only structured results |
 | Privacy | Local storage by default; no analytics, telemetry, shared AI key, developer-controlled bookmark server, or AI proxy |
 
 The remaining roadmap is tracked in [TASKS.md](TASKS.md) and [PROGRESS.md](PROGRESS.md). Known gaps include final visible browser click-through checks, live-provider compatibility testing with user-owned credentials, store portal submission, and later automatic recommendation work. Full destructive replacement restore is documented as deferred.
@@ -106,7 +106,7 @@ The `v0.2.0` beta candidate currently passes:
 
 - ESLint with zero errors and zero warnings.
 - TypeScript strict type checking.
-- 97 Vitest unit and component tests.
+- 100 Vitest unit and component tests.
 - 11 Playwright end-to-end flows.
 - Production extension validation.
 - Permission audit for the release manifest and privacy copy.

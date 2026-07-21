@@ -1,6 +1,6 @@
 # Current Session
 
-Date: 2026-07-16
+Date: 2026-07-21
 
 ## Working On
 
@@ -140,6 +140,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Link issue rows now support an in-place single-link recheck using the current scanner settings; successful checks remove the issue, while failures refresh its status and classification without adding an ignore rule.
 - The first AI milestone is implemented as optional, disabled-by-default, read-only bookmark-library analysis using a user-provided Chat Completions-compatible endpoint and model.
 - AI supports whole-library or folder scope, domain-only or redacted metadata modes, exact request preview, transient API keys/results, separate endpoint permission, timeout, cancellation, provider error handling, and strict structured result validation.
+- AI provider compatibility now accepts an origin or `/v1` base URL, shows the exact resolved Chat Completions URL, accepts standard string or text-part response content, filters individual unsupported findings, and distinguishes response-content, schema, and evidence failures without logging provider output.
 - Local AI preprocessing runs in a Worker, strips URL queries/fragments, caps samples at 200, and covers full-scope aggregates for at least 10,000 bookmarks.
 - Store-installed updates now use the Chrome/Edge-managed `runtime.onUpdateAvailable` lifecycle. FavGrove persists only the pending version and detection time, shows a localized global notice, and reloads only after the user chooses to apply the downloaded update. No remote version polling or new permission was added.
 - The update notice now appears immediately if Chrome or Edge downloads an update while FavGrove is already open, and stale non-newer update records are cleared locally.
@@ -152,7 +153,7 @@ Load the rebuilt `dist/` in visible Chrome and Edge, complete the checklist incl
 ## After E2E
 
 1. Run the visible Chrome and Edge checklist in `docs/release/browser-clickthrough.md`.
-2. Confirm the public privacy policy URL and support URL in the store portals.
+2. Copy the verified public privacy policy URL and support URL into the store portals.
 3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.0.md`.
 4. Upload the verified release ZIP only after the visible browser pass is recorded.
 5. Record a live-provider AI compatibility result without persisting the user-owned API key.
@@ -172,7 +173,7 @@ Latest verification:
 
 - ESLint: passed, 0 errors and 0 warnings.
 - TypeScript strict check: passed.
-- Vitest: passed, 26 test files and 97 tests.
+- Vitest: passed, 26 test files and 100 tests.
 - Vite production extension build, validation, and permission audit: passed.
 - Chrome and Edge headless `dist/` load checks: passed.
 - Playwright E2E: passed, 11 tests.
@@ -213,6 +214,8 @@ Latest verification:
 - On 2026-07-16, non-destructive missing-bookmark recovery passed ESLint with 0 warnings, TypeScript strict checking, 21 Vitest files with 82 tests, production extension build validation and permission audit, Chrome/Edge headless load checks, and 8 Playwright E2E tests.
 - On 2026-07-16, requested-format export moved to a dedicated Worker with import/export busy feedback; ESLint, TypeScript, 21 Vitest files with 83 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 9 Playwright E2E tests passed. A Chrome 10,000-bookmark CSV run completed in 105 ms with no observed Long Task.
 - On 2026-07-16, the first read-only AI analysis milestone passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 97 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. The rebuilt `dist/` includes the AI preprocessing Worker and analysis route; a live-provider check still requires user-owned credentials.
+- On 2026-07-16, the OpenAI-compatible endpoint follow-up passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. A credential-free real-endpoint probe confirmed the Chat Completions and Bearer-auth transport contract; an authenticated rerun with the rebuilt extension remains open.
+- On 2026-07-21, the current compatibility candidate was reverified with ESLint at 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the focused 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, 11 Playwright E2E tests, and release ZIP packaging. The public repository, privacy policy, and Issues support URLs were also verified as anonymously accessible.
 
 ## Notes
 

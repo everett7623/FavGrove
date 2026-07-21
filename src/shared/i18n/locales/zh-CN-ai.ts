@@ -7,8 +7,9 @@ export const zhCNAi = {
     enabled: '启用 AI 分析',
     enabledDescription: '只有在你查看预览并确认后，FavGrove 才会发起 AI 请求。',
     disabledNotice: 'AI 分析当前关闭。启用后可配置用户自有端点。',
-    endpoint: 'Chat Completions 端点',
-    endpointPlaceholder: 'https://provider.example/v1/chat/completions',
+    endpoint: 'OpenAI 兼容基础地址或 Chat Completions 端点',
+    endpointPlaceholder: 'https://provider.example/v1',
+    endpointDescription: '填写域名或 /v1 基础地址时会自动补全；自定义完整路径保持不变。',
     model: '模型',
     modelPlaceholder: 'provider-model-name',
     apiKey: 'API Key（本地端点可不填）',
@@ -24,7 +25,7 @@ export const zhCNAi = {
     preparing: '正在本地准备...',
     previewTitle: '请求预览',
     previewDescription: '授予端点访问权限前，请检查将要发送的准确内容。',
-    endpointOrigin: '发送目标',
+    resolvedEndpoint: '实际请求地址',
     selectedScope: '选定范围',
     detectedCount: '本地分析 {{count}} 个书签',
     includedCount: '包含 {{count}} 个书签样本',
@@ -48,13 +49,19 @@ export const zhCNAi = {
     emptyTopics: '模型未返回主题。',
     emptySuggestions: '模型未返回建议。',
     suggestionTypes: { folder: '文件夹', tag: '标签', organization: '整理', review: '复核' },
+    providerWarnings: {
+      filteredEvidence: '已移除 {{count}} 条依据与请求预览不匹配的 AI 结论。'
+    },
     errors: {
-      invalidEndpoint: '请输入有效的 HTTP 或 HTTPS Chat Completions 端点，且不要在地址中嵌入账号密码。',
+      invalidEndpoint: '请输入有效的 HTTP 或 HTTPS OpenAI 兼容基础地址或 Chat Completions 端点，且不要在地址中嵌入账号密码。',
       missingModel: '请输入供应商使用的模型名称。',
       permissionDenied: '未授予该端点的访问权限。',
       preprocessFailed: '无法准备用于分析的书签元数据。',
       providerFailed: 'AI 供应商请求失败。',
-      invalidResponse: '供应商返回的结构化分析无效。',
+      invalidResponse: '供应商返回了无法读取、空白或过大的 JSON。',
+      missingResponseContent: '响应中缺少 choices[0].message.content，请确认使用的是 Chat Completions 兼容端点。',
+      invalidResponseSchema: '模型未返回要求的结构化分析 JSON，请尝试更能遵循 JSON 指令的模型。',
+      invalidEvidence: '模型返回的结论均未引用请求预览中存在的依据。',
       timedOut: 'AI 请求已在 60 秒后超时。',
       cancelled: 'AI 请求已取消。'
     }

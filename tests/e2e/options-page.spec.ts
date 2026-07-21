@@ -225,11 +225,12 @@ test('requires AI opt-in and preview before returning read-only analysis', async
   const previewButton = page.getByRole('button', { name: 'Build request preview' });
   await expect(previewButton).toBeDisabled();
   await page.getByRole('checkbox', { name: /Enable AI analysis/ }).check();
-  await page.getByRole('textbox', { name: 'Chat Completions endpoint' }).fill('https://provider.test/v1/chat/completions');
+  await page.getByRole('textbox', { name: /OpenAI-compatible base URL/ }).fill('https://provider.test');
   await page.getByRole('textbox', { name: 'Model' }).fill('test-model');
   await previewButton.click();
 
   await expect(page.getByRole('heading', { name: 'Request preview' })).toBeVisible();
+  await expect(page.getByText('https://provider.test/v1/chat/completions')).toBeVisible();
   expect(providerRequests).toBe(0);
   await page.getByRole('button', { name: 'Confirm and analyze' }).click();
   await expect(page.getByRole('heading', { name: 'Analysis result' })).toBeVisible();
@@ -253,7 +254,7 @@ test('cancels an AI request and surfaces provider failures', async ({ page }) =>
   await page.goto('/');
   await page.getByRole('link', { name: 'AI Analysis' }).click();
   await page.getByRole('checkbox', { name: /Enable AI analysis/ }).check();
-  await page.getByRole('textbox', { name: 'Chat Completions endpoint' }).fill('https://slow-provider.test/v1/chat/completions');
+  await page.getByRole('textbox', { name: /OpenAI-compatible base URL/ }).fill('https://slow-provider.test/v1/chat/completions');
   await page.getByRole('textbox', { name: 'Model' }).fill('test-model');
   await page.getByRole('button', { name: 'Build request preview' }).click();
   await page.getByRole('button', { name: 'Confirm and analyze' }).click();

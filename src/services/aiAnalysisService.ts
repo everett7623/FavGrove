@@ -15,6 +15,11 @@ export function parseAiEndpoint(value: string): URL | null {
   try {
     const endpoint = new URL(value.trim());
     if (!['http:', 'https:'].includes(endpoint.protocol) || endpoint.username || endpoint.password) return null;
+    const pathname = endpoint.pathname.replace(/\/+$/, '');
+    if (!pathname) endpoint.pathname = '/v1/chat/completions';
+    else if (pathname === '/v1') endpoint.pathname = '/v1/chat/completions';
+    else endpoint.pathname = pathname;
+    endpoint.hash = '';
     return endpoint;
   } catch {
     return null;
