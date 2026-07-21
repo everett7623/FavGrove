@@ -728,6 +728,7 @@ Status:
 
 - Translation resources exist for both languages
 - English and Chinese locale key parity is enforced by unit test
+- Production React markup is guarded against static English JSX text and user-facing string attributes
 - English route smoke checks pass through Playwright
 - Chinese primary route smoke checks pass through Playwright
 - Route loading and beta status labels use shared locale resources
@@ -735,7 +736,7 @@ Status:
 Acceptance:
 
 - English and Chinese locale files have identical key sets
-- No user-facing English strings remain hardcoded in React components
+- No user-facing English strings remain hardcoded in React components, with direct production JSX copy covered by an AST regression test
 - Recent Activity messages render in the selected language
 - Service and Worker errors are mapped to localized user-facing messages
 - English and Chinese manual route checks pass

@@ -121,6 +121,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Backup creation now honors the persisted backup retention setting, and lowering retention trims excess backups safely.
 - JSON, CSV, TXT, OPML, and HTML imports now share the existing preview, conflict resolver, and backup-before-import flow through a Worker parser.
 - English and Chinese locale key parity is enforced by a unit test; English route smoke coverage remains green.
+- A TypeScript AST regression test prevents static English JSX text and user-facing string attributes from being added to production React markup.
 - Manager now supports batch tag add/remove for selected bookmarks and expand/collapse controls for nested folders.
 - Dashboard now includes quick actions, local scan-result recommendations, and pinyin/full-initial search support through the shared bookmark search utility.
 - Chinese primary route smoke coverage was added to Playwright and passes after switching the app language in Settings.

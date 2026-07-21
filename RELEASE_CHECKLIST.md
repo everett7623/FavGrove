@@ -21,6 +21,7 @@
 ## Localization
 
 - [x] English and Chinese locale key sets match.
+- [x] Production React markup rejects static English JSX copy through an AST regression test.
 - [x] Recent Activity and error messages follow locale keys.
 - [x] English primary route smoke checks pass.
 - [x] Chinese primary route smoke checks pass.

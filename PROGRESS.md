@@ -92,6 +92,7 @@ Last updated: 2026-07-22
 - Backup creation now uses the persisted retention setting, and lowering retention trims excess backups safely.
 - Import/Export now imports JSON, CSV, TXT, OPML, and HTML through the shared Worker preview, conflict resolver, and backup-before-import flow.
 - English and Chinese locale key parity is enforced by a unit test.
+- Production React markup is scanned by a TypeScript AST regression test for static English JSX text and user-facing string attributes.
 - Manager supports batch tag add/remove for selected bookmarks and expand/collapse controls in the folder tree.
 - Dashboard includes quick actions, local scan-result recommendations, and full-pinyin/pinyin-initial search support.
 - Chinese primary route smoke coverage passes through Playwright after switching language in Settings.
