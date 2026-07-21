@@ -104,6 +104,7 @@ Last updated: 2026-07-22
 - `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
 - `npm run package:release` creates both the versioned ZIP and a matching SHA-256 checksum file for GitHub pre-release verification.
 - Release ZIP entries use stable path ordering and normalized timestamps; rebuilding identical `dist/` content reproduces the same archive SHA-256.
+- Release packaging reopens the generated ZIP and verifies its complete entry set against `dist/` by path, order, length, timestamp, and content hash before writing the checksum file.
 - Production build validation and release packaging reject non-`x.y.z` or mismatched versions across `package.json`, `package-lock.json`, source `manifest.json`, and `dist/manifest.json`.
 - Manifest required permissions are limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after confirming no `chrome.tabs` usage.
 - `npm run audit:permissions` validates the manifest permission boundary and permission documentation in `PRIVACY.md`.

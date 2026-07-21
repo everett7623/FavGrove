@@ -120,6 +120,27 @@ if (packaged.status !== 0 || !existsSync(archivePath)) {
   process.exit(packaged.status ?? 1);
 }
 
+const verification = spawnSync(
+  'powershell.exe',
+  [
+    '-NoProfile',
+    '-ExecutionPolicy',
+    'Bypass',
+    '-File',
+    resolve(root, 'scripts/verify-release-archive.ps1'),
+    '-SourceDirectory',
+    distDir,
+    '-ArchivePath',
+    archivePath
+  ],
+  { stdio: 'inherit' }
+);
+if (verification.status !== 0) {
+  rmSync(archivePath, { force: true });
+  console.error('Release archive verification failed.');
+  process.exit(verification.status ?? 1);
+}
+
 const checksum = createHash('sha256').update(readFileSync(archivePath)).digest('hex');
 writeFileSync(checksumPath, `${checksum}  ${basename(archivePath)}\n`, 'utf8');
 

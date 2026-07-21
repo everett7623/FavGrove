@@ -133,6 +133,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
 - Release packaging now writes `release/favgrove-v0.2.0.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
 - Release ZIP generation is deterministic across identical production content by sorting entry paths and normalizing ZIP timestamps; a Windows regression test covers differing source order and file times.
+- Packaging now reopens the ZIP and verifies every entry against `dist/` before generating the checksum; invalid or stale archives are deleted.
 - Build validation and release packaging now reject invalid or mismatched versions across package metadata, source Manifest, and the built Manifest, preventing stale `dist/` archives.
 - Manifest required permissions are now limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after a source audit found no `chrome.tabs` usage.
 - `npm run audit:permissions` verifies the manifest permission boundary and `PRIVACY.md` permission copy.

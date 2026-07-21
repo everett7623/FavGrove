@@ -12,6 +12,7 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 - Added an AST-based localization regression test that rejects static English copy in production React markup.
 - Added release gates that reject invalid or mismatched versions across package metadata, source Manifest, and production `dist/`.
 - Made release ZIP generation deterministic by sorting entries and normalizing ZIP timestamps, with a Windows reproducibility test.
+- Added post-package verification that requires every ZIP entry to match production `dist/` by path, order, length, timestamp, and SHA-256.
 - Added optional, read-only AI bookmark-library analysis with user-provided Chat Completions endpoints, explicit request preview, privacy modes, cancellation, and structured evidence validation.
 - Improved OpenAI-compatible provider handling with base-URL completion, exact resolved endpoint previews, text-part response support, per-finding evidence filtering, and actionable contract errors.
 - Added a localized in-app notice when Chrome or Edge has downloaded a newer store version, with an explicit action to reload FavGrove and apply it.
