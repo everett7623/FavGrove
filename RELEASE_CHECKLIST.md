@@ -15,6 +15,7 @@
 - [x] `npm run capture:store-screenshots`
 - [x] `npm run package:release`
 - [x] Release packaging creates a SHA-256 checksum file beside the ZIP.
+- [x] Release ZIP generation is deterministic for identical production content.
 - [x] Windows GitHub Actions quality workflow is configured for the release gates.
 - [ ] The quality workflow passes on the pushed `0.2.0` beta commit.
 

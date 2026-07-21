@@ -106,8 +106,12 @@ const command = [
   '-NoProfile',
   '-ExecutionPolicy',
   'Bypass',
-  '-Command',
-  `Compress-Archive -Path '${distDir.replaceAll("'", "''")}\\*' -DestinationPath '${archivePath.replaceAll("'", "''")}' -Force`
+  '-File',
+  resolve(root, 'scripts/create-release-archive.ps1'),
+  '-SourceDirectory',
+  distDir,
+  '-DestinationPath',
+  archivePath
 ];
 const packaged = spawnSync('powershell.exe', command, { stdio: 'inherit' });
 
