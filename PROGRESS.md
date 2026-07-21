@@ -100,6 +100,7 @@ Last updated: 2026-07-21
 - Store listing copy, promotional SVG sources, and 1280x800 screenshots are available under `store/`.
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles and verifies enabled extension metadata, the MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
 - `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
+- `npm run package:release` creates both the versioned ZIP and a matching SHA-256 checksum file for GitHub pre-release verification.
 - Manifest required permissions are limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after confirming no `chrome.tabs` usage.
 - `npm run audit:permissions` validates the manifest permission boundary and permission documentation in `PRIVACY.md`.
 - Visible Chrome and Edge click-through steps are prepared in `docs/release/browser-clickthrough.md`.

@@ -129,6 +129,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Store listing copy, promotional SVG sources, and 1280x800 page screenshots now live under `store/`.
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles, then verifies the enabled extension metadata, MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
 - A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
+- Release packaging now writes `release/favgrove-v0.2.0.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
 - Manifest required permissions are now limited to `alarms`, `bookmarks`, and `storage`; the unused `tabs` permission was removed after a source audit found no `chrome.tabs` usage.
 - `npm run audit:permissions` verifies the manifest permission boundary and `PRIVACY.md` permission copy.
 - Visible browser click-through steps are prepared in `docs/release/browser-clickthrough.md`; the final human-visible Chrome and Edge results still need to be recorded before store submission.

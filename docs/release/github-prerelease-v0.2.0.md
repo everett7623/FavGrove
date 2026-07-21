@@ -6,7 +6,9 @@
 - Target branch: `main`
 - Release title: `FavGrove v0.2.0 Beta`
 - Mark as pre-release: yes
-- Attach asset: `release/favgrove-v0.2.0.zip`
+- Attach assets:
+  - `release/favgrove-v0.2.0.zip`
+  - `release/favgrove-v0.2.0.sha256`
 
 ## Summary
 

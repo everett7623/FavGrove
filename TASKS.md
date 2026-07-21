@@ -713,6 +713,7 @@ Acceptance:
 
 - `npm run build:extension` validates production extension output
 - `npm run package:release` creates the versioned ZIP artifact
+- Release packaging creates a matching SHA-256 checksum file for the ZIP
 - `npm run check:browsers` verifies enabled extension metadata, the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests in isolated installed Chrome/Edge profiles
 - Visible unpacked-extension loading is recorded separately in official Chrome and Edge
 - `.github/workflows/quality.yml` runs lint, type checking, tests, production validation, browser checks, E2E, and release packaging on Windows

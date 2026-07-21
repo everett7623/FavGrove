@@ -14,6 +14,7 @@
 - [x] `npm run check:browsers`
 - [x] `npm run capture:store-screenshots`
 - [x] `npm run package:release`
+- [x] Release packaging creates a SHA-256 checksum file beside the ZIP.
 - [x] Windows GitHub Actions quality workflow is configured for the release gates.
 - [ ] The quality workflow passes on the pushed `0.2.0` beta commit.
 
@@ -79,6 +80,7 @@ The packaging command creates:
 
 ```txt
 release/favgrove-v<version>.zip
+release/favgrove-v<version>.sha256
 ```
 
-Upload the generated ZIP to the Chrome Web Store or Microsoft Edge Add-ons portal.
+Upload the generated ZIP to the Chrome Web Store or Microsoft Edge Add-ons portal. Attach both files to the matching GitHub pre-release.

@@ -1,6 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 
 const root = process.cwd();
 const distDir = resolve(root, 'dist');
@@ -75,8 +76,10 @@ if (exposedResources.includes('*') || exposedResources.includes('**/*')) {
 
 const releaseDir = resolve(root, 'release');
 const archivePath = resolve(releaseDir, `favgrove-v${manifest.version}.zip`);
+const checksumPath = resolve(releaseDir, `favgrove-v${manifest.version}.sha256`);
 mkdirSync(releaseDir, { recursive: true });
 rmSync(archivePath, { force: true });
+rmSync(checksumPath, { force: true });
 
 const command = [
   '-NoProfile',
@@ -92,4 +95,8 @@ if (packaged.status !== 0 || !existsSync(archivePath)) {
   process.exit(packaged.status ?? 1);
 }
 
+const checksum = createHash('sha256').update(readFileSync(archivePath)).digest('hex');
+writeFileSync(checksumPath, `${checksum}  ${basename(archivePath)}\n`, 'utf8');
+
 console.log(`Created ${archivePath}`);
+console.log(`Created ${checksumPath}`);

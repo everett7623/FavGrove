@@ -41,6 +41,7 @@ The extension does not request the `tabs` permission.
 - Screenshots: `store/screenshots/`
 - Promotional assets: `store/assets/`
 - Extension package: `release/favgrove-v0.2.0.zip`
+- Extension package checksum: `release/favgrove-v0.2.0.sha256`
 
 ## Beta Notes
 
