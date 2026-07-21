@@ -228,6 +228,7 @@ Latest verification:
 - On 2026-07-21, `.github/workflows/quality.yml` was added to reproduce the verified release gates on `windows-latest`; local validation is complete, while the first remote run requires a later push.
 - On 2026-07-22, dependency hardening upgraded CRXJS to `2.7.1`, Vitest to `3.2.7`, and safe transitive packages without changing Vite 5. A clean install, production audit, lint, type checking, 107 Vitest tests, benchmark, production build, Chrome/Edge verification, 11 E2E tests, and release packaging passed.
 - On 2026-07-22, Vite development/preview loopback and CORS hardening passed lint, TypeScript strict checking, 31 Vitest files with 112 tests, production build validation, and 11 E2E tests. README test counts now match the current suite.
+- On 2026-07-22, the post-hardening `0.2.0` candidate was rebuilt and reverified in isolated Chrome `150.0.7871.125` and Edge `150.0.4078.83` profiles. Both browsers loaded the enabled MV3 extension, service worker, six primary routes, disabled AI state, and zero pre-confirmation external requests. Release packaging and archive verification produced a 320,972-byte ZIP with matching SHA-256 `e25549d37d7701f070fcdac41a4f49ef8c7992cf895ef8b80e89cd6d61298412`.
 
 ## Notes
 
