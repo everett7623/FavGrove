@@ -13,12 +13,14 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 - Added release gates that reject invalid or mismatched versions across package metadata, source Manifest, and production `dist/`.
 - Made release ZIP generation deterministic by sorting entries and normalizing ZIP timestamps, with a Windows reproducibility test.
 - Added post-package verification that requires every ZIP entry to match production `dist/` by path, order, length, timestamp, and SHA-256.
+- Added a production dependency security audit gate and documented the remaining Vite 5 development-tool advisories.
 - Added optional, read-only AI bookmark-library analysis with user-provided Chat Completions endpoints, explicit request preview, privacy modes, cancellation, and structured evidence validation.
 - Improved OpenAI-compatible provider handling with base-URL completion, exact resolved endpoint previews, text-part response support, per-finding evidence filtering, and actionable contract errors.
 - Added a localized in-app notice when Chrome or Edge has downloaded a newer store version, with an explicit action to reload FavGrove and apply it.
 
 ### Changed
 
+- Updated CRXJS to `2.7.1`, Vitest to `3.2.7`, and vulnerable transitive development dependencies while retaining the approved Vite 5 stack.
 - Browser release verification now installs `dist/` through the supported DevTools extension API in isolated Chrome and Edge profiles, then requires the real MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
 - Export now serializes only the selected format in a Web Worker, with immediate busy feedback instead of generating all five formats on the options-page main thread.
 - Replaced destructive backup restore with additive missing-bookmark recovery, parent-ID/path mapping, safety backups, and rollback of failed restore writes.

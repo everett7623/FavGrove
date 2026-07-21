@@ -909,6 +909,25 @@ Acceptance:
 
 ---
 
+TASK-815
+
+Dependency Security Audit
+
+Status:
+
+- Production dependency audit passes with zero vulnerabilities
+- CRXJS, Vitest, and safe transitive dependency updates are applied
+- Vite 5 development-tool findings remain tracked pending an explicit Vite-major migration decision
+
+Acceptance:
+
+- `npm run audit:dependencies` uses the npm registry and fails on high or critical production vulnerabilities
+- Windows CI runs the production dependency audit before build and test gates
+- `docs/security/dependency-audit.md` records the current production and development audit boundary
+- Vite-major migration is not performed without a separate compatibility plan and approval
+
+---
+
 # Core Feature Audit
 
 Reviewed against the current implementation on 2026-06-06.

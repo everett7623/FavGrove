@@ -12,6 +12,7 @@
     "test": "vitest run",
     "benchmark:performance": "vitest run src/shared/utils/performance.test.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
+    "audit:dependencies": "npm audit --omit=dev --audit-level=high --registry=https://registry.npmjs.org",
     "build": "vite build",
     "build:extension": "npm run build && npm run validate:extension && npm run audit:permissions",
     "validate:extension": "node scripts/validate-extension-build.mjs",
@@ -36,7 +37,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.30",
+    "@crxjs/vite-plugin": "^2.7.1",
     "@eslint/js": "^9.17.0",
     "@playwright/test": "^1.49.1",
     "@testing-library/jest-dom": "^6.6.3",
@@ -58,6 +59,6 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^5.4.11",
-    "vitest": "^2.1.8"
+    "vitest": "^3.2.7"
   }
 }

@@ -6,6 +6,7 @@
 - [x] `npm run lint`
 - [x] `npm run typecheck`
 - [x] `npm run test`
+- [x] `npm run audit:dependencies` reports zero production vulnerabilities.
 - [x] `npm run benchmark:performance`
 - [x] `npm run test:e2e`
 - [x] `npm run build`
