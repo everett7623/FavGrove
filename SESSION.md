@@ -132,6 +132,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - `npm run check:browsers:visible -- chrome|edge` launches one official browser at a time with an isolated temporary profile for the final click-through pass, then removes that profile when the browser closes.
 - A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
 - Dependency auditing now runs through the official npm registry in local checks and Windows CI; production must be clean, and only the documented Vite 5/esbuild development advisory IDs are allowed pending a Vite-major decision.
+- Shared Vite development and preview configuration now binds to `127.0.0.1` and restricts Host/CORS origins as defense in depth for the remaining Vite 5 advisories.
 - Release packaging now writes `release/favgrove-v0.2.0.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
 - Release ZIP generation is deterministic across identical production content by sorting entry paths and normalizing ZIP timestamps; a Windows regression test covers differing source order and file times.
 - Packaging now reopens the ZIP and verifies every entry against `dist/` before generating the checksum; invalid or stale archives are deleted.
@@ -226,6 +227,7 @@ Latest verification:
 - On 2026-07-21, the current compatibility candidate was reverified with ESLint at 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the focused 10,000-bookmark benchmark, production extension validation and permission audit, 11 Playwright E2E tests, and release ZIP packaging. A follow-up audit found that the old browser script only checked branded-browser exit codes after Chrome removed unpacked-extension command-line loading; the gate now installs `dist/` through the supported DevTools extension API and positively verifies it in isolated installed Chrome 150 and Edge 150 profiles. The public repository, privacy policy, and Issues support URLs were also verified as anonymously accessible.
 - On 2026-07-21, `.github/workflows/quality.yml` was added to reproduce the verified release gates on `windows-latest`; local validation is complete, while the first remote run requires a later push.
 - On 2026-07-22, dependency hardening upgraded CRXJS to `2.7.1`, Vitest to `3.2.7`, and safe transitive packages without changing Vite 5. A clean install, production audit, lint, type checking, 107 Vitest tests, benchmark, production build, Chrome/Edge verification, 11 E2E tests, and release packaging passed.
+- On 2026-07-22, Vite development/preview loopback and CORS hardening passed lint, TypeScript strict checking, 31 Vitest files with 112 tests, production build validation, and 11 E2E tests. README test counts now match the current suite.
 
 ## Notes
 

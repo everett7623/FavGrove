@@ -5,6 +5,12 @@ import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import manifest from './manifest.json';
 
+const developmentCorsOrigins = [
+  /^http:\/\/127\.0\.0\.1(?::\d+)?$/,
+  /^http:\/\/localhost(?::\d+)?$/,
+  /^chrome-extension:\/\/[a-p]{32}$/
+];
+
 function copyLicense(): Plugin {
   return {
     name: 'copy-license',
@@ -18,6 +24,18 @@ function copyLicense(): Plugin {
 
 export default defineConfig(({ command }) => ({
   plugins: [react(), crx({ manifest }), copyLicense()],
+  server: {
+    host: '127.0.0.1',
+    allowedHosts: ['127.0.0.1', 'localhost'],
+    cors: { origin: developmentCorsOrigins },
+    strictPort: true
+  },
+  preview: {
+    host: '127.0.0.1',
+    allowedHosts: ['127.0.0.1', 'localhost'],
+    cors: { origin: developmentCorsOrigins },
+    strictPort: true
+  },
   build: {
     outDir: command === 'serve' ? '.crx-dev' : 'dist',
     emptyOutDir: true

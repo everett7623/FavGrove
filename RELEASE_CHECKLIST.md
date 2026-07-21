@@ -47,6 +47,7 @@
 
 - [x] `PRIVACY.md` matches current behavior.
 - [x] No analytics, telemetry, remote tracking, developer-operated AI proxy, or automatic cloud upload was introduced.
+- [x] Vite development and preview servers bind to loopback and restrict CORS origins.
 - [x] Imported files and URLs are validated.
 - [x] Destructive operations create backups where currently implemented.
 - [x] No bookmark data is sent to a developer-controlled FavGrove server; optional AI requests go directly to the user-selected endpoint after preview and confirmation.

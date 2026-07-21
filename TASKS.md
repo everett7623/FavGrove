@@ -917,12 +917,14 @@ Status:
 
 - Production dependency audit passes with zero vulnerabilities
 - CRXJS, Vitest, and safe transitive dependency updates are applied
+- Vite development and preview servers are restricted to loopback hosts and explicit CORS origins
 - Vite 5 development-tool findings remain tracked pending an explicit Vite-major migration decision
 
 Acceptance:
 
 - `npm run audit:dependencies` uses the npm registry and fails on high or critical production vulnerabilities
 - The audit policy fails when a new development package, advisory ID, or severity escalation appears
+- Shared Vite server configuration does not expose the development server on LAN interfaces or allow arbitrary CORS origins
 - Windows CI runs the production dependency audit before build and test gates
 - `docs/security/dependency-audit.md` records the current production and development audit boundary
 - Vite-major migration is not performed without a separate compatibility plan and approval

@@ -103,6 +103,7 @@ Last updated: 2026-07-22
 - `npm run check:browsers:visible -- chrome|edge` provides the final human click-through pass with one official browser at a time, an isolated temporary profile, production `dist/`, and automatic profile cleanup after the window closes.
 - `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
 - `npm run audit:dependencies` and Windows CI now gate production dependencies and reject any development advisory outside the documented Vite 5/esbuild policy.
+- Vite development and preview servers bind to `127.0.0.1`, accept only loopback Host headers, and restrict CORS to loopback or Chrome extension origins.
 - `npm run package:release` creates both the versioned ZIP and a matching SHA-256 checksum file for GitHub pre-release verification.
 - Release ZIP entries use stable path ordering and normalized timestamps; rebuilding identical `dist/` content reproduces the same archive SHA-256.
 - Release packaging reopens the generated ZIP and verifies its complete entry set against `dist/` by path, order, length, timestamp, and content hash before writing the checksum file.
@@ -205,6 +206,7 @@ Additional verification in this Codex session on 2026-07-08:
 - On 2026-07-16, OpenAI-compatible endpoint normalization and response diagnostics passed ESLint with 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the 10,000-bookmark benchmark, production extension validation and permission audit, Chrome/Edge headless load checks, and 11 Playwright E2E tests. A credential-free probe confirmed that the reported real endpoint recognizes Chat Completions and Bearer authentication; the rebuilt extension still needs an authenticated user rerun.
 - On 2026-07-21, the current AI provider compatibility candidate was reverified with ESLint at 0 warnings, TypeScript strict checking, 26 Vitest files with 100 tests, the focused 10,000-bookmark benchmark, production extension validation and permission audit, 11 Playwright E2E tests, and release ZIP packaging. A follow-up audit replaced the old browser exit-code check with supported DevTools installation and positive production-extension verification in isolated installed Chrome 150 and Edge 150 profiles; toolbar clicking, permission prompts, destructive flows, and restart persistence remain manual.
 - On 2026-07-22, CRXJS `2.7.1`, Vitest `3.2.7`, and safe transitive security updates passed a clean `npm ci`, zero-vulnerability production audit, ESLint, TypeScript strict checking, 29 Vitest files with 107 tests, the performance benchmark, production build validation, installed Chrome/Edge verification, 11 Playwright E2E tests, and verified release packaging.
+- On 2026-07-22, Vite development-server loopback/CORS hardening passed ESLint, TypeScript strict checking, 31 Vitest files with 112 tests, production extension build validation, and 11 Playwright E2E tests; the production dependency audit policy remained clean.
 
 ## Release Decision
 

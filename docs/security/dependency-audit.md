@@ -21,6 +21,8 @@ The development audit no longer reports the earlier CRXJS/Rollup, Vitest, `brace
 
 The remaining findings affect local build/test tooling, not the bundled production extension. Do not expose the Vite development server or run Vitest UI against untrusted projects. CI runs this production and development-policy audit as a release gate; the two documented Vite 5 findings remain an informational migration item until the fixed Vite major line is approved.
 
+As defense in depth, the shared Vite configuration binds development and preview servers to `127.0.0.1`, restricts accepted Host headers to loopback names, and allows CORS only for loopback HTTP origins and Chrome extension origins. This reduces exposure but does not replace the future Vite-major migration.
+
 Relevant advisories:
 
 - [Vite optimized-deps path traversal](https://github.com/advisories/GHSA-4w7w-66w2-5vf9)
