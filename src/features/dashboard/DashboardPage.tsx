@@ -1,7 +1,7 @@
 import { Activity, AlertTriangle, Bookmark, Clock, Copy, FileInput, Folder, Play, Search, Sparkles } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { scanService } from '../../services/scanService';
 import { Button } from '../../shared/components/ui/Button';
 import { Skeleton } from '../../shared/components/ui/Skeleton';

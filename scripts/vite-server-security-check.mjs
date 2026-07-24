@@ -1,5 +1,21 @@
 import { request } from 'node:http';
+import { createServer as createNetServer } from 'node:net';
 import { createServer } from 'vite';
+
+async function findAvailablePort() {
+  const probe = createNetServer();
+
+  await new Promise((resolve, reject) => {
+    probe.once('error', reject);
+    probe.listen(0, '127.0.0.1', resolve);
+  });
+
+  const address = probe.address();
+  await new Promise((resolve, reject) => probe.close((error) => (error ? reject(error) : resolve())));
+
+  if (!address || typeof address === 'string') throw new Error('Unable to allocate a Vite test server port.');
+  return address.port;
+}
 
 function requestServer(port, headers) {
   return new Promise((resolve, reject) => {
@@ -20,10 +36,11 @@ function requestServer(port, headers) {
   });
 }
 
+const port = await findAvailablePort();
 const server = await createServer({
   logLevel: 'silent',
   optimizeDeps: { noDiscovery: true, include: [] },
-  server: { host: '127.0.0.1', port: 0 }
+  server: { host: '127.0.0.1', port }
 });
 let exitCode = 0;
 try {

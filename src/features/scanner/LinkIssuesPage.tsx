@@ -1,7 +1,7 @@
 import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, Edit3, ExternalLink, RefreshCw, Trash2, WifiOff } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { scanService } from '../../services/scanService';
 import { Button } from '../../shared/components/ui/Button';
 import { ConfirmDialog } from '../../shared/components/ui/ConfirmDialog';

@@ -70,6 +70,7 @@ async function verifyBrowser(name, executablePath) {
 
     await page.goto(`chrome-extension://${extensionId}/${manifest.options_ui.page}#/ai-analysis`, { waitUntil: 'domcontentloaded' });
     const aiCheckboxes = page.locator('input[type=checkbox]');
+    await aiCheckboxes.first().waitFor({ state: 'visible', timeout: 10_000 });
     if ((await aiCheckboxes.count()) !== 1 || (await aiCheckboxes.isChecked())) {
       throw new Error(`${name} did not render AI analysis disabled by default.`);
     }

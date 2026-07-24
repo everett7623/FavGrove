@@ -16,7 +16,7 @@ npm run check:browsers:visible -- chrome
 npm run check:browsers:visible -- edge
 ```
 
-The visible runner uses a temporary browser profile, loads `dist/` through the DevTools extension API, and removes the profile after the browser closes. It does not use or modify the normal Chrome or Edge profile.
+The visible runner uses a temporary browser profile, loads `dist/` through the DevTools extension API, opens the FavGrove options page, and removes the profile after the browser closes. It does not use or modify the normal Chrome or Edge profile. The runner opening the initial options tab does not replace the separate action-button check below.
 
 Load only:
 

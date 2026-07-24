@@ -1,6 +1,6 @@
 # Current Session
 
-Date: 2026-07-22
+Date: 2026-07-25
 
 ## Working On
 
@@ -154,6 +154,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Store-installed updates now use the Chrome/Edge-managed `runtime.onUpdateAvailable` lifecycle. FavGrove persists only the pending version and detection time, shows a localized global notice, and reloads only after the user chooses to apply the downloaded update. No remote version polling or new permission was added.
 - The update notice now appears immediately if Chrome or Edge downloads an update while FavGrove is already open, and stale non-newer update records are cleared locally.
 - The route-loading fallback and beta status badge now use the shared English and Chinese locale resources.
+- React `19.2.7`, React DOM `19.2.7`, and React Router `8.3.0` replace the prior React 18 / Router v6-v7 stack after newly published security advisories. Declarative `HashRouter` routing remains unchanged, imports use the supported `react-router` v8 package, and production dependencies again have zero reported vulnerabilities.
 
 ## Next Step
 
@@ -230,6 +231,10 @@ Latest verification:
 - On 2026-07-22, Vite development/preview loopback and CORS hardening passed lint, TypeScript strict checking, 31 Vitest files with 112 tests, production build validation, and 11 E2E tests. README test counts now match the current suite.
 - On 2026-07-22, the post-hardening `0.2.0` candidate was rebuilt and reverified in isolated Chrome `150.0.7871.125` and Edge `150.0.4078.83` profiles. Both browsers loaded the enabled MV3 extension, service worker, six primary routes, disabled AI state, and zero pre-confirmation external requests. Release packaging and archive verification produced a 320,972-byte ZIP with matching SHA-256 `e25549d37d7701f070fcdac41a4f49ef8c7992cf895ef8b80e89cd6d61298412`.
 - On 2026-07-22, local English/Chinese desktop and 390px visual QA fixed Manager page overflow, made the narrow table prioritize title/actions, and made Recent Activity follow live language changes. ESLint, TypeScript strict checking, 31 Vitest files with 112 tests, production extension validation, permission audit, isolated installed Chrome/Edge verification, and 12 Playwright E2E tests passed. Verified packaging produced a 321,078-byte ZIP with SHA-256 `ee1a8c7665c561e17ad02b7b72e8ffea1ccdcfeb00287a4d4be7703314e69c9e`; final human-visible Chrome/Edge checks remain open.
+- On 2026-07-23, the visible-browser runner cleanup now waits for the browser disconnect event and retries transient Windows profile-handle removal errors. ESLint now ignores Vite's transient timestamped config modules, and the Vite security check allocates a real free port instead of colliding with an occupied `5173`. ESLint, TypeScript strict checking, 32 Vitest files with 115 tests, and production extension validation with permission audit passed. The final human-visible Chrome/Edge checks remain open.
+- On 2026-07-25, React Router `7.18.1` migration passed a clean `npm ci`, the zero-vulnerability production dependency audit, ESLint with 0 warnings, TypeScript strict checking, 32 Vitest files with 115 tests, the 10,000-bookmark performance gate, production extension validation and permission audit, 12 Playwright E2E tests, and isolated installed Chrome `150.0.7871.129` / Edge `150.0.4078.96` verification. Verified packaging produced a 326,464-byte ZIP with SHA-256 `50e2871271d020a89489748c6733321070596f689a44610fdbea747f9e96eba9`; the documented Vite 5/esbuild development advisories remain the only allowed audit findings.
+- A later 2026-07-25 registry refresh added high-severity `GHSA-qwww-vcr4-c8h2` for React Router's unstable RSC APIs, causing the production dependency gate to fail again. FavGrove has no RSC, server rendering, or action endpoints, but the release policy does not waive production-package findings. Router `8.3.0` requires React `19.2.7+`, so no stack migration or commit was made without explicit approval.
+- On 2026-07-25, the approved React `19.2.7` / React DOM `19.2.7` / React Router `8.3.0` migration replaced `react-router-dom` imports with `react-router`, added matching React 19 type packages, and patched PostCSS/Nanoid after a fresh development audit. The production dependency audit again passes with zero vulnerabilities; ESLint with 0 warnings, TypeScript strict checking, 32 Vitest files with 115 tests, the 10,000-bookmark performance gate, production extension validation and permission audit, 12 Playwright E2E tests, and isolated installed Chrome `150.0.7871.129` / Edge `150.0.4078.96` verification passed. The browser checker now waits for the lazy AI route before asserting its disabled state. Verified packaging produced a 340,358-byte ZIP with SHA-256 `c4bc13f4e6982e0811d95612ee5b63f70509035f3212784db4b45cd25a87b999`.
 
 ## Notes
 

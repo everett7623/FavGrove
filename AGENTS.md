@@ -26,13 +26,13 @@ task-specific design notes.
 
 Use the existing stack unless the user explicitly approves a change:
 
-- React 18
+- React 19
 - TypeScript strict mode
 - Vite 5
 - CRXJS
 - Manifest V3
 - Zustand
-- React Router v6 with `HashRouter`
+- React Router v8 with `HashRouter`
 - Tailwind CSS
 - shadcn-style local UI primitives
 - Lucide React

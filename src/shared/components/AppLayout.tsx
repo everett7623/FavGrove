@@ -1,7 +1,7 @@
 import { BarChart3, Bookmark, BrainCircuit, FolderTree, Import, Menu, ScanSearch, Search, Settings } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { Button } from './ui/Button';
 import { cn } from '../utils/cn';

@@ -3,8 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { App } from './App';
 import './shared/i18n';
 
-// App includes HashRouter with future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-// so the router wrapper used in tests already has matching future flags.
 describe('App', () => {
   it('renders the full-screen foundation layout', async () => {
     render(<App />);

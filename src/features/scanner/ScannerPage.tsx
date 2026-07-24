@@ -1,7 +1,7 @@
 import { Play, RotateCcw, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { scanService } from '../../services/scanService';
 import { useBookmarkStore } from '../../stores/bookmarkStore';
 import { useScanStore } from '../../stores/scanStore';

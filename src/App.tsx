@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import i18n from './shared/i18n';
 import { AppLayout } from './shared/components/AppLayout';
 import { useBookmarkStore } from './stores/bookmarkStore';
@@ -42,7 +42,7 @@ export function App() {
   }, [settings.theme]);
 
   return (
-    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <HashRouter>
       <AppLayout>
         <Suspense fallback={<div className="p-6 text-sm text-slate-500">{t('status.loading')}</div>}>
           <Routes>

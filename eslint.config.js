@@ -5,7 +5,16 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', '.crx-dev', 'coverage', 'playwright-report', 'test-results'] },
+  {
+    ignores: [
+      'dist',
+      '.crx-dev',
+      'coverage',
+      'playwright-report',
+      'test-results',
+      '**/*.timestamp-*.mjs'
+    ]
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

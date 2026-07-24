@@ -4,8 +4,8 @@ Date: 2026-07-16
 
 ## Status
 
-- Pending a clean visible Chrome and Edge browser session; automated UI control stopped before extension installation or manual verification.
-- Current `main` matches `origin/main` at `7febb36d` after the browser-managed update notification merge.
+- Continued on 2026-07-22 from a clean working tree; `main` is 14 commits ahead of `origin/main`.
+- Automated installed-browser smoke passed previously, while the final human-visible interaction checks remain open.
 
 ## Goal
 
@@ -36,6 +36,19 @@ the FavGrove `0.2.0` beta candidate using the production `dist/` build.
 - [ ] Update `docs/release/browser-clickthrough.md`
 - [ ] Update `RELEASE_CHECKLIST.md`, `SESSION.md`, and `PROGRESS.md`
 - [ ] Run the required documentation/change verification
+
+## 2026-07-22 Continuation
+
+- [x] Rebuild and validate the current `dist/` without changing permissions or release metadata.
+- [ ] Launch the isolated visible Chrome runner and verify the non-destructive, credential-free checklist items.
+- [ ] Launch the isolated visible Edge runner and verify the same checklist items.
+- [ ] Record only directly observed results; keep optional-host-permission acceptance, destructive bookmark flows, restart persistence, and authenticated provider checks manual unless explicitly authorized.
+
+### Runner cleanup defect
+
+- Closing visible Chrome exposed an `EPERM` failure while removing its isolated temporary profile.
+- Root cause: the runner observed the persistent context closing but did not wait for the browser process to disconnect before deleting the profile.
+- Fix implemented and verified: wait for browser disconnect, then retry only transient Windows handle-release errors with a bounded delay.
 
 ## Notes
 

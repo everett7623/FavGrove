@@ -918,6 +918,7 @@ Status:
 
 - Production dependency audit passes with zero vulnerabilities
 - CRXJS, Vitest, and safe transitive dependency updates are applied
+- React `19.2.7` and React Router `8.3.0` replace the vulnerable React 18 / Router v6-v7 lines and pass route compatibility checks
 - Vite development and preview servers are restricted to loopback hosts and explicit CORS origins
 - Vite 5 development-tool findings remain tracked pending an explicit Vite-major migration decision
 

@@ -1,8 +1,9 @@
 import { chromium } from '@playwright/test';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { findBrowserExecutable } from './browser-paths.mjs';
+import { removeBrowserProfile, waitForBrowserDisconnect } from './browser-profile-cleanup.mjs';
 
 const root = process.cwd();
 const distDir = path.join(root, 'dist');
@@ -33,6 +34,7 @@ if (!resolvedProfileDir.startsWith(`${tempRoot}${path.sep}`)) {
 }
 
 let context;
+let browser;
 const closeContext = () => void context?.close().catch(() => undefined);
 process.once('SIGINT', closeContext);
 process.once('SIGTERM', closeContext);
@@ -45,7 +47,7 @@ try {
     args: ['--enable-unsafe-extension-debugging', '--no-first-run', '--no-default-browser-check']
   });
 
-  const browser = context.browser();
+  browser = context.browser();
   if (!browser) throw new Error(`Unable to inspect the ${browserName} browser process.`);
 
   const session = await browser.newBrowserCDPSession();
@@ -56,18 +58,22 @@ try {
   }
 
   const page = context.pages()[0] ?? (await context.newPage());
-  await page.goto('about:blank');
+  const optionsUrl = `chrome-extension://${extensionId}/${manifest.options_ui.page}#/`;
+  await page.goto(optionsUrl, { waitUntil: 'domcontentloaded' });
+  await page.locator('main').waitFor({ state: 'visible', timeout: 10_000 });
 
   console.log(`Visible ${browserName} ${browser.version()} is ready with FavGrove ${extensionInfo.version}.`);
   console.log(`Extension ID: ${extensionId}`);
+  console.log(`Opened: ${optionsUrl}`);
   console.log('Close the browser window to clean up the isolated profile and finish.');
 
   await new Promise((resolve) => context.once('close', resolve));
   context = undefined;
+  await waitForBrowserDisconnect(browser);
 } finally {
   process.removeListener('SIGINT', closeContext);
   process.removeListener('SIGTERM', closeContext);
   await context?.close().catch(() => undefined);
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  rmSync(resolvedProfileDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  await waitForBrowserDisconnect(browser);
+  await removeBrowserProfile(resolvedProfileDir);
 }
