@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import type { BookmarkNode } from '../types';
 import {
+  annotateBookmarkPaths,
   calculateBookmarkStats,
   flattenFolders,
+  getBookmarkNodeCapabilities,
   getFolderDescendantBookmarks,
   getFolderIdsWithFolderChildren,
   getVisibleFolders,
   mergeFolderNodes,
   moveBookmarkNodes,
+  normalizeBookmarkTree,
+  planBookmarkDeletion,
   planDuplicateBookmarkCleanup,
   removeBookmarkNodes,
   reorderNodeBefore,
@@ -63,6 +67,49 @@ describe('bookmark utilities', () => {
 
     expect(bookmark.title).toBe('GitHub');
     expect(bookmark.url).toBe('https://github.com/new');
+  });
+
+  it('normalizes browser roots and protects permanent and managed nodes', () => {
+    const chromeTree: BookmarkNode[] = [{
+      id: '0',
+      title: '',
+      children: [
+        {
+          id: '1',
+          title: 'Bookmarks Bar',
+          parentId: '0',
+          folderType: 'bookmarks-bar',
+          children: [{ id: '10', title: 'Writable', parentId: '1', children: [] }]
+        },
+        {
+          id: '3',
+          title: 'Managed',
+          parentId: '0',
+          folderType: 'managed',
+          unmodifiable: 'managed',
+          children: [{ id: '30', title: 'Managed link', parentId: '3', url: 'https://managed.test' }]
+        }
+      ]
+    }];
+
+    const normalized = normalizeBookmarkTree(chromeTree);
+    const annotated = annotateBookmarkPaths(chromeTree);
+    const capabilities = getBookmarkNodeCapabilities(chromeTree);
+
+    expect(normalized.map((node) => node.id)).toEqual(['1', '3']);
+    expect(annotated[0].path).toEqual(['Bookmarks Bar']);
+    expect(capabilities.get('1')).toMatchObject({ permanentRoot: true, canMutate: false, canAcceptChildren: true });
+    expect(capabilities.get('10')).toMatchObject({ permanentRoot: false, canMutate: true, canAcceptChildren: true });
+    expect(capabilities.get('30')).toMatchObject({ managed: true, canMutate: false, canAcceptChildren: false });
+    expect(planBookmarkDeletion(chromeTree, new Set(['1']))).toBeNull();
+    expect(planBookmarkDeletion(chromeTree, new Set(['10']))).toHaveLength(1);
+  });
+
+  it('rejects non-empty folder deletion but plans empty folders and bookmarks', () => {
+    expect(planBookmarkDeletion(tree, new Set(['4']))).toBeNull();
+    expect(planBookmarkDeletion(tree, new Set(['2']))).toMatchObject([{ oldId: '2', url: 'https://github.com' }]);
+    const withEmpty = [{ ...tree[0], children: [...(tree[0].children as BookmarkNode[]), { id: 'empty', title: 'Empty', parentId: '1', children: [] }] }];
+    expect(planBookmarkDeletion(withEmpty, new Set(['empty']))).toMatchObject([{ oldId: 'empty', url: undefined }]);
   });
 
   it('calculates bookmark stats from a tree', () => {

@@ -5,6 +5,8 @@ Use this worksheet when copying FavGrove metadata into the Chrome Web Store and 
 ## Listing
 
 - Product name: `FavGrove - Bookmark Manager`
+- Developer name: `everettlabs`
+- Contact email: `everett7623@gmail.com`
 - Short description: `A local-first bookmark workspace with scanning, cleanup, import/export, backups, and optional user-configured AI analysis.`
 - Category: `Productivity`
 - Support URL: `https://github.com/everett7623/FavGrove/issues`
@@ -40,9 +42,9 @@ The extension does not request the `tabs` permission.
 - Store listing draft: `store/listing.md`
 - Screenshots: `store/screenshots/`
 - Promotional assets: `store/assets/`
-- Extension package: `release/favgrove-v0.2.0.zip`
-- Extension package checksum: `release/favgrove-v0.2.0.sha256`
+- Extension package: `release/favgrove-v0.2.1.zip`
+- Extension package checksum: `release/favgrove-v0.2.1.sha256`
 
 ## Beta Notes
 
-Use `v0.2.0` as a beta or pre-release label. Do not present this build as stable `1.0.0` until the visible browser checks, portal review, and final publication gates are complete.
+Use `v0.2.1` as a beta or pre-release label. Do not present this build as stable `1.0.0` until the visible browser checks, portal review, and final publication gates are complete.

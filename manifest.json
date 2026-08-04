@@ -1,8 +1,11 @@
 {
   "manifest_version": 3,
   "name": "FavGrove - Bookmark Manager",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A local-first bookmark manager for Chrome and Edge.",
+  "author": {
+    "email": "everett7623@gmail.com"
+  },
   "permissions": ["alarms", "bookmarks", "storage"],
   "optional_host_permissions": ["<all_urls>"],
   "icons": {

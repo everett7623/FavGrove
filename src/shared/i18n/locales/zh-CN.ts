@@ -63,7 +63,10 @@ export const zhCN = {
     browserStoreManualVerification: '浏览器商店链接需要人工验证。',
     linkCheckIncomplete: '链接检测未完成。',
     registerAutoScan: '无法注册自动扫描。',
-    applyExtensionUpdate: '无法应用扩展更新。'
+    applyExtensionUpdate: '无法应用扩展更新。',
+    protectedBookmarkNode: '此浏览器根节点或受管理书签节点为只读。',
+    invalidBookmarkTarget: '请选择可写入的书签文件夹。',
+    unsupportedBookmarkDelete: '只能删除可写书签和空文件夹。'
   },
   foundation: { ready: '基础路由已就绪，产品功能将在后续里程碑中添加。' },
   dashboard: {
@@ -211,6 +214,7 @@ export const zhCN = {
     editTagsAria: '编辑 {{title}} 的标签',
     expandFolder: '展开 {{title}}',
     collapseFolder: '折叠 {{title}}',
+    readOnly: '只读',
     columns: {
       title: '标题',
       url: '网址',
@@ -236,6 +240,9 @@ export const zhCN = {
     importAll: '全部导入',
     noImportItems: '文件中未发现有效的 HTTP 或 HTTPS 书签。',
     bookmarksReady: '个书签可导出',
+    importTarget: '导入到',
+    noWritableTarget: '没有可写入的书签文件夹',
+    previewStale: '书签树已发生变化，请重新选择文件后再试。',
     formats: {
       json: 'JSON',
       csv: 'CSV',

@@ -10,7 +10,9 @@ import { useContainerHeight } from '../../shared/hooks/useContainerHeight';
 import { useVirtualList } from '../../shared/hooks/useVirtualList';
 import { cn } from '../../shared/utils/cn';
 import {
+  flattenBookmarks,
   flattenFolders,
+  getBookmarkNodeCapabilities,
   getFolderDescendantBookmarks,
   getFolderIdsWithFolderChildren,
   getVisibleFolders,
@@ -41,6 +43,7 @@ export default function ManagerPage() {
   const searchResults = useBookmarkStore((state) => state.searchResults);
   const loading = useBookmarkStore((state) => state.loading);
   const mutating = useBookmarkStore((state) => state.mutating);
+  const mutationError = useBookmarkStore((state) => state.error);
   const deleteBookmarks = useBookmarkStore((state) => state.deleteBookmarks);
   const renameBookmark = useBookmarkStore((state) => state.renameBookmark);
   const renameFolder = useBookmarkStore((state) => state.renameFolder);
@@ -64,7 +67,9 @@ export default function ManagerPage() {
   const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
   const { ref: listContainerRef, height: containerHeight } = useContainerHeight(620);
 
+  const capabilities = useMemo(() => getBookmarkNodeCapabilities(bookmarks), [bookmarks]);
   const folders = useMemo(() => flattenFolders(bookmarks), [bookmarks]);
+  const moveTargets = useMemo(() => folders.filter((folder) => capabilities.get(folder.id)?.canAcceptChildren === true), [capabilities, folders]);
   const visibleFolders = useMemo(() => getVisibleFolders(bookmarks, collapsedFolderIds), [bookmarks, collapsedFolderIds]);
   const expandableFolderIds = useMemo(() => getFolderIdsWithFolderChildren(bookmarks), [bookmarks]);
   const availableTags = useMemo(() => [...new Set(Object.values(tagsByBookmarkId).flat())].sort((a, b) => a.localeCompare(b)), [tagsByBookmarkId]);
@@ -80,12 +85,16 @@ export default function ManagerPage() {
     [bookmarks, searchQuery, searchResults, selectedFolderId, tagFilter]
   );
   const visibleBookmarks = useMemo(() => sortBookmarks(baseVisibleBookmarks, sortBy), [baseVisibleBookmarks, sortBy]);
-  const visibleBookmarkIds = useMemo(() => new Set(visibleBookmarks.map((bookmark) => bookmark.id)), [visibleBookmarks]);
+  const mutableVisibleBookmarks = useMemo(
+    () => visibleBookmarks.filter((bookmark) => capabilities.get(bookmark.id)?.canMutate === true),
+    [capabilities, visibleBookmarks]
+  );
+  const visibleBookmarkIds = useMemo(() => new Set(mutableVisibleBookmarks.map((bookmark) => bookmark.id)), [mutableVisibleBookmarks]);
   const viewportHeight = Math.max(rowHeight, containerHeight);
   const { virtualItems, totalHeight, setScrollTop } = useVirtualList(visibleBookmarks, rowHeight, viewportHeight);
   const selectedCount = selectedIds.size;
   const selectedVisibleCount = [...selectedIds].filter((id) => visibleBookmarkIds.has(id)).length;
-  const allVisibleSelected = visibleBookmarks.length > 0 && selectedVisibleCount === visibleBookmarks.length;
+  const allVisibleSelected = mutableVisibleBookmarks.length > 0 && selectedVisibleCount === mutableVisibleBookmarks.length;
   const someVisibleSelected = selectedVisibleCount > 0 && !allVisibleSelected;
 
   const toggleSelected = (id: string, checked: boolean) => {
@@ -101,17 +110,21 @@ export default function ManagerPage() {
     setSelectedIds((current) => {
       const next = new Set(current);
       if (allVisibleSelected) {
-        for (const bookmark of visibleBookmarks) next.delete(bookmark.id);
+        for (const bookmark of mutableVisibleBookmarks) next.delete(bookmark.id);
       } else {
-        for (const bookmark of visibleBookmarks) next.add(bookmark.id);
+        for (const bookmark of mutableVisibleBookmarks) next.add(bookmark.id);
       }
       return next;
     });
   };
 
   const performDelete = useCallback(async (ids: string[]) => {
-    await deleteBookmarks(ids);
-    setSelectedIds(new Set());
+    const deleted = await deleteBookmarks(ids);
+    if (deleted.success) setSelectedIds(new Set());
+    else {
+      const remainingIds = new Set(flattenBookmarks(useBookmarkStore.getState().bookmarks).map((bookmark) => bookmark.id));
+      setSelectedIds((current) => new Set([...current].filter((id) => remainingIds.has(id))));
+    }
   }, [deleteBookmarks]);
 
   const deleteSelected = useCallback(async () => {
@@ -131,8 +144,8 @@ export default function ManagerPage() {
   }, [performDelete, selectedIds, t]);
 
   const performMove = async (ids: string[], targetFolderId: string) => {
-    await moveBookmarks(ids, targetFolderId);
-    setSelectedIds(new Set());
+    const moved = await moveBookmarks(ids, targetFolderId);
+    if (moved.success) setSelectedIds(new Set());
   };
 
   const moveSelected = async (targetFolderId = moveTargetId) => {
@@ -227,17 +240,27 @@ export default function ManagerPage() {
 
   const dropOnFolder = async (folderId: string) => {
     if (draggedIds.length === 0) return;
-    await moveFolders(draggedIds, folderId);
-    setDraggedIds([]);
-    setSelectedIds(new Set());
+    const moved = await moveFolders(draggedIds, folderId);
+    if (moved.success) {
+      setDraggedIds([]);
+      setSelectedIds(new Set());
+    }
   };
 
   const dropBeforeBookmark = async (bookmarkId: string) => {
     const [draggedId] = draggedIds;
     if (!draggedId) return;
-    await reorderBookmarkBefore(draggedId, bookmarkId);
-    setDraggedIds([]);
+    const reordered = await reorderBookmarkBefore(draggedId, bookmarkId);
+    if (reordered.success) setDraggedIds([]);
   };
+
+  useEffect(() => {
+    setSelectedIds((current) => {
+      const next = new Set([...current].filter((id) => capabilities.get(id)?.canMutate === true));
+      return next.size === current.size ? current : next;
+    });
+    if (selectedFolderId && !folders.some((folder) => folder.id === selectedFolderId)) setSelectedFolderId(null);
+  }, [capabilities, folders, selectedFolderId]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -254,7 +277,7 @@ export default function ManagerPage() {
 
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') {
         event.preventDefault();
-        setSelectedIds(new Set(visibleBookmarks.map((bookmark) => bookmark.id)));
+        setSelectedIds(new Set(mutableVisibleBookmarks.map((bookmark) => bookmark.id)));
         return;
       }
 
@@ -271,10 +294,15 @@ export default function ManagerPage() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [confirmState, deleteSelected, promptState, selectedIds, visibleBookmarks]);
+  }, [confirmState, deleteSelected, mutableVisibleBookmarks, promptState, selectedIds]);
 
   return (
     <div className="grid h-full min-h-0 gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+      {mutationError ? (
+        <div role="alert" data-testid="manager-error" className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 xl:col-span-2">
+          {mutationError}
+        </div>
+      ) : null}
       <section className="rounded-lg border bg-white p-4 shadow-sm dark:bg-slate-950">
         <div className="mb-4">
           <h1 className="text-xl font-semibold">{t('pages.manager.title')}</h1>
@@ -295,24 +323,29 @@ export default function ManagerPage() {
           <span>{getFolderDescendantBookmarks(bookmarks, null).length}</span>
         </button>
         <div className="max-h-[560px] space-y-1 overflow-auto pr-1">
-          {visibleFolders.map((folder) => (
-            <FolderButton
-              key={folder.id}
-              folder={folder}
-              selected={selectedFolderId === folder.id}
-              count={getFolderDescendantBookmarks(bookmarks, folder.id).length}
-              collapsed={collapsedFolderIds.has(folder.id)}
-              expandable={expandableFolderIds.has(folder.id)}
-              onClick={() => {
-                setSelectedFolderId(folder.id);
-                setSelectedIds(new Set());
-              }}
-              onToggleCollapse={() => toggleFolderCollapsed(folder.id)}
-              onRename={() => void renameFolderItem(folder)}
-              onDragStart={() => setDraggedIds([folder.id])}
-              onDrop={() => void dropOnFolder(folder.id)}
-            />
-          ))}
+          {visibleFolders.map((folder) => {
+            const access = capabilities.get(folder.id);
+            return (
+              <FolderButton
+                key={folder.id}
+                folder={folder}
+                selected={selectedFolderId === folder.id}
+                count={getFolderDescendantBookmarks(bookmarks, folder.id).length}
+                collapsed={collapsedFolderIds.has(folder.id)}
+                expandable={expandableFolderIds.has(folder.id)}
+                readOnly={access?.canMutate !== true}
+                acceptsChildren={access?.canAcceptChildren === true}
+                onClick={() => {
+                  setSelectedFolderId(folder.id);
+                  setSelectedIds(new Set());
+                }}
+                onToggleCollapse={() => toggleFolderCollapsed(folder.id)}
+                onRename={() => void renameFolderItem(folder)}
+                onDragStart={() => setDraggedIds([folder.id])}
+                onDrop={() => void dropOnFolder(folder.id)}
+              />
+            );
+          })}
         </div>
       </section>
 
@@ -350,13 +383,14 @@ export default function ManagerPage() {
               <option value="url-asc">{t('manager.sortOptions.urlAsc')}</option>
             </select>
             <select
+              data-testid="manager-move-target"
               value={moveTargetId}
               onChange={(event) => setMoveTargetId(event.target.value)}
               className="h-9 rounded-md border bg-white px-2 text-sm dark:bg-slate-950"
               aria-label={t('manager.moveTarget')}
             >
               <option value="">{t('manager.moveTo')}</option>
-              {folders.map((folder) => (
+              {moveTargets.map((folder) => (
                 <option key={folder.id} value={folder.id}>{folder.path?.join(' / ') || folder.title}</option>
               ))}
             </select>
@@ -370,7 +404,7 @@ export default function ManagerPage() {
             <Button variant="outline" onClick={() => editSelectedTags('remove')} disabled={selectedCount === 0 || mutating}>
               {t('manager.removeTags')}
             </Button>
-            <Button variant="outline" onClick={() => void undoLastDelete()} disabled={!canUndoDelete || mutating}>
+            <Button data-testid="manager-undo" variant="outline" onClick={() => void undoLastDelete()} disabled={!canUndoDelete || mutating}>
               <RotateCcw size={16} />
               {t('manager.undo')}
             </Button>
@@ -392,7 +426,7 @@ export default function ManagerPage() {
           <SelectAllCheckbox
             checked={allVisibleSelected}
             indeterminate={someVisibleSelected}
-            disabled={visibleBookmarks.length === 0}
+            disabled={mutableVisibleBookmarks.length === 0}
             ariaLabel={t('manager.selectAll')}
             onChange={toggleAllVisible}
           />
@@ -416,6 +450,7 @@ export default function ManagerPage() {
                   key={item.id}
                   bookmark={item}
                   selected={selectedIds.has(item.id)}
+                  readOnly={capabilities.get(item.id)?.canMutate !== true}
                   offsetTop={offsetTop}
                   onSelectedChange={toggleSelected}
                   onRename={renameItem}
@@ -493,13 +528,17 @@ function FolderButton({
   onToggleCollapse,
   onRename,
   onDragStart,
-  onDrop
+  onDrop,
+  readOnly,
+  acceptsChildren
 }: {
   folder: BookmarkNode;
   selected: boolean;
   count: number;
   collapsed: boolean;
   expandable: boolean;
+  readOnly: boolean;
+  acceptsChildren: boolean;
   onClick: () => void;
   onToggleCollapse: () => void;
   onRename: () => void;
@@ -510,10 +549,15 @@ function FolderButton({
   const depth = Math.max(0, (folder.path?.length ?? 1) - 1);
   return (
     <div
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={(event) => event.preventDefault()}
-      onDrop={onDrop}
+      data-folder-id={folder.id}
+      data-node-kind="folder"
+      data-readonly={readOnly ? 'true' : 'false'}
+      draggable={!readOnly}
+      onDragStart={readOnly ? undefined : onDragStart}
+      onDragOver={(event) => {
+        if (acceptsChildren) event.preventDefault();
+      }}
+      onDrop={acceptsChildren ? onDrop : undefined}
       className={cn(
         'flex w-full items-center rounded-md py-1.5 pr-3 text-left text-sm',
         selected ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-200' : 'hover:bg-slate-100 dark:hover:bg-slate-900'
@@ -529,10 +573,11 @@ function FolderButton({
       >
         {expandable ? collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} /> : <span className="h-3.5 w-3.5" />}
       </button>
-      <button type="button" onClick={onClick} onDoubleClick={onRename} className="flex min-w-0 flex-1 items-center gap-2 py-0.5 text-left">
+      <button type="button" onClick={onClick} onDoubleClick={readOnly ? undefined : onRename} className="flex min-w-0 flex-1 items-center gap-2 py-0.5 text-left">
         <Folder size={16} className="shrink-0" />
         <span className="truncate">{folder.title || t('manager.untitled')}</span>
       </button>
+      {readOnly ? <span className="ml-2 text-[10px] uppercase text-slate-400">{t('manager.readOnly')}</span> : null}
       <span className="ml-2 text-xs text-slate-500">{count}</span>
     </div>
   );
@@ -541,6 +586,7 @@ function FolderButton({
 function BookmarkRow({
   bookmark,
   selected,
+  readOnly,
   offsetTop,
   onSelectedChange,
   onRename,
@@ -550,6 +596,7 @@ function BookmarkRow({
 }: {
   bookmark: BookmarkNode;
   selected: boolean;
+  readOnly: boolean;
   offsetTop: number;
   onSelectedChange: (id: string, checked: boolean) => void;
   onRename: (bookmark: BookmarkNode) => void;
@@ -560,14 +607,19 @@ function BookmarkRow({
   const { t } = useTranslation();
   return (
     <div
-      draggable
-      onDragStart={() => onDragStart(bookmark.id)}
-      onDragOver={(event) => event.preventDefault()}
-      onDrop={() => onDropBefore(bookmark.id)}
+      data-bookmark-id={bookmark.id}
+      data-node-kind="bookmark"
+      data-readonly={readOnly ? 'true' : 'false'}
+      draggable={!readOnly}
+      onDragStart={readOnly ? undefined : () => onDragStart(bookmark.id)}
+      onDragOver={(event) => {
+        if (!readOnly) event.preventDefault();
+      }}
+      onDrop={readOnly ? undefined : () => onDropBefore(bookmark.id)}
       className="absolute grid w-full grid-cols-[36px_minmax(120px,1fr)_80px] items-center gap-2 border-b px-4 text-sm md:grid-cols-[36px_minmax(120px,1fr)_minmax(150px,1.2fr)_minmax(96px,0.7fr)_80px] dark:border-slate-800"
       style={{ height: rowHeight, transform: `translateY(${offsetTop}px)` }}
     >
-      <input type="checkbox" checked={selected} onChange={(event) => onSelectedChange(bookmark.id, event.target.checked)} aria-label={t('manager.selectAria', { title: bookmark.title || t('manager.untitled') })} />
+      <input type="checkbox" checked={selected} disabled={readOnly} onChange={(event) => onSelectedChange(bookmark.id, event.target.checked)} aria-label={t('manager.selectAria', { title: bookmark.title || t('manager.untitled') })} />
       <a href={bookmark.url} target="_blank" rel="noreferrer" className="min-w-0 truncate font-medium hover:text-indigo-600">
         {bookmark.title || t('manager.untitled')}
         {bookmark.tags && bookmark.tags.length > 0 ? <span className="ml-2 text-xs font-normal text-indigo-500">#{bookmark.tags.join(' #')}</span> : null}
@@ -577,10 +629,10 @@ function BookmarkRow({
       </a>
       <span className="hidden min-w-0 truncate text-xs text-slate-500 md:block">{bookmark.path?.slice(0, -1).join(' / ')}</span>
       <span className="flex items-center gap-1">
-        <button type="button" onClick={() => onRename(bookmark)} className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-900" aria-label={t('manager.renameAria', { title: bookmark.title || t('manager.untitled') })}>
+        <button type="button" data-action="rename" disabled={readOnly} onClick={() => onRename(bookmark)} className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 disabled:opacity-40 dark:hover:bg-slate-900" aria-label={t('manager.renameAria', { title: bookmark.title || t('manager.untitled') })}>
           <Edit3 size={15} />
         </button>
-        <button type="button" onClick={() => onEditTags(bookmark)} className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-900" aria-label={t('manager.editTagsAria', { title: bookmark.title || t('manager.untitled') })}>
+        <button type="button" data-action="tags" disabled={readOnly} onClick={() => onEditTags(bookmark)} className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 disabled:opacity-40 dark:hover:bg-slate-900" aria-label={t('manager.editTagsAria', { title: bookmark.title || t('manager.untitled') })}>
           <Tags size={15} />
         </button>
       </span>

@@ -1,5 +1,5 @@
 import type { BookmarkNode, ScanResult } from '../types';
-import { flattenBookmarks, flattenFolders } from './bookmarks';
+import { flattenBookmarks, flattenFolders, getBookmarkNodeCapabilities } from './bookmarks';
 
 function findDuplicateBookmarkGroups(bookmarks: BookmarkNode[]): BookmarkNode[][] {
   const byUrl = new Map<string, BookmarkNode[]>();
@@ -28,8 +28,9 @@ function findEmptyFolders(folders: BookmarkNode[]): BookmarkNode[] {
 }
 
 export function createStructureScanResult(bookmarks: BookmarkNode[]): ScanResult {
-  const flatBookmarks = flattenBookmarks(bookmarks);
-  const folders = flattenFolders(bookmarks);
+  const capabilities = getBookmarkNodeCapabilities(bookmarks);
+  const flatBookmarks = flattenBookmarks(bookmarks).filter((bookmark) => capabilities.get(bookmark.id)?.canMutate !== false);
+  const folders = flattenFolders(bookmarks).filter((folder) => capabilities.get(folder.id)?.canMutate === true);
 
   return {
     duplicateBookmarkGroups: findDuplicateBookmarkGroups(flatBookmarks),

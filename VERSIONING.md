@@ -4,7 +4,7 @@ FavGrove follows Semantic Versioning while the product is below `1.0.0`.
 
 ## Current Version
 
-`0.2.0`
+`0.2.1`
 
 This is the FavGrove rebrand beta candidate. The published `0.1.0` release remains the historical Markora beta and must not be rewritten or retagged.
 

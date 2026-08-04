@@ -1,6 +1,6 @@
 # Current Session
 
-Date: 2026-07-25
+Date: 2026-08-04
 
 ## Working On
 
@@ -8,7 +8,7 @@ AI Bookmark Analysis And Release Readiness
 
 ## Current Goal
 
-Complete the first read-only AI analysis milestone, preserve the local-first consent boundary, and close the remaining `0.2.0` release gaps.
+Complete the first read-only AI analysis milestone, preserve the local-first consent boundary, and close the remaining `0.2.1` release gaps.
 
 ## Current Status
 
@@ -58,7 +58,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Link scan results now separate confirmed broken links from links that could not be verified because of timeout, server, network, proxy, DNS, TLS, or regional access conditions.
 - `/scanner/links` provides filtering, 50-row pagination, manual open-and-check, and backup-protected batch deletion.
 - Link issue rows provide separate open, edit URL, and confirmed delete actions.
-- The product brand is now `FavGrove - Bookmark Manager` / `FavGrove 书签管理器` for the `0.2.0` beta candidate; the published `0.1.0` Markora release remains historical.
+- The product brand is now `FavGrove - Bookmark Manager` / `FavGrove 书签管理器` for the `0.2.1` beta candidate; the published `0.1.0` Markora release remains historical.
 - Import/Export currently supports:
   - JSON, CSV, TXT, OPML, and HTML export.
   - Worker-based Netscape HTML import parsing.
@@ -91,7 +91,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - `npm run validate:extension` rejects development URLs, broad resource exposure, and missing background service workers.
 - Multi-format import requirements are now recorded for JSON, CSV, TXT, and OPML.
 - Localization audit found 15 English locale keys missing from Chinese and additional hardcoded user-facing English strings.
-- `VERSIONING.md` defines `0.2.0` as the FavGrove beta candidate, preserves `0.1.0` as the historical Markora beta, and reserves `1.0.0` for the first stable store release.
+- `VERSIONING.md` defines `0.2.1` as the FavGrove beta candidate, preserves `0.1.0` as the historical Markora beta, and reserves `1.0.0` for the first stable store release.
 - Locale key parity was improved for `en` and `zh_CN`, and multiple Manager/Scanner/Settings hardcoded UI strings were switched to i18n keys.
 - `bookmarkStore` activity log messages and URL validation error text were migrated to i18n keys.
 - Service-layer fallback error messages in storage/import/bookmark/scan/link-request services were migrated to i18n keys.
@@ -133,7 +133,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
 - Dependency auditing now runs through the official npm registry in local checks and Windows CI; production must be clean, and only the documented Vite 5/esbuild development advisory IDs are allowed pending a Vite-major decision.
 - Shared Vite development and preview configuration now binds to `127.0.0.1` and restricts Host/CORS origins as defense in depth for the remaining Vite 5 advisories.
-- Release packaging now writes `release/favgrove-v0.2.0.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
+- Release packaging now writes `release/favgrove-v0.2.1.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
 - Release ZIP generation is deterministic across identical production content by sorting entry paths and normalizing ZIP timestamps; a Windows regression test covers differing source order and file times.
 - Packaging now reopens the ZIP and verifies every entry against `dist/` before generating the checksum; invalid or stale archives are deleted.
 - Build validation and release packaging now reject invalid or mismatched versions across package metadata, source Manifest, and the built Manifest, preventing stale `dist/` archives.
@@ -141,7 +141,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - `npm run audit:permissions` verifies the manifest permission boundary and `PRIVACY.md` permission copy.
 - Visible browser click-through steps and an isolated visible runner are prepared in `docs/release/browser-clickthrough.md`; the final human-visible Chrome and Edge results still need to be recorded before store submission.
 - Full destructive replacement restore is deferred by `docs/decisions/restore-strategy.md`; the current recovery flow is additive, backup-protected, path-mapped, and service-boundary scoped.
-- GitHub pre-release metadata, store submission fields, and post-beta AI guardrails are prepared in `docs/release/github-prerelease-v0.2.0.md`, `store/submission-fields.md`, and `docs/roadmap/post-beta-ai.md`.
+- GitHub pre-release metadata, store submission fields, and post-beta AI guardrails are prepared in `docs/release/github-prerelease-v0.2.1.md`, `store/submission-fields.md`, and `docs/roadmap/post-beta-ai.md`.
 - Link checking now treats ambiguous 4xx responses, including 404, authentication, proxy, and rate-limit responses, as requiring manual verification; only HTTP 410 is automatically classified as confirmed broken.
 - Legacy cached 404 results are reclassified under the conservative policy, and link issue rows can be dismissed with "Works for me" / "确认可打开" without changing the bookmark.
 - Manually dismissed link URLs are now persisted locally and filtered from future scans and cached results.
@@ -155,6 +155,14 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - The update notice now appears immediately if Chrome or Edge downloads an update while FavGrove is already open, and stale non-newer update records are cleared locally.
 - The route-loading fallback and beta status badge now use the shared English and Chinese locale resources.
 - React `19.2.7`, React DOM `19.2.7`, and React Router `8.3.0` replace the prior React 18 / Router v6-v7 stack after newly published security advisories. Declarative `HashRouter` routing remains unchanged, imports use the supported `react-router` v8 package, and production dependencies again have zero reported vulnerabilities.
+- Chrome/Edge synthetic bookmark roots are normalized out of the application tree; permanent browser roots remain visible and usable as destinations but are read-only, while managed nodes and descendants are excluded from mutation and cleanup candidates.
+- Multi-step delete, move, merge, import, and Undo flows reconcile the live Chrome tree after success or partial failure instead of trusting a hand-built local mirror.
+- Undo now restores both bookmarks and empty folders with browser-generated IDs, migrates local tags to restored bookmark IDs, and supports an immediate second mutation without reloading.
+- Import uses an explicit writable target, rolls back created nodes on failure, and displays the live Chrome hierarchy immediately without requiring a reload.
+- A Chrome-only installed-extension data-safety gate verifies real CRUD, bookmark/empty-folder Undo, tag-ID migration, and nested import consistency; Chrome and Edge smoke checks also verify synthetic roots are hidden and permanent roots are read-only.
+- `brace-expansion` is locked to safe `1.1.18` and `5.0.9` releases after the first remote quality run exposed a newly published high-severity development advisory.
+- Link Issues now prevents selection, URL edits, and deletion for managed/read-only bookmarks, bookmark reordering handles a missing source safely, and the process-based Vite security test has bounded timeouts that remain stable in the full suite.
+- FavGrove beta metadata is synchronized at `0.2.1`; the responsive footer displays `v0.2.1 · everettlabs · everett7623@gmail.com`, Manifest/npm metadata uses the same author identity, and active release/package references use the matching version.
 
 ## Next Step
 
@@ -164,7 +172,7 @@ Load the rebuilt `dist/` in visible Chrome and Edge, complete the checklist incl
 
 1. Run the visible Chrome and Edge checklist in `docs/release/browser-clickthrough.md`.
 2. Copy the verified public privacy policy URL and support URL into the store portals.
-3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.0.md`.
+3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.1.md`.
 4. Upload the verified release ZIP only after the visible browser pass is recorded.
 5. Record a live-provider AI compatibility result without persisting the user-owned API key.
 
@@ -192,7 +200,7 @@ Latest verification:
 - Production extension validation: passed.
 - E2E isolation check: passed; `dist/` hashes remained unchanged.
 - Release audit rerun passed: ESLint, TypeScript, 42 Vitest tests, 7 Playwright tests, production build, extension validation, and release packaging.
-- Current release classification: `0.2.0` FavGrove beta candidate. The public `0.1.0` Markora beta remains historical; stable store publication is not yet approved.
+- Current release classification: `0.2.1` FavGrove beta candidate. The public `0.1.0` Markora beta remains historical; stable store publication is not yet approved.
 - Link-check transport regression verification passed with 46 Vitest tests and 7 Playwright tests after moving HTTPS requests to the background service worker.
 - Browser-store URL protection verification passed with 48 Vitest tests and 7 Playwright tests; protected store links are skipped before `fetch`.
 - GitHub README was rebuilt for the public beta, with honest feature status, installation instructions, privacy boundaries, browser support, quality gates, and the new repository URL.
@@ -217,7 +225,7 @@ Latest verification:
 - On 2026-07-13, single-link rechecking was added; ESLint passed with 0 warnings, TypeScript strict check passed, Vitest passed with 16 files and 66 tests, `npm run build:extension` passed, and Playwright E2E passed with 8 tests.
 - On 2026-07-15, the FavGrove `0.2.0` rebrand passed ESLint with 0 warnings, TypeScript strict checking, 66 Vitest tests, `npm run benchmark:performance`, production extension build validation and permission audit, `npm run check:browsers`, regenerated and visually checked store screenshots, 8 Playwright E2E tests, and release packaging/inspection for `favgrove-v0.2.0.zip`.
 - On 2026-07-15, the GitHub repository was renamed to `everett7623/FavGrove`; the local `origin`, README, privacy/support links, store metadata, and `v0.2.0` pre-release notes now use the new URL.
-- On 2026-07-15, project author attribution was normalized to `everettlabs` across the MIT license, README, npm package metadata, and repository-local Git configuration. The extension manifest author field is intentionally omitted because the CRXJS Manifest V3 contract accepts an email object, not a display name.
+- On 2026-07-15, project author attribution was normalized to `everettlabs` across the MIT license, README, npm package metadata, and repository-local Git configuration. At that time, the extension Manifest author field was omitted because no public email had been provided.
 - On 2026-07-15, the complete local repository was moved to `D:\EvenFrank\Workspace\Plugins\Google\FavGrove`; Git object integrity, branch tracking, remote configuration, and working-tree changes were verified after the move.
 - On 2026-07-15, the FavGrove `0.2.0` development line and future releases were relicensed under `GPL-3.0-or-later`. Production builds and release archives now include the matching license text; previously granted MIT rights, historical release assets, and third-party dependency licenses were not rewritten.
 - On 2026-07-16, the browser-managed extension update notice passed ESLint with 0 warnings, TypeScript strict checking, 19 Vitest files with 74 tests, production extension build validation and permission audit, Chrome/Edge headless load checks, and 8 Playwright E2E tests. The required permission set remains `alarms`, `bookmarks`, and `storage`.
@@ -235,6 +243,7 @@ Latest verification:
 - On 2026-07-25, React Router `7.18.1` migration passed a clean `npm ci`, the zero-vulnerability production dependency audit, ESLint with 0 warnings, TypeScript strict checking, 32 Vitest files with 115 tests, the 10,000-bookmark performance gate, production extension validation and permission audit, 12 Playwright E2E tests, and isolated installed Chrome `150.0.7871.129` / Edge `150.0.4078.96` verification. Verified packaging produced a 326,464-byte ZIP with SHA-256 `50e2871271d020a89489748c6733321070596f689a44610fdbea747f9e96eba9`; the documented Vite 5/esbuild development advisories remain the only allowed audit findings.
 - A later 2026-07-25 registry refresh added high-severity `GHSA-qwww-vcr4-c8h2` for React Router's unstable RSC APIs, causing the production dependency gate to fail again. FavGrove has no RSC, server rendering, or action endpoints, but the release policy does not waive production-package findings. Router `8.3.0` requires React `19.2.7+`, so no stack migration or commit was made without explicit approval.
 - On 2026-07-25, the approved React `19.2.7` / React DOM `19.2.7` / React Router `8.3.0` migration replaced `react-router-dom` imports with `react-router`, added matching React 19 type packages, and patched PostCSS/Nanoid after a fresh development audit. The production dependency audit again passes with zero vulnerabilities; ESLint with 0 warnings, TypeScript strict checking, 32 Vitest files with 115 tests, the 10,000-bookmark performance gate, production extension validation and permission audit, 12 Playwright E2E tests, and isolated installed Chrome `150.0.7871.129` / Edge `150.0.4078.96` verification passed. The browser checker now waits for the lazy AI route before asserting its disabled state. Verified packaging produced a 340,358-byte ZIP with SHA-256 `c4bc13f4e6982e0811d95612ee5b63f70509035f3212784db4b45cd25a87b999`.
+- On 2026-08-04, the `0.2.1` stabilization pass fixed the installed Chrome data-safety move/delete race, converted the Vite server security child process to bounded asynchronous execution, and synchronized the responsive version/author/email attribution with Manifest/npm metadata. Production dependencies remained at zero vulnerabilities; ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension validation and permission audit, Chrome `151.0.7922.72` / Edge `151.0.4129.59` installed checks, Chrome real-data safety, and 12 Playwright E2E tests passed. Verified packaging produced a 343,770-byte ZIP with SHA-256 `4a0f56ccd57766045537bc7329e63b365b64d0fa18bcbfd0f0f97f3a907cf73f`.
 
 ## Notes
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { BookmarkNode } from '../types';
 import { serializeExport } from './exportFormats';
 import { createAiAnalysisPayload } from './aiPreprocess';
-import { searchBookmarks } from './bookmarks';
+import { planBookmarkDeletion, searchBookmarks, wouldCreateMoveCycle } from './bookmarks';
 import { createStructureScanResult } from './structureScan';
 
 function createLargeBookmarkTree(count: number): BookmarkNode[] {
@@ -58,6 +58,18 @@ describe('large collection performance', () => {
     const durationMs = performance.now() - startedAt;
 
     expect(csv).toContain('bookmark-9999');
+    expect(durationMs).toBeLessThan(1_500);
+  });
+
+  it('preflights 5,000 selected bookmarks without quadratic tree scans', () => {
+    const selectedIds = new Set(Array.from({ length: 5_000 }, (_, index) => `bookmark-${index}`));
+    const startedAt = performance.now();
+    const planned = planBookmarkDeletion(tree, selectedIds);
+    const cycle = wouldCreateMoveCycle(tree, selectedIds, 'folder-99');
+    const durationMs = performance.now() - startedAt;
+
+    expect(planned).toHaveLength(5_000);
+    expect(cycle).toBe(false);
     expect(durationMs).toBeLessThan(1_500);
   });
 

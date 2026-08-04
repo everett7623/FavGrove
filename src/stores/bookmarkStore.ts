@@ -5,25 +5,35 @@ import { bookmarkService } from '../services/bookmarkService';
 import { storageService } from '../services/storageService';
 import i18n from '../shared/i18n';
 import { STORAGE_KEYS } from '../shared/constants/storage';
-import type { BackupRecord, BookmarkNode, BookmarkStats, ImportConflictStrategy, ImportPreview, RecentActivity } from '../shared/types';
+import type {
+  BackupRecord,
+  BookmarkNode,
+  BookmarkStats,
+  DeletedBookmarkNode,
+  ImportConflictStrategy,
+  ImportPreview,
+  RecentActivity,
+  Result
+} from '../shared/types';
 import {
   annotateBookmarkPaths,
   calculateBookmarkStats,
-  collectBookmarkNodesByIds,
   findNodeParent,
-  isDescendantNode,
+  indexBookmarkNodes,
   mergeFolderNodes,
   moveBookmarkNodes,
+  planBookmarkDeletion,
   reorderNodeBefore,
   removeBookmarkNodes,
+  restoreDeletedBookmarkNodes,
   searchBookmarks,
   updateBookmarkNodeTitle,
-  updateBookmarkNodeUrl
+  updateBookmarkNodeUrl,
+  wouldCreateMoveCycle
 } from '../shared/utils/bookmarks';
 
 type DeletedSnapshot = {
-  bookmarksBeforeDelete: BookmarkNode[];
-  deletedBookmarks: BookmarkNode[];
+  items: DeletedBookmarkNode[];
 };
 
 interface BookmarkStore {
@@ -43,21 +53,21 @@ interface BookmarkStore {
   load: () => Promise<void>;
   loadBackups: () => Promise<void>;
   setSearchQuery: (query: string) => Promise<void>;
-  deleteBookmarks: (ids: string[]) => Promise<void>;
-  renameBookmark: (id: string, title: string) => Promise<void>;
-  updateBookmarkUrl: (id: string, url: string) => Promise<void>;
-  renameFolder: (id: string, title: string) => Promise<void>;
-  moveBookmarks: (ids: string[], parentId: string) => Promise<void>;
-  moveFolders: (ids: string[], parentId: string) => Promise<void>;
-  mergeFolders: (sourceIds: string[], targetId: string) => Promise<void>;
-  reorderBookmarkBefore: (id: string, beforeId: string) => Promise<void>;
-  undoLastDelete: () => Promise<void>;
+  deleteBookmarks: (ids: string[]) => Promise<Result<number>>;
+  renameBookmark: (id: string, title: string) => Promise<Result<void>>;
+  updateBookmarkUrl: (id: string, url: string) => Promise<Result<void>>;
+  renameFolder: (id: string, title: string) => Promise<Result<void>>;
+  moveBookmarks: (ids: string[], parentId: string) => Promise<Result<number>>;
+  moveFolders: (ids: string[], parentId: string) => Promise<Result<number>>;
+  mergeFolders: (sourceIds: string[], targetId: string) => Promise<Result<number>>;
+  reorderBookmarkBefore: (id: string, beforeId: string) => Promise<Result<void>>;
+  undoLastDelete: () => Promise<Result<number>>;
   setBookmarkTags: (id: string, tags: string[]) => Promise<void>;
   updateBookmarkTags: (ids: string[], tags: string[], mode: 'add' | 'remove') => Promise<void>;
   setTagFilter: (tag: string | null) => void;
-  importBookmarks: (preview: ImportPreview, strategy: ImportConflictStrategy) => Promise<void>;
-  restoreBackup: (id: string) => Promise<void>;
-  deleteBackup: (id: string) => Promise<void>;
+  importBookmarks: (preview: ImportPreview, strategy: ImportConflictStrategy, targetParentId: string) => Promise<Result<number>>;
+  restoreBackup: (id: string) => Promise<Result<number>>;
+  deleteBackup: (id: string) => Promise<Result<void>>;
   addActivity: (activity: Omit<RecentActivity, 'id' | 'createdAt'>) => Promise<void>;
 }
 
@@ -78,7 +88,7 @@ async function saveActivities(recentActivities: RecentActivity[]) {
 }
 
 async function saveTags(tagsByBookmarkId: Record<string, string[]>) {
-  await storageService.set(STORAGE_KEYS.bookmarkTags, tagsByBookmarkId);
+  return storageService.set(STORAGE_KEYS.bookmarkTags, tagsByBookmarkId);
 }
 
 async function getBackupListFallback(fallback: BackupRecord[]): Promise<BackupRecord[]> {
@@ -103,6 +113,11 @@ function applyBookmarks(bookmarks: BookmarkNode[], query: string, tagsByBookmark
     searchResults,
     stats: calculateBookmarkStats(taggedBookmarks)
   };
+}
+
+async function readBookmarkTruth(fallback: BookmarkNode[]): Promise<Result<BookmarkNode[]>> {
+  if (!bookmarkService.usesChromeApi()) return { success: true, data: fallback };
+  return bookmarkService.getTree();
 }
 
 export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
@@ -183,67 +198,86 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }
   },
   deleteBookmarks: async (ids) => {
-    if (ids.length === 0) return;
+    const uniqueIds = [...new Set(ids)];
+    if (uniqueIds.length === 0) return { success: true, data: 0 };
 
     set({ mutating: true, error: null });
-    const currentBookmarks = useBookmarkStore.getState().bookmarks;
-    const idsSet = new Set(ids);
-    const deletedBookmarks = collectBookmarkNodesByIds(currentBookmarks, idsSet);
+    const currentBookmarks = get().bookmarks;
+    const idsSet = new Set(uniqueIds);
+    const planned = planBookmarkDeletion(currentBookmarks, idsSet);
+    if (!planned) {
+      const error = i18n.t('serviceErrors.unsupportedBookmarkDelete');
+      set({ error, mutating: false });
+      return { success: false, error };
+    }
     const backup = await backupService.create(currentBookmarks, 'delete');
     if (!backup.success) {
       set({ error: backup.error, mutating: false });
-      return;
+      return backup;
     }
     set((state) => ({ backups: [backup.data, ...state.backups] }));
 
-    const deleted = await bookmarkService.removeMany(ids);
-    if (!deleted.success) {
-      set({ error: deleted.error, mutating: false });
-      return;
+    const deleted = await bookmarkService.removeMany(uniqueIds, currentBookmarks);
+    const removedIds = new Set(deleted.success ? deleted.data : []);
+    const truth = await readBookmarkTruth(removeBookmarkNodes(currentBookmarks, removedIds));
+    if (!truth.success) {
+      set({ error: truth.error, mutating: false });
+      return truth;
     }
 
     const refreshedBackups = await getBackupListFallback(get().backups);
-    set((state) => {
-      const next = applyBookmarks(removeBookmarkNodes(state.bookmarks, idsSet), state.searchQuery, state.tagsByBookmarkId, state.tagFilter);
-      return {
-        ...next,
-        backups: refreshedBackups,
-        lastDeletedSnapshot: { bookmarksBeforeDelete: currentBookmarks, deletedBookmarks },
-        mutating: false
-      };
+    const truthById = indexBookmarkNodes(truth.data);
+    const remainingItems = planned.filter((item) => !truthById.has(item.oldId));
+    const nextTags = { ...get().tagsByBookmarkId };
+    for (const item of remainingItems) delete nextTags[item.oldId];
+    const tagsSaved = await saveTags(nextTags);
+    const operationError = !deleted.success ? deleted.error : !tagsSaved.success ? tagsSaved.error : null;
+    const next = applyBookmarks(truth.data, get().searchQuery, nextTags, get().tagFilter);
+    set({
+      ...next,
+      tagsByBookmarkId: nextTags,
+      backups: refreshedBackups,
+      lastDeletedSnapshot: remainingItems.length > 0 ? { items: remainingItems } : null,
+      error: operationError,
+      mutating: false
     });
+    if (operationError) return { success: false, error: operationError };
+
     await get().addActivity({
       type: 'delete',
       messageKey: 'activity.deletedBookmarks',
-      messageValues: { count: ids.length, suffix: ids.length === 1 ? '' : 's' }
+      messageValues: { count: remainingItems.length, suffix: remainingItems.length === 1 ? '' : 's' }
     });
+    return { success: true, data: remainingItems.length };
   },
   renameBookmark: async (id, title) => {
     const normalized = title.trim();
-    if (!normalized) return;
+    if (!normalized) return { success: true, data: undefined };
 
     set({ mutating: true, error: null });
-    const renamed = await bookmarkService.updateTitle(id, normalized);
+    const renamed = await bookmarkService.updateTitle(id, normalized, get().bookmarks);
     if (!renamed.success) {
       set({ error: renamed.error, mutating: false });
-      return;
+      return renamed;
     }
 
     set((state) => ({ ...applyBookmarks(updateBookmarkNodeTitle(state.bookmarks, id, normalized), state.searchQuery, state.tagsByBookmarkId, state.tagFilter), mutating: false }));
     await get().addActivity({ type: 'rename', messageKey: 'activity.renamedBookmark', messageValues: { title: normalized } });
+    return { success: true, data: undefined };
   },
   updateBookmarkUrl: async (id, url) => {
     const normalized = url.trim();
     if (!/^https?:\/\//i.test(normalized)) {
-      set({ error: i18n.t('errors.invalidBookmarkUrl') });
-      return;
+      const error = i18n.t('errors.invalidBookmarkUrl');
+      set({ error });
+      return { success: false, error };
     }
 
     set({ mutating: true, error: null });
-    const updated = await bookmarkService.updateUrl(id, normalized);
+    const updated = await bookmarkService.updateUrl(id, normalized, get().bookmarks);
     if (!updated.success) {
       set({ error: updated.error, mutating: false });
-      return;
+      return updated;
     }
 
     set((state) => ({
@@ -251,105 +285,156 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       mutating: false
     }));
     await get().addActivity({ type: 'rename', messageKey: 'activity.updatedBookmarkUrl', messageValues: { url: normalized } });
+    return { success: true, data: undefined };
   },
   moveBookmarks: async (ids, parentId) => {
-    const movableIds = ids.filter((id) => id !== parentId && !isDescendantNode(get().bookmarks, id, parentId));
-    if (movableIds.length === 0) return;
-
-    set({ mutating: true, error: null });
-    const moved = await bookmarkService.moveMany(movableIds, parentId);
-    if (!moved.success) {
-      set({ error: moved.error, mutating: false });
-      return;
+    const currentBookmarks = get().bookmarks;
+    const movableIds = [...new Set(ids)].filter((id) => id !== parentId);
+    if (movableIds.length === 0) return { success: true, data: 0 };
+    if (wouldCreateMoveCycle(currentBookmarks, new Set(movableIds), parentId)) {
+      const error = i18n.t('serviceErrors.invalidBookmarkTarget');
+      set({ error });
+      return { success: false, error };
     }
 
-    set((state) => ({ ...applyBookmarks(moveBookmarkNodes(state.bookmarks, new Set(movableIds), parentId), state.searchQuery, state.tagsByBookmarkId, state.tagFilter), mutating: false }));
+    set({ mutating: true, error: null });
+    const moved = await bookmarkService.moveMany(movableIds, parentId, currentBookmarks);
+    const fallback = moved.success ? moveBookmarkNodes(currentBookmarks, new Set(movableIds), parentId) : currentBookmarks;
+    const truth = await readBookmarkTruth(fallback);
+    if (!truth.success) {
+      set({ error: truth.error, mutating: false });
+      return truth;
+    }
+    set({ ...applyBookmarks(truth.data, get().searchQuery, get().tagsByBookmarkId, get().tagFilter), error: moved.success ? null : moved.error, mutating: false });
+    if (!moved.success) return moved;
+
     await get().addActivity({
       type: 'move',
       messageKey: 'activity.movedItems',
       messageValues: { count: movableIds.length, suffix: movableIds.length === 1 ? '' : 's' }
     });
+    return { success: true, data: movableIds.length };
   },
-  renameFolder: async (id, title) => {
-    await get().renameBookmark(id, title);
-  },
-  moveFolders: async (ids, parentId) => {
-    await get().moveBookmarks(ids, parentId);
-  },
+  renameFolder: async (id, title) => get().renameBookmark(id, title),
+  moveFolders: async (ids, parentId) => get().moveBookmarks(ids, parentId),
   mergeFolders: async (sourceIds, targetId) => {
-    const validSourceIds = sourceIds.filter((id) => id !== targetId);
-    if (validSourceIds.length === 0) return;
+    const validSourceIds = [...new Set(sourceIds)].filter((id) => id !== targetId);
+    if (validSourceIds.length === 0) return { success: true, data: 0 };
 
     set({ mutating: true, error: null });
     const currentBookmarks = get().bookmarks;
     const backup = await backupService.create(currentBookmarks, 'merge');
     if (!backup.success) {
       set({ error: backup.error, mutating: false });
-      return;
+      return backup;
     }
     set((state) => ({ backups: [backup.data, ...state.backups] }));
 
-    const merged = await bookmarkService.mergeFolders(validSourceIds, targetId);
-    if (!merged.success) {
-      set({ error: merged.error, mutating: false });
-      return;
+    const merged = await bookmarkService.mergeFolders(validSourceIds, targetId, currentBookmarks);
+    const fallback = merged.success ? mergeFolderNodes(currentBookmarks, new Set(validSourceIds), targetId) : currentBookmarks;
+    const truth = await readBookmarkTruth(fallback);
+    if (!truth.success) {
+      set({ error: truth.error, mutating: false });
+      return truth;
     }
-
     const refreshedBackups = await getBackupListFallback(get().backups);
-    set((state) => ({
-      ...applyBookmarks(mergeFolderNodes(state.bookmarks, new Set(validSourceIds), targetId), state.searchQuery, state.tagsByBookmarkId, state.tagFilter),
+    set({
+      ...applyBookmarks(truth.data, get().searchQuery, get().tagsByBookmarkId, get().tagFilter),
       backups: refreshedBackups,
+      error: merged.success ? null : merged.error,
       mutating: false
-    }));
+    });
+    if (!merged.success) return merged;
+
     await get().addActivity({
       type: 'merge',
       messageKey: 'activity.mergedFolders',
       messageValues: { count: validSourceIds.length, suffix: validSourceIds.length === 1 ? '' : 's' }
     });
+    return { success: true, data: validSourceIds.length };
   },
   reorderBookmarkBefore: async (id, beforeId) => {
-    if (id === beforeId) return;
-    const target = findNodeParent(get().bookmarks, beforeId);
-    if (!target) return;
+    if (id === beforeId) return { success: true, data: undefined };
+    const currentBookmarks = get().bookmarks;
+    const source = findNodeParent(currentBookmarks, id);
+    const target = findNodeParent(currentBookmarks, beforeId);
+    if (!target) return { success: true, data: undefined };
+    const targetIndex = source !== null && source.parentId === target.parentId && source.index < target.index
+      ? target.index - 1
+      : target.index;
 
     set({ mutating: true, error: null });
-    const moved = await bookmarkService.moveOne(id, target.parentId, target.index);
+    const moved = await bookmarkService.moveOne(id, target.parentId, targetIndex, currentBookmarks);
     if (!moved.success) {
       set({ error: moved.error, mutating: false });
-      return;
+      return moved;
     }
 
     set((state) => {
-      const source = findNodeParent(state.bookmarks, id);
       const movedTree = source?.parentId === target.parentId || !target.parentId ? state.bookmarks : moveBookmarkNodes(state.bookmarks, new Set([id]), target.parentId);
       return { ...applyBookmarks(reorderNodeBefore(movedTree, id, beforeId), state.searchQuery, state.tagsByBookmarkId, state.tagFilter), mutating: false };
     });
     await get().addActivity({ type: 'move', messageKey: 'activity.reorderedBookmark' });
+    return { success: true, data: undefined };
   },
   undoLastDelete: async () => {
     const snapshot = get().lastDeletedSnapshot;
-    if (!snapshot) return;
+    if (!snapshot) return { success: true, data: 0 };
 
     set({ mutating: true, error: null });
-    const restored = await bookmarkService.restoreMany(snapshot.deletedBookmarks);
+    const currentBookmarks = get().bookmarks;
+    const restored = await bookmarkService.restoreMany(snapshot.items, currentBookmarks);
+    const fallback = restored.success
+      ? restoreDeletedBookmarkNodes(currentBookmarks, snapshot.items, restored.data.idMap)
+      : currentBookmarks;
+    const truth = await readBookmarkTruth(fallback);
+    if (!truth.success) {
+      set({ error: truth.error, lastDeletedSnapshot: null, mutating: false });
+      return truth;
+    }
     if (!restored.success) {
-      set({ error: restored.error, mutating: false });
-      return;
+      set({
+        ...applyBookmarks(truth.data, get().searchQuery, get().tagsByBookmarkId, get().tagFilter),
+        error: restored.error,
+        lastDeletedSnapshot: null,
+        mutating: false
+      });
+      return restored;
     }
 
-    set((state) => ({
-      ...applyBookmarks(snapshot.bookmarksBeforeDelete, state.searchQuery, state.tagsByBookmarkId, state.tagFilter),
+    const nextTags = { ...get().tagsByBookmarkId };
+    for (const item of snapshot.items) {
+      delete nextTags[item.oldId];
+      const nextId = restored.data.idMap[item.oldId];
+      if (nextId && item.tags.length > 0) nextTags[nextId] = item.tags;
+    }
+    const tagsSaved = await saveTags(nextTags);
+    if (!tagsSaved.success) {
+      set({
+        ...applyBookmarks(truth.data, get().searchQuery, nextTags, get().tagFilter),
+        tagsByBookmarkId: nextTags,
+        error: tagsSaved.error,
+        lastDeletedSnapshot: null,
+        mutating: false
+      });
+      return tagsSaved;
+    }
+
+    set({
+      ...applyBookmarks(truth.data, get().searchQuery, nextTags, get().tagFilter),
+      tagsByBookmarkId: nextTags,
       lastDeletedSnapshot: null,
       mutating: false
-    }));
+    });
     await get().addActivity({
       type: 'undo',
       messageKey: 'activity.restoredBookmarks',
       messageValues: {
-        count: snapshot.deletedBookmarks.length,
-        suffix: snapshot.deletedBookmarks.length === 1 ? '' : 's'
+        count: restored.data.restoredCount,
+        suffix: restored.data.restoredCount === 1 ? '' : 's'
       }
     });
+    return { success: true, data: restored.data.restoredCount };
   },
   setBookmarkTags: async (id, tags) => {
     const normalizedTags = [...new Set(tags.map((tag) => tag.trim()).filter(Boolean))].slice(0, 8);
@@ -393,63 +478,61 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       searchResults: searchBookmarks(state.bookmarks, state.searchQuery).filter((bookmark) => !tag || bookmark.tags?.includes(tag))
     }));
   },
-  importBookmarks: async (preview, strategy) => {
+  importBookmarks: async (preview, strategy, targetParentId) => {
     const conflictUrls = new Set(preview.conflicts.map((conflict) => conflict.imported.url));
     const items = strategy === 'skip' ? preview.items.filter((item) => !conflictUrls.has(item.url)) : preview.items;
-    if (items.length === 0) return;
+    if (items.length === 0) return { success: true, data: 0 };
 
     set({ mutating: true, error: null });
     const currentBookmarks = get().bookmarks;
     const backup = await backupService.create(currentBookmarks, 'import');
     if (!backup.success) {
       set({ error: backup.error, mutating: false });
-      return;
+      return backup;
     }
     set((state) => ({ backups: [backup.data, ...state.backups] }));
 
-    const created = await bookmarkService.createMany(items);
-    if (!created.success) {
-      set({ error: created.error, mutating: false });
-      return;
+    const created = await bookmarkService.createMany(items, targetParentId, currentBookmarks);
+    const truth = created.success ? created : await readBookmarkTruth(currentBookmarks);
+    if (!truth.success) {
+      set({ error: truth.error, mutating: false });
+      return truth;
     }
-
     const refreshedBackups = await getBackupListFallback(get().backups);
-    set((state) => {
-      const [firstRoot, ...restRoots] = state.bookmarks;
-      const nextRoots = firstRoot
-        ? [{ ...firstRoot, children: [...((firstRoot.children as BookmarkNode[] | undefined) ?? []), ...created.data] }, ...restRoots]
-        : created.data;
-      return {
-        ...applyBookmarks(nextRoots, state.searchQuery, state.tagsByBookmarkId, state.tagFilter),
-        backups: refreshedBackups,
-        mutating: false
-      };
+    set({
+      ...applyBookmarks(truth.data, get().searchQuery, get().tagsByBookmarkId, get().tagFilter),
+      backups: refreshedBackups,
+      error: created.success ? null : created.error,
+      mutating: false
     });
+    if (!created.success) return created;
+
     await get().addActivity({
       type: 'import',
       messageKey: 'activity.importedBookmarks',
       messageValues: { count: items.length, suffix: items.length === 1 ? '' : 's' }
     });
+    return { success: true, data: items.length };
   },
   restoreBackup: async (id) => {
     const target = get().backups.find((backup) => backup.id === id);
-    if (!target) return;
+    if (!target) return { success: true, data: 0 };
 
     set({ mutating: true, error: null });
     const restored = await backupRestoreService.restoreMissing(get().bookmarks, target.bookmarks);
     if (!restored.success) {
       set({ error: restored.error, mutating: false });
-      return;
+      return restored;
     }
     if (restored.data === 0) {
       set({ mutating: false });
-      return;
+      return { success: true, data: 0 };
     }
 
     const tree = await bookmarkService.getTree();
     if (!tree.success) {
       set({ error: tree.error, mutating: false });
-      return;
+      return tree;
     }
     const refreshedBackups = await getBackupListFallback(get().backups);
 
@@ -466,14 +549,16 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
         suffix: restored.data === 1 ? '' : 's'
       }
     });
+    return { success: true, data: restored.data };
   },
   deleteBackup: async (id) => {
     const removed = await backupService.remove(id);
     if (!removed.success) {
       set({ error: removed.error });
-      return;
+      return removed;
     }
     set((state) => ({ backups: state.backups.filter((backup) => backup.id !== id) }));
+    return { success: true, data: undefined };
   },
   addActivity: async (activity) => {
     const recentActivities = [createActivity(activity), ...get().recentActivities].slice(0, 10);

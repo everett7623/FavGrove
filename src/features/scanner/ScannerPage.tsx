@@ -8,7 +8,7 @@ import { useScanStore } from '../../stores/scanStore';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { Button } from '../../shared/components/ui/Button';
 import { ConfirmDialog } from '../../shared/components/ui/ConfirmDialog';
-import type { BookmarkNode } from '../../shared/types';
+import type { BookmarkNode, Result } from '../../shared/types';
 import { flattenBookmarks, planDuplicateBookmarkCleanup } from '../../shared/utils/bookmarks';
 import { normalizeLinkIssue } from '../../shared/utils/linkCheck';
 
@@ -89,19 +89,12 @@ export default function ScannerPage() {
     await scanService.saveCache(nextResult);
   };
 
-  const runRepair = async (repair: () => Promise<void>) => {
+  const runRepair = async (repair: () => Promise<Result<number>>) => {
     setRunning(true);
     setError(null);
-    await repair();
-
-    const mutationError = useBookmarkStore.getState().error;
-    if (mutationError) {
-      setError(mutationError);
-      setRunning(false);
-      return;
-    }
-
+    const repaired = await repair();
     await refreshStructureResults();
+    if (!repaired.success) setError(repaired.error);
     setRunning(false);
   };
 

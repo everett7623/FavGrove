@@ -60,6 +60,31 @@ async function verifyBrowser(name, executablePath) {
       await page.locator('main').waitFor({ state: 'visible', timeout: 10_000 });
     }
 
+    await page.goto(`chrome-extension://${extensionId}/${manifest.options_ui.page}#/manager`, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-testid="manager-move-target"]').waitFor({ state: 'visible', timeout: 10_000 });
+    const rootInfo = await page.evaluate(async () => {
+      const [syntheticRoot] = await globalThis.chrome.bookmarks.getTree();
+      return {
+        syntheticRootId: syntheticRoot.id,
+        permanentRoots: (syntheticRoot.children ?? []).map((node) => ({
+          id: node.id,
+          writable: !node.unmodifiable && node.folderType !== 'managed'
+        }))
+      };
+    });
+    if (await page.locator(`[data-folder-id="${rootInfo.syntheticRootId}"]`).count()) {
+      throw new Error(`${name} rendered the synthetic bookmark root.`);
+    }
+    for (const rootNode of rootInfo.permanentRoots) {
+      const row = page.locator(`[data-folder-id="${rootNode.id}"]`);
+      await row.waitFor({ state: 'visible', timeout: 10_000 });
+      if ((await row.getAttribute('data-readonly')) !== 'true') throw new Error(`${name} rendered permanent root ${rootNode.id} as writable.`);
+    }
+    const moveTargetValues = await page.locator('[data-testid="manager-move-target"] option').evaluateAll((options) => options.map((option) => option.value));
+    if (!rootInfo.permanentRoots.some((rootNode) => rootNode.writable && moveTargetValues.includes(rootNode.id))) {
+      throw new Error(`${name} did not expose a writable permanent root as a move target.`);
+    }
+
     let worker = context.serviceWorkers().find((item) => new URL(item.url()).host === extensionId);
     if (!worker) {
       worker = await context.waitForEvent('serviceworker', {

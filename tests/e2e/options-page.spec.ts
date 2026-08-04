@@ -7,6 +7,7 @@ test('renders all foundation navigation routes', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Local recommendations' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Start scan/ })).toBeVisible();
+  await expect(page.getByText('v0.2.1 · everettlabs · everett7623@gmail.com')).toBeVisible();
 
   await page.getByRole('link', { name: 'Scanner' }).click();
   await expect(page.getByRole('heading', { name: 'Scanner' })).toBeVisible();
@@ -198,6 +199,7 @@ test('previews an HTML import, resolves conflicts, and imports new bookmarks', a
   await expect(page.getByText(/2 detected/)).toBeVisible();
   await expect(page.getByText(/1 conflicts/)).toBeVisible();
   await expect(page.getByText('Conflict resolver')).toBeVisible();
+  await page.getByTestId('import-target').selectOption({ label: 'Bookmarks Bar' });
 
   await page.getByRole('button', { name: 'Import new only (1)' }).click();
   await expect(page.getByRole('heading', { name: 'Import preview' })).toBeHidden();
@@ -324,4 +326,10 @@ test('renames, tags, moves, deletes, and restores a bookmark', async ({ page }) 
 
   await page.getByRole('button', { name: 'Undo' }).click();
   await expect(page.getByRole('checkbox', { name: 'Select GitHub Renamed' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Rename GitHub Renamed', exact: true }).click();
+  const restoredRenameDialog = page.getByRole('dialog', { name: 'Rename bookmark' });
+  await restoredRenameDialog.getByRole('textbox').fill('GitHub Restored');
+  await restoredRenameDialog.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('checkbox', { name: 'Select GitHub Restored' })).toBeVisible();
 });

@@ -1,12 +1,13 @@
 # Browser Click-Through Checklist
 
-Use this checklist for the final visible Chrome and Edge pass. `npm run check:browsers` installs and loads the production extension through the supported DevTools extension API in isolated official Chrome and Edge profiles. This document records the human-visible workflows that automation cannot close before store submission.
+Use this checklist for the final visible Chrome and Edge pass. `npm run check:browsers` installs and loads the production extension through the supported DevTools extension API in isolated official Chrome and Edge profiles. `npm run check:browser-data-safety` additionally exercises real Chrome bookmark CRUD, bookmark and empty-folder Undo with browser-generated IDs, tag migration, and nested import consistency in a disposable profile. This document records the human-visible workflows that automation still cannot close before store submission.
 
 ## Build Under Test
 
 ```bash
 npm run build:extension
 npm run check:browsers
+npm run check:browser-data-safety
 ```
 
 For the isolated visible pass, launch one browser at a time and close its window when the checklist is complete:
@@ -42,7 +43,7 @@ Do not load the project root or `.crx-dev`.
 - Confirm AI Analysis is disabled by default and makes no request before preview confirmation.
 - With a disposable user-owned compatible endpoint, confirm the request preview shows destination, model, scope, fields, counts, and estimate before endpoint permission is requested.
 - Confirm cancellation and a provider-error response return the page to an actionable state without modifying bookmarks.
-- Exercise rename, move, delete, undo, duplicate-folder merge, import preview, export, backup, and missing-bookmark restore flows on disposable bookmark data; confirm restore keeps current bookmarks.
+- Confirm the automated Chrome data-safety result, then visibly exercise duplicate-folder merge, export, backup, and missing-bookmark restore flows on disposable bookmark data; confirm restore keeps current bookmarks.
 - Confirm light mode, dark mode, English, and Chinese settings persist after browser restart.
 - Confirm no popup page appears and all primary workflows remain in the options tab.
 

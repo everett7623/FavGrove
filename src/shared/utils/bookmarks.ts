@@ -1,19 +1,61 @@
 import { pinyin } from 'pinyin-pro';
-import type { BookmarkNode, BookmarkStats, ScanResult } from '../types';
+import type { BookmarkNode, BookmarkStats, DeletedBookmarkNode, ScanResult } from '../types';
 
 export type SortOption = 'default' | 'title-asc' | 'title-desc' | 'date-asc' | 'date-desc' | 'url-asc';
 
+export interface BookmarkNodeCapabilities {
+  permanentRoot: boolean;
+  managed: boolean;
+  canMutate: boolean;
+  canAcceptChildren: boolean;
+}
+
 const cjkPattern = /[\u3400-\u9fff]/;
 
-export function annotateBookmarkPaths(nodes: BookmarkNode[], parentPath: string[] = []): BookmarkNode[] {
+export function isSyntheticBookmarkRoot(node: BookmarkNode, siblingCount: number): boolean {
+  return siblingCount === 1 && !node.parentId && !node.url && (node.id === '0' || !node.title.trim());
+}
+
+export function normalizeBookmarkTree(nodes: BookmarkNode[]): BookmarkNode[] {
+  const [root] = nodes;
+  if (!root || !isSyntheticBookmarkRoot(root, nodes.length)) return nodes;
+  return (root.children as BookmarkNode[] | undefined) ?? [];
+}
+
+export function getBookmarkNodeCapabilities(nodes: BookmarkNode[]): Map<string, BookmarkNodeCapabilities> {
+  const capabilities = new Map<string, BookmarkNodeCapabilities>();
+
+  const visit = (currentNodes: BookmarkNode[], depth: number, managedAncestor: boolean) => {
+    for (const node of currentNodes) {
+      const permanentRoot = depth === 0 || node.folderType !== undefined;
+      const managed = managedAncestor || node.unmodifiable === 'managed' || node.folderType === 'managed';
+      capabilities.set(node.id, {
+        permanentRoot,
+        managed,
+        canMutate: !permanentRoot && !managed,
+        canAcceptChildren: !node.url && !managed
+      });
+      if (node.children) visit(node.children as BookmarkNode[], depth + 1, managed);
+    }
+  };
+
+  visit(normalizeBookmarkTree(nodes), 0, false);
+  return capabilities;
+}
+
+function annotateNodes(nodes: BookmarkNode[], parentPath: string[]): BookmarkNode[] {
   return nodes.map((node) => {
     const path = [...parentPath, node.title || 'Untitled'];
     return {
       ...node,
       path,
-      children: node.children ? annotateBookmarkPaths(node.children as BookmarkNode[], path) : undefined
+      children: node.children ? annotateNodes(node.children as BookmarkNode[], path) : undefined
     };
   });
+}
+
+export function annotateBookmarkPaths(nodes: BookmarkNode[], parentPath: string[] = []): BookmarkNode[] {
+  return annotateNodes(normalizeBookmarkTree(nodes), parentPath);
 }
 
 export function flattenBookmarks(nodes: BookmarkNode[]): BookmarkNode[] {
@@ -187,6 +229,97 @@ export function collectNodesByIds(nodes: BookmarkNode[], ids: Set<string>): Book
   return found;
 }
 
+export function indexBookmarkNodes(nodes: BookmarkNode[]): Map<string, BookmarkNode> {
+  const indexed = new Map<string, BookmarkNode>();
+  const visit = (currentNodes: BookmarkNode[]) => {
+    for (const node of currentNodes) {
+      indexed.set(node.id, node);
+      if (node.children) visit(node.children as BookmarkNode[]);
+    }
+  };
+  visit(normalizeBookmarkTree(nodes));
+  return indexed;
+}
+
+export function findBookmarkNode(nodes: BookmarkNode[], id: string): BookmarkNode | null {
+  return indexBookmarkNodes(nodes).get(id) ?? null;
+}
+
+export function wouldCreateMoveCycle(nodes: BookmarkNode[], ids: Set<string>, targetId: string): boolean {
+  const indexed = indexBookmarkNodes(nodes);
+  let current = indexed.get(targetId);
+  while (current) {
+    if (ids.has(current.id)) return true;
+    current = current.parentId ? indexed.get(current.parentId) : undefined;
+  }
+  return false;
+}
+
+export function planBookmarkDeletion(nodes: BookmarkNode[], ids: Set<string>): DeletedBookmarkNode[] | null {
+  const capabilities = getBookmarkNodeCapabilities(nodes);
+  const indexed = indexBookmarkNodes(nodes);
+  const planned: DeletedBookmarkNode[] = [];
+
+  for (const id of ids) {
+    const node = indexed.get(id);
+    const access = capabilities.get(id);
+    if (!node?.parentId || !access?.canMutate) return null;
+    if (!node.url && (node.children?.length ?? 0) > 0) return null;
+    planned.push({
+      oldId: node.id,
+      parentId: node.parentId,
+      index: node.index,
+      title: node.title,
+      url: node.url,
+      tags: node.tags ?? []
+    });
+  }
+
+  return planned.sort((left, right) => left.parentId.localeCompare(right.parentId) || (left.index ?? 0) - (right.index ?? 0));
+}
+
+export function insertBookmarkNodes(nodes: BookmarkNode[], parentId: string, inserted: BookmarkNode[]): BookmarkNode[] {
+  return nodes.map((node) => ({
+    ...node,
+    children:
+      node.id === parentId && node.children
+        ? [...(node.children as BookmarkNode[]), ...inserted]
+        : node.children
+          ? insertBookmarkNodes(node.children as BookmarkNode[], parentId, inserted)
+          : undefined
+  }));
+}
+
+export function restoreDeletedBookmarkNodes(
+  nodes: BookmarkNode[],
+  deleted: DeletedBookmarkNode[],
+  idMap: Record<string, string>
+): BookmarkNode[] {
+  let restored = nodes;
+  for (const item of deleted) {
+    const restoredNode: BookmarkNode = {
+      id: idMap[item.oldId] ?? item.oldId,
+      title: item.title,
+      parentId: item.parentId,
+      index: item.index,
+      url: item.url,
+      tags: item.tags,
+      children: item.url ? undefined : []
+    };
+    const insert = (currentNodes: BookmarkNode[]): BookmarkNode[] =>
+      currentNodes.map((node) => {
+        if (node.id === item.parentId && node.children) {
+          const children = [...(node.children as BookmarkNode[])];
+          children.splice(Math.min(item.index ?? children.length, children.length), 0, restoredNode);
+          return { ...node, children };
+        }
+        return { ...node, children: node.children ? insert(node.children as BookmarkNode[]) : undefined };
+      });
+    restored = insert(restored);
+  }
+  return restored;
+}
+
 export function isDescendantNode(nodes: BookmarkNode[], ancestorId: string, targetId: string): boolean {
   const findAncestor = (currentNodes: BookmarkNode[]): BookmarkNode | null => {
     for (const node of currentNodes) {
@@ -221,8 +354,9 @@ export function updateBookmarkNodeUrl(nodes: BookmarkNode[], id: string, url: st
 }
 
 export function moveBookmarkNodes(nodes: BookmarkNode[], ids: Set<string>, targetFolderId: string): BookmarkNode[] {
+  if (wouldCreateMoveCycle(nodes, ids, targetFolderId)) return nodes;
   const moving = collectNodesByIds(nodes, ids)
-    .filter((node) => node.id !== targetFolderId && !isDescendantNode(nodes, node.id, targetFolderId))
+    .filter((node) => node.id !== targetFolderId)
     .map((node) => ({ ...node, parentId: targetFolderId }));
   if (moving.length === 0) return nodes;
 

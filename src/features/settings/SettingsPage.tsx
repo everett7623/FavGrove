@@ -25,6 +25,7 @@ export default function SettingsPage() {
   const updateScanner = useSettingsStore((state) => state.updateScanner);
   const backups = useBookmarkStore((state) => state.backups);
   const mutating = useBookmarkStore((state) => state.mutating);
+  const bookmarkError = useBookmarkStore((state) => state.error);
   const loadBackups = useBookmarkStore((state) => state.loadBackups);
   const restoreBackup = useBookmarkStore((state) => state.restoreBackup);
   const deleteBackup = useBookmarkStore((state) => state.deleteBackup);
@@ -78,8 +79,9 @@ export default function SettingsPage() {
 
   const confirmRestore = async () => {
     const target = restoreTarget;
-    setRestoreTarget(null);
-    if (target) await restoreBackup(target.id);
+    if (!target) return;
+    const restored = await restoreBackup(target.id);
+    if (restored.success) setRestoreTarget(null);
   };
 
   return (
@@ -94,7 +96,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {(error || alarmError) && <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error ?? alarmError}</div>}
+      {(error || alarmError || bookmarkError) && <div role="alert" data-testid="settings-error" className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error ?? alarmError ?? bookmarkError}</div>}
 
       <section className="grid gap-4 lg:grid-cols-2">
         <SettingsCard title={t('settings.appearance')}>

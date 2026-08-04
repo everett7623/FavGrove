@@ -56,6 +56,9 @@ jobs:
       - name: Verify installed Chrome and Edge
         run: npm run check:browsers
 
+      - name: Verify installed Chrome data safety
+        run: npm run check:browser-data-safety
+
       - name: End-to-end tests
         run: npm run test:e2e
 

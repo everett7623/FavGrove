@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import process from 'node:process';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -6,9 +6,16 @@ import { describe, expect, it } from 'vitest';
 const securityCheckScript = path.resolve(process.cwd(), 'scripts/vite-server-security-check.mjs');
 
 describe('Vite development server security', () => {
-  it('restricts Host headers and CORS origins', () => {
-    const result = spawnSync(process.execPath, [securityCheckScript], { encoding: 'utf8' });
+  it('restricts Host headers and CORS origins', async () => {
+    const result = await new Promise((resolve) => {
+      execFile(
+        process.execPath,
+        [securityCheckScript],
+        { encoding: 'utf8', timeout: 30_000, windowsHide: true },
+        (error, stdout, stderr) => resolve({ error, stderr, stdout })
+      );
+    });
 
-    expect(result.status, result.stderr || result.stdout).toBe(0);
-  });
+    expect(result.error, result.error?.message || result.stderr || result.stdout).toBeNull();
+  }, 35_000);
 });

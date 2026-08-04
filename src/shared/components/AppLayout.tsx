@@ -18,6 +18,9 @@ const navigation = [
   { to: '/settings', key: 'settings', icon: Settings }
 ] as const;
 
+const APP_AUTHOR = 'everettlabs';
+const APP_AUTHOR_EMAIL = 'everett7623@gmail.com';
+
 export function AppLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -97,9 +100,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </header>
         <UpdateBanner />
         <main className="min-h-0 flex-1 overflow-auto p-4 lg:p-6">{children}</main>
-        <footer className="flex h-10 items-center justify-between border-t bg-white px-4 text-xs text-slate-500 lg:px-6 dark:bg-slate-950">
+        <footer className="flex min-h-10 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t bg-white px-4 py-2 text-xs text-slate-500 lg:px-6 dark:bg-slate-950">
           <span>{t('footer.localOnly')}</span>
-          <span>v{CURRENT_EXTENSION_VERSION}</span>
+          <span className="whitespace-nowrap">v{CURRENT_EXTENSION_VERSION} · {APP_AUTHOR} · {APP_AUTHOR_EMAIL}</span>
         </footer>
       </div>
     </div>

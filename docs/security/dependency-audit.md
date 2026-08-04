@@ -1,6 +1,6 @@
 # Dependency Audit
 
-## 2026-07-25
+## 2026-08-04
 
 Production dependencies are checked with:
 
@@ -18,6 +18,8 @@ The full development-tool audit currently reports two findings:
 
 - Vite `5.4.21` and its esbuild `0.21.5` dependency are affected by advisories fixed only by a newer Vite major line.
 - The project remains intentionally on Vite 5, so this migration requires an explicit stack decision and a separate compatibility pass.
+
+A later `brace-expansion` denial-of-service advisory (`GHSA-mh99-v99m-4gvg`) made the first remote Windows quality run and the local policy fail on 2026-07-30. The existing dependency ranges already allowed fixed releases, so `package-lock.json` was refreshed without adding a direct dependency, override, or allowlist exception: the ESLint chain now uses `brace-expansion` `1.1.18`, and the TypeScript ESLint chain uses `5.0.9`. The policy again reports only the documented Vite 5/esbuild findings.
 
 The development audit no longer reports the earlier CRXJS/Rollup, Vitest, PostCSS, `brace-expansion`, `form-data`, or `js-yaml` findings. CRXJS is `2.7.1`, Vitest is `3.2.7`, and the patched transitive versions are locked in `package-lock.json`.
 

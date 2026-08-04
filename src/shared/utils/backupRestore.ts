@@ -1,12 +1,9 @@
 import type { BookmarkNode, BookmarkRestoreItem } from '../types';
+import { isSyntheticBookmarkRoot } from './bookmarks';
 
 export interface FolderRestoreEntry {
   id: string;
   path: string[];
-}
-
-function isSyntheticRoot(node: BookmarkNode, depth: number, siblingCount: number): boolean {
-  return depth === 0 && siblingCount === 1 && (node.id === '0' || (!node.parentId && !node.title));
 }
 
 function visitTree(
@@ -22,7 +19,7 @@ function visitTree(
       continue;
     }
 
-    const syntheticRoot = isSyntheticRoot(node, depth, nodes.length);
+    const syntheticRoot = depth === 0 && isSyntheticBookmarkRoot(node, nodes.length);
     const path = syntheticRoot ? parentPath : [...parentPath, node.title];
     if (!syntheticRoot) onFolder({ id: node.id, path });
     if (node.children) visitTree(node.children as BookmarkNode[], onFolder, onBookmark, path, depth + 1);

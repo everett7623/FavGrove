@@ -123,7 +123,7 @@ The near-term priorities are:
 
 1. Run and record final visible Chrome and Edge click-through checks from `dist/`.
 2. Copy the verified public privacy policy and support URLs with the prepared submission fields into the store portals.
-3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.0.md`.
+3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.1.md`.
 4. Keep destructive full replacement restore deferred unless a separate safety design is approved.
 5. After release gates close, choose the next post-beta task; the read-only `TASK-705` milestone is implemented, while automatic AI recommendations and mutations remain deferred.
 

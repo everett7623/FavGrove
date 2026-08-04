@@ -181,7 +181,8 @@ describe('bookmarkStore', () => {
           }
         ]
       },
-      'skip'
+      'skip',
+      '1'
     );
 
     const imported = useBookmarkStore.getState().searchResults.find((bookmark) => bookmark.url === 'https://import.test');
@@ -193,6 +194,35 @@ describe('bookmarkStore', () => {
     if (backups.success) {
       expect(backups.data?.data[0].reason).toBe('import');
     }
+  });
+
+  it('uses the service truth without reading the Chrome tree twice after import', async () => {
+    await useBookmarkStore.getState().load();
+    const current = useBookmarkStore.getState().bookmarks;
+    const importedTree = current.map((root) => root.id === '2'
+      ? {
+          ...root,
+          children: [...((root.children as BookmarkNode[] | undefined) ?? []), {
+            id: 'imported-live',
+            title: 'Imported live',
+            url: 'https://imported-live.test',
+            parentId: '2'
+          }]
+        }
+      : root);
+    vi.spyOn(bookmarkService, 'usesChromeApi').mockReturnValue(true);
+    const getTree = vi.spyOn(bookmarkService, 'getTree');
+    vi.spyOn(bookmarkService, 'createMany').mockResolvedValue({ success: true, data: importedTree });
+
+    const result = await useBookmarkStore.getState().importBookmarks(
+      { items: [{ title: 'Imported live', url: 'https://imported-live.test', path: [] }], conflicts: [] },
+      'skip',
+      '2'
+    );
+
+    expect(result.success).toBe(true);
+    expect(getTree).not.toHaveBeenCalled();
+    expect(useBookmarkStore.getState().searchResults.some((bookmark) => bookmark.id === 'imported-live')).toBe(true);
   });
 
   it('restores missing bookmarks without deleting the current collection', async () => {
@@ -256,5 +286,58 @@ describe('bookmarkStore', () => {
     await useBookmarkStore.getState().deleteBackup('backup-1');
 
     expect(useBookmarkStore.getState().backups.some((item) => item.id === 'backup-1')).toBe(false);
+  });
+
+  it('uses Chrome-generated ids after undo and migrates bookmark tags', async () => {
+    await useBookmarkStore.getState().load();
+    await useBookmarkStore.getState().setBookmarkTags('101', ['work']);
+
+    const afterDelete = useBookmarkStore.getState().bookmarks.map((root) => ({
+      ...root,
+      children: root.children?.map((folder) => ({
+        ...folder,
+        children: folder.children?.filter((bookmark) => bookmark.id !== '101')
+      }))
+    })) as BookmarkNode[];
+    const afterUndo = afterDelete.map((root) => ({
+      ...root,
+      children: root.children?.map((folder) => folder.id === '10'
+        ? {
+            ...folder,
+            children: [...((folder.children as BookmarkNode[] | undefined) ?? []), {
+              id: 'restored-101',
+              title: 'GitHub',
+              url: 'https://github.com',
+              parentId: '10'
+            }]
+          }
+        : folder)
+    })) as BookmarkNode[];
+
+    vi.spyOn(bookmarkService, 'usesChromeApi').mockReturnValue(true);
+    const getTree = vi.spyOn(bookmarkService, 'getTree')
+      .mockResolvedValueOnce({ success: true, data: afterDelete })
+      .mockResolvedValueOnce({ success: true, data: afterUndo });
+    vi.spyOn(bookmarkService, 'removeMany').mockResolvedValue({ success: true, data: ['101'] });
+    vi.spyOn(bookmarkService, 'restoreMany').mockResolvedValue({
+      success: true,
+      data: { restoredCount: 1, idMap: { '101': 'restored-101' } }
+    });
+    const updateTitle = vi.spyOn(bookmarkService, 'updateTitle').mockResolvedValue({
+      success: true,
+      data: { id: 'restored-101', title: 'GitHub Restored' }
+    });
+
+    const deleted = await useBookmarkStore.getState().deleteBookmarks(['101']);
+    const restored = await useBookmarkStore.getState().undoLastDelete();
+    const renamed = await useBookmarkStore.getState().renameBookmark('restored-101', 'GitHub Restored');
+
+    expect(deleted.success).toBe(true);
+    expect(restored.success).toBe(true);
+    expect(renamed.success).toBe(true);
+    expect(getTree).toHaveBeenCalledTimes(2);
+    expect(useBookmarkStore.getState().tagsByBookmarkId['101']).toBeUndefined();
+    expect(useBookmarkStore.getState().tagsByBookmarkId['restored-101']).toEqual(['work']);
+    expect(updateTitle).toHaveBeenCalledWith('restored-101', 'GitHub Restored', expect.any(Array));
   });
 });

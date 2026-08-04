@@ -1,21 +1,22 @@
-# GitHub Pre-Release Draft: v0.2.0
+# GitHub Pre-Release Draft: v0.2.1
 
 ## Release Settings
 
-- Tag: `v0.2.0`
+- Tag: `v0.2.1`
 - Target branch: `main`
-- Release title: `FavGrove v0.2.0 Beta`
+- Release title: `FavGrove v0.2.1 Beta`
 - Mark as pre-release: yes
 - Attach assets:
-  - `release/favgrove-v0.2.0.zip`
-  - `release/favgrove-v0.2.0.sha256`
+  - `release/favgrove-v0.2.1.zip`
+  - `release/favgrove-v0.2.1.sha256`
 
 ## Summary
 
-FavGrove v0.2.0 is the rebranded beta of the local-first Manifest V3 bookmark workspace for Chrome and Edge. The product was previously released as Markora v0.1.0; bookmark data, settings, backups, and import formats remain compatible.
+FavGrove v0.2.1 is the rebranded beta of the local-first Manifest V3 bookmark workspace for Chrome and Edge. The product was previously released as Markora v0.1.0; bookmark data, settings, backups, and import formats remain compatible.
 
 ## Highlights
 
+- `0.2.1` hardens managed/read-only bookmark protections, bookmark reorder safety, and installed-browser data verification.
 - New FavGrove product name and refreshed English and Chinese release copy.
 - Full-screen options-page workspace for Chrome and Edge.
 - Dashboard statistics, quick actions, recent activity, and local cleanup recommendations.
@@ -32,7 +33,7 @@ FavGrove stores bookmark metadata, settings, scan cache, search history, tags, a
 
 ## License
 
-FavGrove v0.2.0 is distributed under `GPL-3.0-or-later`. The release archive includes the matching license text, and the corresponding source is available from the tagged repository version. Previously distributed versions retain their existing license grants.
+FavGrove v0.2.1 is distributed under `GPL-3.0-or-later`. The release archive includes the matching license text, and the corresponding source is available from the tagged repository version. Previously distributed versions retain their existing license grants.
 
 ## Verification Before Publishing
 

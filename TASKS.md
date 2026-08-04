@@ -279,6 +279,8 @@ Empty Folder Cleanup
 Status:
 
 - Implemented
+- Browser permanent roots and managed nodes are excluded from cleanup candidates
+- Bookmark and empty-folder Undo use browser-generated IDs and reconcile the live tree
 
 Acceptance:
 
@@ -753,7 +755,7 @@ Release Versioning
 Status:
 
 - Version policy documented in `VERSIONING.md`
-- Current development version is `0.2.0`
+- Current development version is `0.2.1`
 - Build and package gates enforce matching semantic versions across package metadata, source Manifest, and production `dist/`
 
 Acceptance:
@@ -848,7 +850,7 @@ Status:
 
 Acceptance:
 
-- GitHub pre-release draft is prepared in `docs/release/github-prerelease-v0.2.0.md`
+- GitHub pre-release draft is prepared in `docs/release/github-prerelease-v0.2.1.md`
 - Store portal field worksheet is prepared in `store/submission-fields.md`
 - Required permission justifications and beta notes are ready to copy into portals
 
@@ -884,7 +886,7 @@ Acceptance:
 - User-facing Markora and Bookmark Atlas branding is replaced with FavGrove
 - English product name is `FavGrove - Bookmark Manager`
 - Chinese product name is `FavGrove 书签管理器`
-- Package, manifest, UI footer, release archive, store copy, and promotional assets use `0.2.0` FavGrove metadata
+- Package, manifest, UI footer, release archive, store copy, and promotional assets use `0.2.1` FavGrove metadata
 - Browser storage keys, import schemas, and stable background identifiers remain compatible
 - The published `v0.1.0` Markora release remains historical and unchanged
 
@@ -921,6 +923,7 @@ Status:
 - React `19.2.7` and React Router `8.3.0` replace the vulnerable React 18 / Router v6-v7 lines and pass route compatibility checks
 - Vite development and preview servers are restricted to loopback hosts and explicit CORS origins
 - Vite 5 development-tool findings remain tracked pending an explicit Vite-major migration decision
+- `brace-expansion` `1.1.18` and `5.0.9` close the later development-tool denial-of-service advisory without a policy exception
 
 Acceptance:
 
@@ -935,7 +938,7 @@ Acceptance:
 
 # Core Feature Audit
 
-Reviewed against the current implementation on 2026-06-06.
+Reviewed against the current implementation on 2026-08-04.
 
 ## Dashboard
 

@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-FavGrove 是面向 Chrome/Edge 的本地优先书签管理扩展，采用 Manifest V3 架构。当前版本 v0.2.0 beta，核心目标是处理大型书签库（数千条）的管理、扫描、去重、链接检查、导入导出和本地备份。
+FavGrove 是面向 Chrome/Edge 的本地优先书签管理扩展，采用 Manifest V3 架构。当前版本 v0.2.1 beta，核心目标是处理大型书签库（数千条）的管理、扫描、去重、链接检查、导入导出和本地备份。
 
 **技术栈**：React 18 + TypeScript 5 + Vite 5 + CRXJS + Zustand + React Router + Tailwind CSS + Vitest + Playwright
 
@@ -62,7 +62,7 @@ npm run build                  # Vite 生产构建（输出到 dist/）
 npm run build:extension        # 构建 + 验证 + 权限审计
 npm run validate:extension     # 验证 dist/ 的扩展结构
 npm run audit:permissions      # 检查 manifest 和隐私文档的权限一致性
-npm run package:release        # 生成 release/favgrove-v0.2.0.zip
+npm run package:release        # 生成 release/favgrove-v0.2.1.zip
 ```
 
 ### E2E 测试
@@ -197,11 +197,11 @@ npm run test:e2e
 
 ## 当前开发方向
 
-v0.2.0 beta 发布准备阶段，近期优先级：
+v0.2.1 beta 发布准备阶段，近期优先级：
 
 1. 运行并记录最终的 Chrome/Edge 浏览器点击测试（从 `dist/`）
 2. 将验证的隐私政策和支持 URL 连同准备的提交字段复制到商店门户
-3. 从 `docs/release/github-prerelease-v0.2.0.md` 创建 GitHub beta pre-release
+3. 从 `docs/release/github-prerelease-v0.2.1.md` 创建 GitHub beta pre-release
 4. 完整替换恢复功能延后，除非单独的安全设计获批
 5. 发布门禁关闭后，选择下一个 post-beta 任务
 

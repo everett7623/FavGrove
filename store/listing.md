@@ -44,8 +44,9 @@ https://github.com/everett7623/FavGrove/issues
 
 https://github.com/everett7623/FavGrove/blob/main/PRIVACY.md
 
-## Release Notes For 0.2.0 Beta
+## Release Notes For 0.2.1 Beta
 
+- Hardened managed/read-only bookmark protections, bookmark reorder safety, and installed-browser data verification.
 - Renamed from Markora to FavGrove before browser-store submission.
 - Public beta candidate for local testing.
 - Manifest V3 Chrome and Edge extension.

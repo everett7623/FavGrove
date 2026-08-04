@@ -63,7 +63,10 @@ export const en = {
     browserStoreManualVerification: 'Browser store links require manual verification.',
     linkCheckIncomplete: 'Link check did not complete.',
     registerAutoScan: 'Unable to register automatic scanning.',
-    applyExtensionUpdate: 'Unable to apply the extension update.'
+    applyExtensionUpdate: 'Unable to apply the extension update.',
+    protectedBookmarkNode: 'This browser or managed bookmark node is read-only.',
+    invalidBookmarkTarget: 'Choose a writable bookmark folder.',
+    unsupportedBookmarkDelete: 'Only writable bookmarks and empty folders can be deleted.'
   },
   foundation: { ready: 'Foundation route ready. Product behavior will be added in the next milestones.' },
   dashboard: {
@@ -211,6 +214,7 @@ export const en = {
     editTagsAria: 'Edit tags for {{title}}',
     expandFolder: 'Expand {{title}}',
     collapseFolder: 'Collapse {{title}}',
+    readOnly: 'Read only',
     columns: {
       title: 'Title',
       url: 'URL',
@@ -236,6 +240,9 @@ export const en = {
     importNewOnly: 'Import new only',
     importAll: 'Import all',
     noImportItems: 'No valid HTTP or HTTPS bookmarks were found in this file.',
+    importTarget: 'Import into',
+    noWritableTarget: 'No writable bookmark folder is available',
+    previewStale: 'The bookmark tree changed. Choose the file again before retrying.',
     formats: {
       json: 'JSON',
       csv: 'CSV',

@@ -67,3 +67,7 @@ Material privacy changes will be documented in this file and reflected in the ex
 Project repository:
 
 https://github.com/everett7623/FavGrove
+
+Developer: `everettlabs`
+
+Email: `everett7623@gmail.com`

@@ -8,10 +8,29 @@ export type ExportFormat = 'json' | 'csv' | 'txt' | 'opml' | 'html';
 export type ImportFormat = ExportFormat;
 export type ImportConflictStrategy = 'skip' | 'import-all';
 
+export type BookmarkFolderType = 'bookmarks-bar' | 'other' | 'mobile' | 'managed';
+
 export interface BookmarkNode extends chrome.bookmarks.BookmarkTreeNode {
+  children?: BookmarkNode[];
   path?: string[];
   tags?: string[];
   status?: 'valid' | 'invalid' | 'timeout' | 'unknown';
+  folderType?: BookmarkFolderType;
+  syncing?: boolean;
+}
+
+export interface DeletedBookmarkNode {
+  oldId: string;
+  parentId: string;
+  index?: number;
+  title: string;
+  url?: string;
+  tags: string[];
+}
+
+export interface BookmarkRestoreResult {
+  restoredCount: number;
+  idMap: Record<string, string>;
 }
 
 export interface ScannerConfig {

@@ -7,6 +7,7 @@ import { Button } from '../../shared/components/ui/Button';
 import { ConfirmDialog } from '../../shared/components/ui/ConfirmDialog';
 import { PromptDialog } from '../../shared/components/ui/PromptDialog';
 import type { InvalidLink } from '../../shared/types';
+import { flattenBookmarks, getBookmarkNodeCapabilities } from '../../shared/utils/bookmarks';
 import { normalizeLinkIssue } from '../../shared/utils/linkCheck';
 import { useBookmarkStore } from '../../stores/bookmarkStore';
 import { useScanStore } from '../../stores/scanStore';
@@ -26,6 +27,7 @@ export default function LinkIssuesPage() {
   const { t } = useTranslation();
   const result = useScanStore((state) => state.result);
   const setResult = useScanStore((state) => state.setResult);
+  const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const deleteBookmarks = useBookmarkStore((state) => state.deleteBookmarks);
   const updateBookmarkUrl = useBookmarkStore((state) => state.updateBookmarkUrl);
   const mutating = useBookmarkStore((state) => state.mutating);
@@ -37,6 +39,7 @@ export default function LinkIssuesPage() {
   const [editingIssue, setEditingIssue] = useState<InvalidLink | null>(null);
   const [confirmState, setConfirmState] = useState<ConfirmState | null>(null);
   const [recheckingIds, setRecheckingIds] = useState<Set<string>>(new Set());
+  const capabilities = useMemo(() => getBookmarkNodeCapabilities(bookmarks), [bookmarks]);
 
   useEffect(() => {
     if (result) return;
@@ -52,6 +55,14 @@ export default function LinkIssuesPage() {
   const pageIssues = filteredIssues.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   const brokenCount = issues.filter((issue) => issue.kind === 'broken').length;
   const unreachableCount = issues.length - brokenCount;
+  const mutablePageIssues = pageIssues.filter((issue) => capabilities.get(issue.node.id)?.canMutate === true);
+
+  useEffect(() => {
+    setSelectedIds((current) => {
+      const next = new Set([...current].filter((id) => capabilities.get(id)?.canMutate === true));
+      return next.size === current.size ? current : next;
+    });
+  }, [capabilities]);
 
   const changeFilter = (nextFilter: IssueFilter) => {
     setFilter(nextFilter);
@@ -71,15 +82,14 @@ export default function LinkIssuesPage() {
   const performDeleteSelected = async () => {
     const ids = [...selectedIds];
     if (!result || ids.length === 0) return;
-    await deleteBookmarks(ids);
-    if (useBookmarkStore.getState().error) return;
-
+    const deleted = await deleteBookmarks(ids);
+    const remainingIds = new Set(flattenBookmarks(useBookmarkStore.getState().bookmarks).map((bookmark) => bookmark.id));
     const nextResult = {
       ...result,
-      invalidLinks: result.invalidLinks.filter((issue) => !selectedIds.has(issue.node.id))
+      invalidLinks: result.invalidLinks.filter((issue) => remainingIds.has(issue.node.id))
     };
     setResult(nextResult);
-    setSelectedIds(new Set());
+    setSelectedIds((current) => deleted.success ? new Set() : new Set([...current].filter((id) => remainingIds.has(id))));
     await scanService.saveCache(nextResult);
   };
 
@@ -171,8 +181,8 @@ export default function LinkIssuesPage() {
     const issue = editingIssue;
     setEditingIssue(null);
     if (!issue || nextUrl.trim() === issue.node.url) return;
-    await updateBookmarkUrl(issue.node.id, nextUrl);
-    if (!useBookmarkStore.getState().error) await removeIssue(issue.node.id);
+    const updated = await updateBookmarkUrl(issue.node.id, nextUrl);
+    if (updated.success) await removeIssue(issue.node.id);
   };
 
   const deleteIssue = async (issue: InvalidLink) => {
@@ -181,8 +191,10 @@ export default function LinkIssuesPage() {
       description: t('linkIssues.deleteConfirm', { title: issue.node.title || issue.node.url }),
       confirmLabel: t('linkIssues.deleteOne'),
       onConfirm: async () => {
-        await deleteBookmarks([issue.node.id]);
-        if (!useBookmarkStore.getState().error) await removeIssue(issue.node.id);
+        const deleted = await deleteBookmarks([issue.node.id]);
+        if (deleted.success || !flattenBookmarks(useBookmarkStore.getState().bookmarks).some((bookmark) => bookmark.id === issue.node.id)) {
+          await removeIssue(issue.node.id);
+        }
       }
     });
   };
@@ -218,7 +230,7 @@ export default function LinkIssuesPage() {
         </div>
       </div>
 
-      {mutationError && <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{mutationError}</div>}
+      {mutationError && <div role="alert" className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{mutationError}</div>}
 
       <div className="flex flex-wrap gap-2">
         <FilterButton active={filter === 'all'} onClick={() => changeFilter('all')} label={t('linkIssues.all')} count={issues.length} />
@@ -226,8 +238,8 @@ export default function LinkIssuesPage() {
         <FilterButton active={filter === 'unreachable'} onClick={() => changeFilter('unreachable')} label={t('linkIssues.unreachable')} count={unreachableCount} />
         <Button
           variant="outline"
-          onClick={() => setSelectedIds((current) => new Set([...current, ...pageIssues.map((issue) => issue.node.id)]))}
-          disabled={pageIssues.length === 0}
+          onClick={() => setSelectedIds((current) => new Set([...current, ...mutablePageIssues.map((issue) => issue.node.id)]))}
+          disabled={mutablePageIssues.length === 0}
         >
           {t('linkIssues.selectPage')}
         </Button>
@@ -249,6 +261,7 @@ export default function LinkIssuesPage() {
                 issue={issue}
                 selected={selectedIds.has(issue.node.id)}
                 disabled={mutating}
+                readOnly={capabilities.get(issue.node.id)?.canMutate !== true}
                 rechecking={recheckingIds.has(issue.node.id)}
                 onSelectedChange={toggleSelected}
                 onRecheck={(issue) => void recheckIssue(issue)}
@@ -312,6 +325,7 @@ function IssueRow({
   issue,
   selected,
   disabled,
+  readOnly,
   rechecking,
   onSelectedChange,
   onRecheck,
@@ -322,6 +336,7 @@ function IssueRow({
   issue: InvalidLink;
   selected: boolean;
   disabled: boolean;
+  readOnly: boolean;
   rechecking: boolean;
   onSelectedChange: (id: string, checked: boolean) => void;
   onRecheck: (issue: InvalidLink) => void;
@@ -333,7 +348,7 @@ function IssueRow({
   const isBroken = issue.kind === 'broken';
   return (
     <div className="grid gap-3 p-4 md:grid-cols-[32px_minmax(0,1fr)_180px_300px] md:items-center">
-      <input type="checkbox" checked={selected} onChange={(event) => onSelectedChange(issue.node.id, event.target.checked)} aria-label={t('linkIssues.select', { title: issue.node.title || issue.node.url })} />
+      <input type="checkbox" checked={selected} disabled={readOnly} onChange={(event) => onSelectedChange(issue.node.id, event.target.checked)} aria-label={t('linkIssues.select', { title: issue.node.title || issue.node.url })} />
       <div className="min-w-0">
         <div className="truncate font-medium">{issue.node.title || issue.node.url}</div>
         <div className="mt-1 truncate text-xs text-slate-500">{issue.node.url}</div>
@@ -359,11 +374,11 @@ function IssueRow({
           <Check size={14} />
           {t('linkIssues.markWorking')}
         </button>
-        <button type="button" disabled={disabled} onClick={() => onEdit(issue)} className="inline-flex items-center justify-center gap-1 rounded-md border px-3 py-2 text-sm hover:bg-slate-50 disabled:opacity-50 dark:hover:bg-slate-900">
+        <button type="button" disabled={disabled || readOnly} onClick={() => onEdit(issue)} className="inline-flex items-center justify-center gap-1 rounded-md border px-3 py-2 text-sm hover:bg-slate-50 disabled:opacity-50 dark:hover:bg-slate-900">
           <Edit3 size={14} />
           {t('linkIssues.editUrl')}
         </button>
-        <button type="button" disabled={disabled} onClick={() => onDelete(issue)} className="inline-flex items-center justify-center gap-1 rounded-md border border-red-200 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50 dark:hover:bg-red-500/10">
+        <button type="button" disabled={disabled || readOnly} onClick={() => onDelete(issue)} className="inline-flex items-center justify-center gap-1 rounded-md border border-red-200 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50 dark:hover:bg-red-500/10">
           <Trash2 size={14} />
           {t('linkIssues.deleteOne')}
         </button>

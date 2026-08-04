@@ -9,14 +9,14 @@ task-specific design notes.
 - Product: FavGrove - Bookmark Manager.
 - Type: Chrome and Edge extension.
 - Architecture: Manifest V3 full-screen options page, no popup.
-- Current release line: `0.2.0` beta candidate; `0.1.0` is the historical Markora beta.
+- Current release line: `0.2.1` beta candidate; `0.1.0` is the historical Markora beta.
 - Repository: `https://github.com/everett7623/FavGrove`.
 - Local app data policy: bookmark data stays in the browser. Do not add analytics,
   telemetry, cloud sync, or remote bookmark uploads unless explicitly requested.
 
 ## Current Priorities
 
-1. Keep the verified `0.1.0` baseline and the current `0.2.0` FavGrove beta candidate healthy.
+1. Keep the verified `0.1.0` baseline and the current `0.2.1` FavGrove beta candidate healthy.
 2. Close release-readiness gaps recorded in `PROGRESS.md` and `SESSION.md`.
 3. Continue the active roadmap recorded in `SESSION.md`, `PROGRESS.md`, and
    `TASKS.md`.

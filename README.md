@@ -15,7 +15,7 @@
 </div>
 
 > [!IMPORTANT]
-> `v0.2.0` is the FavGrove beta candidate. It is not yet a Chrome Web Store or Edge Add-ons stable release. The published `v0.1.0` release remains available under the former Markora name.
+> `v0.2.1` is the FavGrove beta candidate. It is not yet a Chrome Web Store or Edge Add-ons stable release. The published `v0.1.0` release remains available under the former Markora name.
 
 ## Why FavGrove
 
@@ -29,7 +29,7 @@ Browser bookmark managers become difficult to use once a collection grows into t
 
 ## Current Features
 
-| Area | Available in `v0.2.0 Beta` |
+| Area | Available in `v0.2.1 Beta` |
 |---|---|
 | Dashboard | Bookmark and folder statistics, quick actions, local recommendations, search history, recent activity |
 | Search | Title, URL, folder-path, full-pinyin, and pinyin-initial search with 300 ms debounce and `Ctrl/Cmd+K` |
@@ -58,7 +58,7 @@ FavGrove uses a Web Worker for scheduling, URL deduplication, concurrency, and p
 
 ### Beta Release
 
-1. After the beta is published, download `favgrove-v0.2.0.zip` from [GitHub Releases](https://github.com/everett7623/FavGrove/releases).
+1. After the beta is published, download `favgrove-v0.2.1.zip` from [GitHub Releases](https://github.com/everett7623/FavGrove/releases).
 2. Extract the ZIP to a permanent local folder.
 3. Open `chrome://extensions` or `edge://extensions`.
 4. Enable **Developer mode**.
@@ -97,23 +97,24 @@ npm run package:release
 The release package is generated at:
 
 ```text
-release/favgrove-v0.2.0.zip
+release/favgrove-v0.2.1.zip
 ```
 
 ## Quality
 
-The `v0.2.0` beta candidate currently passes:
+The `v0.2.1` beta candidate currently passes:
 
 - ESLint with zero errors and zero warnings.
 - TypeScript strict type checking.
-- 112 Vitest unit, component, and release-tool tests.
+- 125 Vitest unit, component, and release-tool tests.
 - 12 Playwright end-to-end flows.
 - Production extension validation.
 - Permission audit for the release manifest and privacy copy.
-- Positive isolated Chrome and Edge `dist/` load checks through the supported DevTools extension API, including the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
+- Positive isolated Chrome and Edge `dist/` load checks through the supported DevTools extension API, including protected-root handling, the MV3 service worker, primary routes, disabled AI state, and zero pre-confirmation external requests.
+- A Chrome-only installed-extension data-safety gate covering real bookmark CRUD, bookmark and empty-folder Undo with Chrome-generated IDs, tag migration, and nested import consistency.
 - Release ZIP packaging.
 
-The Windows [quality workflow](.github/workflows/quality.yml) runs these gates on pushes, pull requests, and manual dispatches. Its first remote run will occur after the current beta commits are pushed.
+The Windows [quality workflow](.github/workflows/quality.yml) runs these gates on pushes, pull requests, and manual dispatches. The previous remote run exposed a newly published transitive dependency advisory; the local fix now passes the dependency gate, and the updated workflow will rerun after these changes are reviewed and pushed.
 
 ## Architecture
 
@@ -128,7 +129,7 @@ src/
 └── router/           HashRouter route definitions
 ```
 
-Core stack: React 18, TypeScript 5, Vite 5, CRXJS, Manifest V3, Zustand, React Router, Tailwind CSS, react-i18next, Vitest, and Playwright.
+Core stack: React 19, TypeScript 5, Vite 5, CRXJS, Manifest V3, Zustand, React Router 8, Tailwind CSS, react-i18next, Vitest, and Playwright.
 
 ## Browser Support
 
@@ -164,5 +165,5 @@ FavGrove does not collect personal data or operate a bookmark/AI proxy service. 
 ## Links
 
 - Repository: [github.com/everett7623/FavGrove](https://github.com/everett7623/FavGrove)
-- Author: **everettlabs** ([GitHub](https://github.com/everett7623))
+- Author: **everettlabs** ([GitHub](https://github.com/everett7623), [Email](mailto:everett7623@gmail.com))
 - Website: [seedloc.com](https://seedloc.com)

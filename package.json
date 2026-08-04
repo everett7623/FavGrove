@@ -1,7 +1,10 @@
 {
   "name": "favgrove-bookmark-manager",
-  "version": "0.2.0",
-  "author": "everettlabs",
+  "version": "0.2.1",
+  "author": {
+    "name": "everettlabs",
+    "email": "everett7623@gmail.com"
+  },
   "license": "GPL-3.0-or-later",
   "private": true,
   "type": "module",
@@ -18,6 +21,7 @@
     "validate:extension": "node scripts/validate-extension-build.mjs",
     "audit:permissions": "node scripts/audit-permissions.mjs",
     "check:browsers": "node scripts/check-browsers.mjs",
+    "check:browser-data-safety": "node scripts/check-browser-data-safety.mjs",
     "check:browsers:visible": "node scripts/run-browser-clickthrough.mjs",
     "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",
     "package:release": "node scripts/package-release.mjs"

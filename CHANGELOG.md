@@ -2,7 +2,7 @@
 
 All notable changes to FavGrove, formerly Markora, are documented in this file.
 
-## [0.2.0] - Unreleased
+## [0.2.1] - Unreleased
 
 ### Added
 
@@ -33,6 +33,13 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 - Renamed the product from `Markora - Bookmark Atlas` to `FavGrove - Bookmark Manager`.
 - Updated English and Chinese product copy, release metadata, promotional assets, and package naming for the FavGrove brand.
 - Preserved browser storage contracts, import schemas, and the existing automatic-scan alarm identifier for upgrade compatibility.
+
+### Fixed
+
+- Prevented managed or read-only link issues from being selected, edited, or deleted.
+- Guarded bookmark reordering against missing source nodes.
+- Stabilized process-based Vite security and installed Chrome data-safety checks under asynchronous UI updates.
+- Added the synchronized extension version, `everettlabs` author, and `everett7623@gmail.com` contact email to the responsive application footer and release metadata.
 
 ## [0.1.0] - 2026-06-07
 

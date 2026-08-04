@@ -10,5 +10,6 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
     expect(screen.getByText('All bookmark data stays in your browser.')).toBeInTheDocument();
+    expect(screen.getByText('v0.2.1 · everettlabs · everett7623@gmail.com')).toBeInTheDocument();
   });
 });

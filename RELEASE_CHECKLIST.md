@@ -13,13 +13,14 @@
 - [x] `npm run validate:extension`
 - [x] `npm run audit:permissions`
 - [x] `npm run check:browsers`
+- [x] `npm run check:browser-data-safety`
 - [x] `npm run capture:store-screenshots`
 - [x] `npm run package:release`
 - [x] Release packaging creates a SHA-256 checksum file beside the ZIP.
 - [x] Release ZIP generation is deterministic for identical production content.
 - [x] Generated ZIP entries are verified against `dist/` before the checksum is written.
 - [x] Windows GitHub Actions quality workflow is configured for the release gates.
-- [ ] The quality workflow passes on the pushed `0.2.0` beta commit.
+- [ ] The updated quality workflow passes on the pushed `0.2.1` beta commit; the prior run failed on the now-fixed `brace-expansion` advisory.
 
 ## Localization
 
@@ -64,14 +65,15 @@
 - [ ] Broken-link permission is requested only after starting a scan.
 - [ ] AI endpoint permission is requested only after opt-in, local preview, and explicit confirmation.
 - [ ] AI domain-only mode sends no bookmark titles, paths, tags, URL queries, or URL fragments.
-- [ ] Rename, move, delete, undo, folder merge, import, export, backup, and missing-bookmark restore flows work without deleting current bookmarks.
+- [x] Isolated Chrome automation verifies real rename, move, delete, bookmark/empty-folder undo with new IDs, tag migration, nested import, and reload consistency.
+- [ ] Visible Chrome/Edge checks confirm folder merge, export, backup, and missing-bookmark restore flows without deleting current bookmarks.
 - [ ] Light, dark, English, and Chinese settings persist after restart.
 
 ## Store Submission
 
 - [x] Store description is current.
 - [x] Store portal submission field worksheet is prepared in `store/submission-fields.md`.
-- [x] GitHub pre-release draft metadata is prepared in `docs/release/github-prerelease-v0.2.0.md`.
+- [x] GitHub pre-release draft metadata is prepared in `docs/release/github-prerelease-v0.2.1.md`.
 - [x] Privacy policy URL is publicly accessible.
 - [x] 1280x800 or 640x400 screenshots are prepared.
 - [x] 440x280 promotional tile is prepared if required.
