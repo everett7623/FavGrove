@@ -50,11 +50,11 @@ describe('updateService', () => {
   });
 
   it('returns a newer update persisted by the background lifecycle', async () => {
-    await persistAvailableExtensionUpdate('0.3.0', 123);
+    await persistAvailableExtensionUpdate('0.3.1', 123);
 
     await expect(updateService.getAvailableUpdate()).resolves.toEqual({
       success: true,
-      data: { version: '0.3.0', detectedAt: 123 }
+      data: { version: '0.3.1', detectedAt: 123 }
     });
   });
 
@@ -67,7 +67,7 @@ describe('updateService', () => {
   it('notifies the options page when the local update record changes', async () => {
     const listener = vi.fn();
     const unsubscribe = updateService.subscribeToAvailableUpdate(listener);
-    await persistAvailableExtensionUpdate('0.3.0', 456);
+    await persistAvailableExtensionUpdate('0.3.1', 456);
 
     storageListener?.({
       [STORAGE_KEYS.availableExtensionUpdate]: { newValue: values.get(STORAGE_KEYS.availableExtensionUpdate) }
@@ -75,7 +75,7 @@ describe('updateService', () => {
 
     await vi.waitFor(() => expect(listener).toHaveBeenCalledWith({
       success: true,
-      data: { version: '0.3.0', detectedAt: 456 }
+      data: { version: '0.3.1', detectedAt: 456 }
     }));
     unsubscribe();
     expect(removeStorageListener).toHaveBeenCalledWith(storageListener);

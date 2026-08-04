@@ -4,14 +4,15 @@ FavGrove follows Semantic Versioning while the product is below `1.0.0`.
 
 ## Current Version
 
-`0.2.1`
+`0.3.0`
 
-This is the FavGrove rebrand beta candidate. The published `0.1.0` release remains the historical Markora beta and must not be rewritten or retagged.
+This is the FavGrove multi-provider AI beta candidate. The published `0.1.0` release remains the historical Markora beta and must not be rewritten or retagged.
 
 ## Release Stages
 
 - `0.1.0`: historical Markora public beta.
 - `0.2.x`: FavGrove rebrand, beta stabilization, and compatible improvements.
+- `0.3.x`: opt-in multi-provider AI analysis and compatible provider adapters.
 - `0.9.x`: release candidates after performance, manual browser, privacy, and store checks pass.
 - `1.0.0`: first stable Chrome and Edge store release.
 

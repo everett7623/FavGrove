@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { aiSettingsService, defaultAiSettings } from '../../services/aiSettingsService';
-import { parseAiEndpoint } from '../../services/aiAnalysisService';
+import { getAiProviderDefinition, resolveAiEndpoint } from '../../services/aiProviderConfig';
 import type { AiConnectionSettings } from '../../shared/types';
 import { flattenFolders } from '../../shared/utils/bookmarks';
 import { useAiAnalysisStore } from '../../stores/aiAnalysisStore';
@@ -28,7 +28,7 @@ export default function AiAnalysisPage() {
   const [scopeId, setScopeId] = useState('all');
   const [configError, setConfigError] = useState<string | null>(null);
   const folders = useMemo(() => flattenFolders(bookmarks), [bookmarks]);
-  const endpoint = parseAiEndpoint(settings.endpoint);
+  const endpoint = resolveAiEndpoint(settings);
 
   useEffect(() => {
     void aiSettingsService.load().then((loaded) => {
@@ -39,7 +39,7 @@ export default function AiAnalysisPage() {
 
   useEffect(() => {
     reset();
-  }, [scopeId, settings.enabled, settings.privacyMode, reset]);
+  }, [scopeId, settings.enabled, settings.privacyMode, settings.provider, settings.endpoint, settings.model, reset]);
 
   useEffect(() => () => useAiAnalysisStore.getState().cancel(), []);
 
@@ -47,7 +47,10 @@ export default function AiAnalysisPage() {
     setConfigError(null);
     if (!endpoint) return setConfigError(t('ai.errors.invalidEndpoint'));
     if (!settings.model.trim()) return setConfigError(t('ai.errors.missingModel'));
-    const saved = await aiSettingsService.save({ ...settings, endpoint: endpoint.toString() });
+    const saved = await aiSettingsService.save({
+      ...settings,
+      endpoint: settings.provider === 'openai-compatible' ? endpoint.toString() : settings.endpoint
+    });
     if (!saved.success) return setConfigError(saved.error);
     setSettings(saved.data);
     const folder = scopeId === 'all' ? null : folders.find((item) => item.id === scopeId);
@@ -55,6 +58,11 @@ export default function AiAnalysisPage() {
   };
 
   const handleRun = () => {
+    setConfigError(null);
+    if (getAiProviderDefinition(settings.provider).apiKeyRequired && !apiKey.trim()) {
+      setConfigError(t('ai.errors.missingApiKey'));
+      return;
+    }
     if (preview) void run(settings, apiKey, language);
   };
 
@@ -76,7 +84,7 @@ export default function AiAnalysisPage() {
 
       {configError || taskError ? <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">{configError ?? taskError}</div> : null}
       {status === 'cancelled' ? <div className="rounded-md border bg-slate-100 p-3 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300">{t('ai.cancelled')}</div> : null}
-      {preview && endpoint ? <AiPreviewCard preview={preview} endpointUrl={endpoint.toString()} model={settings.model} status={status} onRun={handleRun} onCancel={cancel} /> : null}
+      {preview && endpoint ? <AiPreviewCard preview={preview} provider={settings.provider} endpointUrl={endpoint.toString()} model={settings.model} status={status} onRun={handleRun} onCancel={cancel} /> : null}
       {result ? <AiResults result={result} /> : null}
     </div>
   );

@@ -655,7 +655,7 @@ AI Bookmark Library Analysis
 Status:
 
 - Implemented: first read-only model-backed milestone
-- Live-provider compatibility check remains user-configured because FavGrove bundles no endpoint or credential
+- Live-provider compatibility checks remain user-configured because FavGrove bundles no credential; the implementation supports OpenAI, Claude, Gemini, Grok, and generic third-party OpenAI-compatible endpoints
 - Detailed scope: `.codex/tasks/ai-analysis-integration-2026-07-15.md`
 
 Acceptance:
@@ -663,7 +663,7 @@ Acceptance:
 - AI analysis is disabled by default and starts only after explicit scope preview and confirmation
 - The first milestone is read-only and cannot directly mutate bookmarks
 - Local preprocessing minimizes and redacts data before an approved remote request
-- The user selects a compatible endpoint and model; the API key remains in current-page memory only
+- The user selects a provider and model, or configures a third-party compatible endpoint; the API key remains in current-page memory only
 - Provider calls stay behind service/background boundaries and return provider-neutral structured results
 - Large-library analysis supports cancellation, timeout, bounded 200-item samples, full-scope aggregates, and at least 10,000 bookmarks
 - Invalid or malicious model output cannot trigger bookmark operations
@@ -755,7 +755,7 @@ Release Versioning
 Status:
 
 - Version policy documented in `VERSIONING.md`
-- Current development version is `0.2.1`
+- Current development version is `0.3.0`
 - Build and package gates enforce matching semantic versions across package metadata, source Manifest, and production `dist/`
 
 Acceptance:
@@ -846,11 +846,11 @@ Pre-Release And Store Submission Metadata
 
 Status:
 
-- Implemented
+- Previous `0.2.1` metadata implemented; current `0.3.0` pre-release metadata pending
 
 Acceptance:
 
-- GitHub pre-release draft is prepared in `docs/release/github-prerelease-v0.2.1.md`
+- Previous GitHub pre-release draft is preserved in `docs/release/github-prerelease-v0.2.1.md`; prepare matching `0.3.0` metadata before publication
 - Store portal field worksheet is prepared in `store/submission-fields.md`
 - Required permission justifications and beta notes are ready to copy into portals
 
@@ -886,7 +886,7 @@ Acceptance:
 - User-facing Markora and Bookmark Atlas branding is replaced with FavGrove
 - English product name is `FavGrove - Bookmark Manager`
 - Chinese product name is `FavGrove 书签管理器`
-- Package, manifest, UI footer, release archive, store copy, and promotional assets use `0.2.1` FavGrove metadata
+- Package, manifest, UI footer, and active release references use `0.3.0` FavGrove metadata
 - Browser storage keys, import schemas, and stable background identifiers remain compatible
 - The published `v0.1.0` Markora release remains historical and unchanged
 

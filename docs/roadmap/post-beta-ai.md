@@ -38,13 +38,13 @@ move, merge, or tag bookmarks.
 
 ## Implemented First-Milestone Sequence
 
-1. User-provided compatible endpoint and transient-key execution model selected.
+1. Provider-aware adapters and transient-key execution selected for OpenAI, Claude, Gemini, Grok, and third-party compatible endpoints.
 2. Versioned request/response schema and local preprocessing contract implemented.
 3. Opt-in scope preview, URL redaction, token estimation, timeout, and cancellation implemented.
 4. Provider-neutral service/background boundary and structured result UI implemented.
 5. Privacy, store disclosure, unit, performance, and E2E validation updated.
 
-No provider SDK, shared credential, default endpoint, or developer-operated AI proxy is bundled.
+No provider SDK, shared credential, or developer-operated AI proxy is bundled. Official endpoint presets remain disabled until the user opts in and confirms a request.
 
 ## Validation
 

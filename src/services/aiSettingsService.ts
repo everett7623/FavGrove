@@ -1,19 +1,26 @@
 import type { AiConnectionSettings, Result } from '../shared/types';
 import { STORAGE_KEYS } from '../shared/constants/storage';
+import { getAiProviderDefinition, isAiProvider } from './aiProviderConfig';
 import { storageService } from './storageService';
 
 export const defaultAiSettings: AiConnectionSettings = {
   enabled: false,
+  provider: 'openai',
   endpoint: '',
-  model: '',
+  model: getAiProviderDefinition('openai').defaultModel,
   privacyMode: 'domain-only'
 };
 
 function normalize(value: Partial<AiConnectionSettings> | null | undefined): AiConnectionSettings {
+  const hasLegacyConnection = typeof value?.endpoint === 'string' && Boolean(value.endpoint.trim());
+  const provider = isAiProvider(value?.provider) ? value.provider : hasLegacyConnection ? 'openai-compatible' : 'openai';
+  const definition = getAiProviderDefinition(provider);
+  const model = typeof value?.model === 'string' ? value.model.trim().slice(0, 200) : '';
   return {
     enabled: value?.enabled === true,
+    provider,
     endpoint: typeof value?.endpoint === 'string' ? value.endpoint.trim().slice(0, 2_000) : '',
-    model: typeof value?.model === 'string' ? value.model.trim().slice(0, 200) : '',
+    model: model || definition.defaultModel,
     privacyMode: value?.privacyMode === 'metadata' ? 'metadata' : 'domain-only'
   };
 }

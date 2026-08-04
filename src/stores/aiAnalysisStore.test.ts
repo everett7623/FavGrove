@@ -9,7 +9,7 @@ const preview: AiAnalysisPreview = {
   estimatedTokens: 500,
   payload: { schemaVersion: 1, scope: { kind: 'library', bookmarkCount: 0 }, aggregate: { topDomains: [], topFolders: [] }, items: [], truncated: false }
 };
-const settings: AiConnectionSettings = { enabled: true, endpoint: 'https://provider.test/v1/chat/completions', model: 'test-model', privacyMode: 'domain-only' };
+const settings: AiConnectionSettings = { enabled: true, provider: 'openai-compatible', endpoint: 'https://provider.test/v1/chat/completions', model: 'test-model', privacyMode: 'domain-only' };
 
 afterEach(() => vi.restoreAllMocks());
 

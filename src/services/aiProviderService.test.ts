@@ -1,12 +1,21 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { AiProviderRequest } from '../shared/types';
+import type { AiProvider, AiProviderRequest } from '../shared/types';
 import { aiProviderService } from './aiProviderService';
 
-function request(requestId: string): AiProviderRequest {
+const providerEndpoints: Record<AiProvider, string> = {
+  openai: 'https://api.openai.com/v1/chat/completions',
+  anthropic: 'https://api.anthropic.com/v1/messages',
+  gemini: 'https://generativelanguage.googleapis.com/v1beta/models/test-model:generateContent',
+  xai: 'https://api.x.ai/v1/chat/completions',
+  'openai-compatible': 'https://provider.test/v1/chat/completions'
+};
+
+function request(requestId: string, provider: AiProvider = 'openai-compatible'): AiProviderRequest {
   return {
     type: 'run-ai-analysis',
     requestId,
-    endpoint: 'https://provider.test/v1/chat/completions',
+    provider,
+    endpoint: providerEndpoints[provider],
     model: 'test-model',
     apiKey: 'session-key',
     language: 'en',
@@ -42,6 +51,60 @@ describe('AI provider service', () => {
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(init.headers).toMatchObject({ Authorization: 'Bearer session-key' });
     expect(JSON.parse(String(init.body))).toMatchObject({ model: 'test-model', stream: false });
+  });
+
+  it('uses the Anthropic Messages contract and extracts text content', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ content: [{ type: 'text', text: JSON.stringify(analysis) }] }), { status: 200 })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(aiProviderService.run(request('anthropic', 'anthropic'))).resolves.toEqual({ success: true, data: analysis });
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(url).toBe(providerEndpoints.anthropic);
+    expect(init.headers).toMatchObject({
+      'x-api-key': 'session-key',
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    });
+    expect(body).toMatchObject({ model: 'test-model', max_tokens: 4096, stream: false });
+    expect(body.messages[0].content).toContain('schemaVersion');
+  });
+
+  it('uses the Gemini generateContent contract and extracts candidate parts', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(analysis) }] } }] }), { status: 200 })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(aiProviderService.run(request('gemini', 'gemini'))).resolves.toEqual({ success: true, data: analysis });
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(url).toBe(providerEndpoints.gemini);
+    expect(init.headers).toMatchObject({ 'x-goog-api-key': 'session-key' });
+    expect(body.systemInstruction.parts[0].text).toContain('bookmark-library metadata');
+    expect(body.contents[0].parts[0].text).toContain('schemaVersion');
+  });
+
+  it('uses the OpenAI-compatible contract for xAI', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(analysis) } }] }), { status: 200 })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(aiProviderService.run(request('xai', 'xai'))).resolves.toEqual({ success: true, data: analysis });
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(providerEndpoints.xai);
+    expect(init.headers).toMatchObject({ Authorization: 'Bearer session-key' });
+  });
+
+  it('rejects an official provider request when its endpoint is overridden', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const result = await aiProviderService.run({ ...request('wrong-endpoint', 'openai'), endpoint: 'https://attacker.test/v1/chat/completions' });
+    expect(result.success).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('filters unsupported findings while preserving supported findings', async () => {

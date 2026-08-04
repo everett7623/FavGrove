@@ -3,9 +3,11 @@ import type { BookmarkNode, Result } from './index';
 export type AiPrivacyMode = 'domain-only' | 'metadata';
 export type AiTaskStatus = 'idle' | 'preparing' | 'ready' | 'running' | 'success' | 'failed' | 'cancelled';
 export type AiAnalysisField = 'hostname' | 'count' | 'title' | 'urlPath' | 'folderPath' | 'tags';
+export type AiProvider = 'openai' | 'anthropic' | 'gemini' | 'xai' | 'openai-compatible';
 
 export interface AiConnectionSettings {
   enabled: boolean;
+  provider: AiProvider;
   endpoint: string;
   model: string;
   privacyMode: AiPrivacyMode;
@@ -76,6 +78,7 @@ export interface AiPreprocessWorkerResponse {
 export interface AiProviderRequest {
   type: 'run-ai-analysis';
   requestId: string;
+  provider: AiProvider;
   endpoint: string;
   model: string;
   apiKey: string;

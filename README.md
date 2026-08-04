@@ -10,12 +10,12 @@
   [![Release](https://img.shields.io/github/v/release/everett7623/FavGrove?include_prereleases&label=beta)](https://github.com/everett7623/FavGrove/releases)
   [![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4)](manifest.json)
   [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6)](tsconfig.json)
-  [![Tests](https://img.shields.io/badge/tests-112%20Vitest%20%2B%2012%20E2E-success)](#quality)
+  [![Tests](https://img.shields.io/badge/tests-137%20Vitest%20%2B%2012%20E2E-success)](#quality)
   [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 </div>
 
 > [!IMPORTANT]
-> `v0.2.1` is the FavGrove beta candidate. It is not yet a Chrome Web Store or Edge Add-ons stable release. The published `v0.1.0` release remains available under the former Markora name.
+> `v0.3.0` is the FavGrove multi-provider AI beta candidate. It is not yet a Chrome Web Store or Edge Add-ons stable release. The published `v0.1.0` release remains available under the former Markora name.
 
 ## Why FavGrove
 
@@ -29,7 +29,7 @@ Browser bookmark managers become difficult to use once a collection grows into t
 
 ## Current Features
 
-| Area | Available in `v0.2.1 Beta` |
+| Area | Available in `v0.3.0 Beta` |
 |---|---|
 | Dashboard | Bookmark and folder statistics, quick actions, local recommendations, search history, recent activity |
 | Search | Title, URL, folder-path, full-pinyin, and pinyin-initial search with 300 ms debounce and `Ctrl/Cmd+K` |
@@ -40,7 +40,7 @@ Browser bookmark managers become difficult to use once a collection grows into t
 | Export | HTML, JSON, CSV, TXT, and OPML |
 | Settings | Theme, language, scanner, cache, automatic scan, backup retention, and non-destructive missing-bookmark recovery |
 | Updates | Browser-managed Chrome/Edge store updates with an in-app reload notice when a new version is ready |
-| AI analysis | Disabled by default; whole-library or folder analysis through a user-provided compatible base URL or endpoint, resolved request preview, URL redaction, cancellation, and read-only structured results |
+| AI analysis | Disabled by default; OpenAI, Claude, Gemini, Grok, and third-party OpenAI-compatible analysis with provider-aware request previews, URL redaction, cancellation, and read-only structured results |
 | Privacy | Local storage by default; no analytics, telemetry, shared AI key, developer-controlled bookmark server, or AI proxy |
 
 The remaining roadmap is tracked in [TASKS.md](TASKS.md) and [PROGRESS.md](PROGRESS.md). Known gaps include final visible browser click-through checks, live-provider compatibility testing with user-owned credentials, store portal submission, and later automatic recommendation work. Full destructive replacement restore is documented as deferred.
@@ -58,7 +58,7 @@ FavGrove uses a Web Worker for scheduling, URL deduplication, concurrency, and p
 
 ### Beta Release
 
-1. After the beta is published, download `favgrove-v0.2.1.zip` from [GitHub Releases](https://github.com/everett7623/FavGrove/releases).
+1. After the beta is published, download `favgrove-v0.3.0.zip` from [GitHub Releases](https://github.com/everett7623/FavGrove/releases).
 2. Extract the ZIP to a permanent local folder.
 3. Open `chrome://extensions` or `edge://extensions`.
 4. Enable **Developer mode**.
@@ -97,12 +97,12 @@ npm run package:release
 The release package is generated at:
 
 ```text
-release/favgrove-v0.2.1.zip
+release/favgrove-v0.3.0.zip
 ```
 
 ## Quality
 
-The `v0.2.1` beta candidate currently passes:
+The `v0.3.0` beta candidate currently passes:
 
 - ESLint with zero errors and zero warnings.
 - TypeScript strict type checking.

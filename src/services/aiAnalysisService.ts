@@ -9,22 +9,10 @@ import type {
   Result
 } from '../shared/types';
 import { createAiAnalysisPayload } from '../shared/utils/aiPreprocess';
+import { getAiProviderDefinition, parseOpenAiCompatibleEndpoint, resolveAiEndpoint } from './aiProviderConfig';
 import { aiProviderService } from './aiProviderService';
 
-export function parseAiEndpoint(value: string): URL | null {
-  try {
-    const endpoint = new URL(value.trim());
-    if (!['http:', 'https:'].includes(endpoint.protocol) || endpoint.username || endpoint.password) return null;
-    const pathname = endpoint.pathname.replace(/\/+$/, '');
-    if (!pathname) endpoint.pathname = '/v1/chat/completions';
-    else if (pathname === '/v1') endpoint.pathname = '/v1/chat/completions';
-    else endpoint.pathname = pathname;
-    endpoint.hash = '';
-    return endpoint;
-  } catch {
-    return null;
-  }
-}
+export const parseAiEndpoint = parseOpenAiCompatibleEndpoint;
 
 async function requestEndpointPermission(endpoint: URL): Promise<boolean> {
   if (!globalThis.chrome?.permissions?.request) return true;
@@ -89,15 +77,19 @@ export const aiAnalysisService = {
     signal: AbortSignal
   ): Promise<AiProviderResult> {
     if (signal.aborted) return { success: false, error: i18n.t('ai.errors.cancelled') };
-    const endpoint = parseAiEndpoint(settings.endpoint);
+    const endpoint = resolveAiEndpoint(settings);
     if (!endpoint) return { success: false, error: i18n.t('ai.errors.invalidEndpoint') };
     if (!settings.model.trim()) return { success: false, error: i18n.t('ai.errors.missingModel') };
+    if (getAiProviderDefinition(settings.provider).apiKeyRequired && !apiKey.trim()) {
+      return { success: false, error: i18n.t('ai.errors.missingApiKey') };
+    }
     if (!(await requestEndpointPermission(endpoint))) return { success: false, error: i18n.t('ai.errors.permissionDenied') };
     if (signal.aborted) return { success: false, error: i18n.t('ai.errors.cancelled') };
 
     const request: AiProviderRequest = {
       type: 'run-ai-analysis',
       requestId: crypto.randomUUID(),
+      provider: settings.provider,
       endpoint: endpoint.toString(),
       model: settings.model.trim(),
       apiKey: apiKey.trim(),

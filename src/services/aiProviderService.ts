@@ -1,6 +1,8 @@
 import i18n from '../shared/i18n';
 import type { AiAnalysisResult, AiProviderRequest, Result } from '../shared/types';
 import { parseAiAnalysisResponse } from '../shared/utils/aiResponse';
+import { buildAiProviderHttpRequest, extractAiProviderContent, getAiProviderResponsePath } from './aiProviderAdapters';
+import { getAiProviderDefinition, isAiProvider, resolveAiEndpoint } from './aiProviderConfig';
 
 const REQUEST_TIMEOUT_MS = 60_000;
 const MAX_PROVIDER_RESPONSE_BYTES = 1_000_000;
@@ -18,22 +20,6 @@ function providerMessage(value: unknown): string | null {
   const error = record.error && typeof record.error === 'object' ? (record.error as Record<string, unknown>) : null;
   const message = error?.message ?? record.message;
   return typeof message === 'string' && message.trim() ? message.trim().slice(0, 300) : null;
-}
-
-function completionContent(value: unknown): string | null {
-  if (!value || typeof value !== 'object') return null;
-  const choices = (value as Record<string, unknown>).choices;
-  if (!Array.isArray(choices) || !choices[0] || typeof choices[0] !== 'object') return null;
-  const message = (choices[0] as Record<string, unknown>).message;
-  if (!message || typeof message !== 'object') return null;
-  const content = (message as Record<string, unknown>).content;
-  if (typeof content === 'string') return content;
-  if (!Array.isArray(content)) return null;
-  const text = content
-    .map((part) => (part && typeof part === 'object' ? (part as Record<string, unknown>).text : null))
-    .filter((part): part is string => typeof part === 'string')
-    .join('');
-  return text || null;
 }
 
 async function readProviderBody(response: Response): Promise<unknown> {
@@ -102,26 +88,25 @@ function validateEvidence(result: AiAnalysisResult, request: AiProviderRequest):
 
 export const aiProviderService = {
   async run(request: AiProviderRequest): Promise<Result<AiAnalysisResult>> {
+    if (!isAiProvider(request.provider)) return { success: false, error: i18n.t('ai.errors.invalidEndpoint') };
+    const expectedEndpoint = resolveAiEndpoint(request);
+    if (!expectedEndpoint || expectedEndpoint.toString() !== request.endpoint) {
+      return { success: false, error: i18n.t('ai.errors.invalidEndpoint') };
+    }
+    if (getAiProviderDefinition(request.provider).apiKeyRequired && !request.apiKey.trim()) {
+      return { success: false, error: i18n.t('ai.errors.missingApiKey') };
+    }
     if (activeRequests.has(request.requestId)) return { success: false, error: i18n.t('ai.errors.providerFailed') };
     const controller = new AbortController();
     activeRequests.set(request.requestId, controller);
     const timeoutId = setTimeout(() => controller.abort('timeout'), REQUEST_TIMEOUT_MS);
 
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (request.apiKey) headers.Authorization = `Bearer ${request.apiKey}`;
+      const providerRequest = buildAiProviderHttpRequest(request, systemPrompt(request.language));
       const response = await fetch(request.endpoint, {
         method: 'POST',
-        headers,
-        body: JSON.stringify({
-          model: request.model,
-          stream: false,
-          temperature: 0.2,
-          messages: [
-            { role: 'system', content: systemPrompt(request.language) },
-            { role: 'user', content: JSON.stringify(request.payload) }
-          ]
-        }),
+        headers: providerRequest.headers,
+        body: JSON.stringify(providerRequest.body),
         signal: controller.signal
       });
       const body = await readProviderBody(response);
@@ -130,8 +115,10 @@ export const aiProviderService = {
         return { success: false, error: detail ? `${detail} (HTTP ${response.status})` : `${i18n.t('ai.errors.providerFailed')} (HTTP ${response.status})` };
       }
       if (body === null) return { success: false, error: i18n.t('ai.errors.invalidResponse') };
-      const content = completionContent(body);
-      if (!content) return { success: false, error: i18n.t('ai.errors.missingResponseContent') };
+      const content = extractAiProviderContent(request, body);
+      if (!content) {
+        return { success: false, error: i18n.t('ai.errors.missingResponseContent', { path: getAiProviderResponsePath(request) }) };
+      }
       const parsed = parseAiAnalysisResponse(content, i18n.t('ai.errors.invalidResponseSchema'));
       return parsed.success ? validateEvidence(parsed.data, request) : parsed;
     } catch (error) {

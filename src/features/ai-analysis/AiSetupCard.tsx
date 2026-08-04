@@ -1,7 +1,8 @@
 import { BrainCircuit, ShieldCheck } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AiConnectionSettings, AiTaskStatus, BookmarkNode } from '../../shared/types';
+import { AI_PROVIDER_DEFINITIONS, getAiProviderDefinition, resolveAiEndpoint } from '../../services/aiProviderConfig';
+import type { AiConnectionSettings, AiProvider, AiTaskStatus, BookmarkNode } from '../../shared/types';
 import { Button } from '../../shared/components/ui/Button';
 
 interface AiSetupCardProps {
@@ -21,7 +22,15 @@ const inputClassName = 'mt-1 w-full rounded-md border bg-white px-3 py-2 text-sm
 export function AiSetupCard({ settings, setSettings, apiKey, setApiKey, folders, scopeId, setScopeId, status, onPrepare }: AiSetupCardProps) {
   const { t } = useTranslation();
   const busy = status === 'preparing' || status === 'running';
-  const ready = settings.enabled && settings.endpoint.trim() && settings.model.trim();
+  const provider = getAiProviderDefinition(settings.provider);
+  const endpoint = resolveAiEndpoint(settings);
+  const ready = settings.enabled && Boolean(endpoint) && Boolean(settings.model.trim());
+
+  const handleProviderChange = (nextProvider: AiProvider) => {
+    const definition = getAiProviderDefinition(nextProvider);
+    setSettings((current) => ({ ...current, provider: nextProvider, model: definition.defaultModel }));
+    setApiKey('');
+  };
 
   return (
     <section className="rounded-lg border bg-white p-5 shadow-sm dark:bg-slate-950">
@@ -47,16 +56,17 @@ export function AiSetupCard({ settings, setSettings, apiKey, setApiKey, folders,
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <label className="text-sm font-medium">
-          {t('ai.endpoint')}
-          <input
-            type="url"
-            value={settings.endpoint}
-            onChange={(event) => setSettings((current) => ({ ...current, endpoint: event.target.value }))}
-            placeholder={t('ai.endpointPlaceholder')}
+          {t('ai.provider')}
+          <select
+            value={settings.provider}
+            onChange={(event) => handleProviderChange(event.target.value as AiProvider)}
             className={inputClassName}
             disabled={!settings.enabled || busy}
-          />
-          <span className="mt-1 block text-xs font-normal text-slate-500">{t('ai.endpointDescription')}</span>
+          >
+            {AI_PROVIDER_DEFINITIONS.map((definition) => (
+              <option key={definition.id} value={definition.id}>{t(`ai.providers.${definition.id}`)}</option>
+            ))}
+          </select>
         </label>
         <label className="text-sm font-medium">
           {t('ai.model')}
@@ -64,12 +74,32 @@ export function AiSetupCard({ settings, setSettings, apiKey, setApiKey, folders,
             value={settings.model}
             onChange={(event) => setSettings((current) => ({ ...current, model: event.target.value }))}
             placeholder={t('ai.modelPlaceholder')}
+            list="ai-model-options"
             className={inputClassName}
             disabled={!settings.enabled || busy}
           />
+          <datalist id="ai-model-options">
+            {provider.modelSuggestions.map((model) => <option key={model} value={model} />)}
+          </datalist>
+          <span className="mt-1 block text-xs font-normal text-slate-500">{t('ai.modelDescription')}</span>
+        </label>
+        <label className="text-sm font-medium lg:col-span-2">
+          {t('ai.endpoint')}
+          <input
+            type="url"
+            value={provider.endpointMode === 'custom' ? settings.endpoint : endpoint?.toString() ?? provider.endpoint}
+            onChange={(event) => setSettings((current) => ({ ...current, endpoint: event.target.value }))}
+            placeholder={t('ai.endpointPlaceholder')}
+            className={inputClassName}
+            disabled={!settings.enabled || busy}
+            readOnly={provider.endpointMode === 'fixed'}
+          />
+          <span className="mt-1 block text-xs font-normal text-slate-500">
+            {t(provider.endpointMode === 'custom' ? 'ai.endpointDescription' : 'ai.officialEndpointDescription')}
+          </span>
         </label>
         <label className="text-sm font-medium">
-          {t('ai.apiKey')}
+          {t(provider.apiKeyRequired ? 'ai.apiKeyRequired' : 'ai.apiKeyOptional')}
           <input type="password" value={apiKey} onChange={(event) => setApiKey(event.target.value)} className={inputClassName} disabled={!settings.enabled || busy} />
           <span className="mt-1 block text-xs font-normal text-slate-500">{t('ai.apiKeyDescription')}</span>
         </label>

@@ -8,7 +8,7 @@ AI Bookmark Analysis And Release Readiness
 
 ## Current Goal
 
-Complete the first read-only AI analysis milestone, preserve the local-first consent boundary, and close the remaining `0.2.1` release gaps.
+Complete and verify the `0.3.0` multi-provider AI analysis milestone while preserving the local-first consent boundary and existing release gates.
 
 ## Current Status
 
@@ -58,7 +58,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - Link scan results now separate confirmed broken links from links that could not be verified because of timeout, server, network, proxy, DNS, TLS, or regional access conditions.
 - `/scanner/links` provides filtering, 50-row pagination, manual open-and-check, and backup-protected batch deletion.
 - Link issue rows provide separate open, edit URL, and confirmed delete actions.
-- The product brand is now `FavGrove - Bookmark Manager` / `FavGrove 书签管理器` for the `0.2.1` beta candidate; the published `0.1.0` Markora release remains historical.
+- The product brand is `FavGrove - Bookmark Manager` / `FavGrove 书签管理器` for the `0.3.0` multi-provider AI beta candidate; the published `0.1.0` Markora release remains historical.
 - Import/Export currently supports:
   - JSON, CSV, TXT, OPML, and HTML export.
   - Worker-based Netscape HTML import parsing.
@@ -91,7 +91,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - `npm run validate:extension` rejects development URLs, broad resource exposure, and missing background service workers.
 - Multi-format import requirements are now recorded for JSON, CSV, TXT, and OPML.
 - Localization audit found 15 English locale keys missing from Chinese and additional hardcoded user-facing English strings.
-- `VERSIONING.md` defines `0.2.1` as the FavGrove beta candidate, preserves `0.1.0` as the historical Markora beta, and reserves `1.0.0` for the first stable store release.
+- `VERSIONING.md` defines `0.3.0` as the FavGrove multi-provider AI beta candidate, preserves `0.1.0` as the historical Markora beta, and reserves `1.0.0` for the first stable store release.
 - Locale key parity was improved for `en` and `zh_CN`, and multiple Manager/Scanner/Settings hardcoded UI strings were switched to i18n keys.
 - `bookmarkStore` activity log messages and URL validation error text were migrated to i18n keys.
 - Service-layer fallback error messages in storage/import/bookmark/scan/link-request services were migrated to i18n keys.
@@ -133,7 +133,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
 - Dependency auditing now runs through the official npm registry in local checks and Windows CI; production must be clean, and only the documented Vite 5/esbuild development advisory IDs are allowed pending a Vite-major decision.
 - Shared Vite development and preview configuration now binds to `127.0.0.1` and restricts Host/CORS origins as defense in depth for the remaining Vite 5 advisories.
-- Release packaging now writes `release/favgrove-v0.2.1.sha256` beside the ZIP, and the GitHub pre-release draft lists both assets.
+- Release packaging writes a versioned SHA-256 file beside the ZIP and verifies both artifacts against the synchronized release version.
 - Release ZIP generation is deterministic across identical production content by sorting entry paths and normalizing ZIP timestamps; a Windows regression test covers differing source order and file times.
 - Packaging now reopens the ZIP and verifies every entry against `dist/` before generating the checksum; invalid or stale archives are deleted.
 - Build validation and release packaging now reject invalid or mismatched versions across package metadata, source Manifest, and the built Manifest, preventing stale `dist/` archives.
@@ -141,15 +141,15 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - `npm run audit:permissions` verifies the manifest permission boundary and `PRIVACY.md` permission copy.
 - Visible browser click-through steps and an isolated visible runner are prepared in `docs/release/browser-clickthrough.md`; the final human-visible Chrome and Edge results still need to be recorded before store submission.
 - Full destructive replacement restore is deferred by `docs/decisions/restore-strategy.md`; the current recovery flow is additive, backup-protected, path-mapped, and service-boundary scoped.
-- GitHub pre-release metadata, store submission fields, and post-beta AI guardrails are prepared in `docs/release/github-prerelease-v0.2.1.md`, `store/submission-fields.md`, and `docs/roadmap/post-beta-ai.md`.
+- The previous `0.2.1` GitHub pre-release metadata remains in `docs/release/github-prerelease-v0.2.1.md`; store submission fields and post-beta AI guardrails remain in `store/submission-fields.md` and `docs/roadmap/post-beta-ai.md`.
 - Link checking now treats ambiguous 4xx responses, including 404, authentication, proxy, and rate-limit responses, as requiring manual verification; only HTTP 410 is automatically classified as confirmed broken.
 - Legacy cached 404 results are reclassified under the conservative policy, and link issue rows can be dismissed with "Works for me" / "确认可打开" without changing the bookmark.
 - Manually dismissed link URLs are now persisted locally and filtered from future scans and cached results.
 - Settings now manages ignored link-check URLs with local search, per-URL re-enable, and confirmation-protected clear-all actions.
 - Link issue rows now support an in-place single-link recheck using the current scanner settings; successful checks remove the issue, while failures refresh its status and classification without adding an ignore rule.
-- The first AI milestone is implemented as optional, disabled-by-default, read-only bookmark-library analysis using a user-provided Chat Completions-compatible endpoint and model.
-- AI supports whole-library or folder scope, domain-only or redacted metadata modes, exact request preview, transient API keys/results, separate endpoint permission, timeout, cancellation, provider error handling, and strict structured result validation.
-- AI provider compatibility now accepts an origin or `/v1` base URL, shows the exact resolved Chat Completions URL, accepts standard string or text-part response content, filters individual unsupported findings, and distinguishes response-content, schema, and evidence failures without logging provider output.
+- AI analysis remains optional, disabled by default, and read-only, with adapters for OpenAI, Claude, Gemini, Grok, and generic third-party OpenAI-compatible endpoints.
+- AI supports whole-library or folder scope, domain-only or redacted metadata modes, provider-aware request preview, transient API keys/results, separate endpoint permission, timeout, cancellation, provider error handling, and strict structured result validation.
+- Official provider endpoints are fixed, third-party compatible endpoints accept an origin, `/v1` base URL, or full Chat Completions URL, and legacy settings migrate without losing endpoint/model/privacy values.
 - Local AI preprocessing runs in a Worker, strips URL queries/fragments, caps samples at 200, and covers full-scope aggregates for at least 10,000 bookmarks.
 - Store-installed updates now use the Chrome/Edge-managed `runtime.onUpdateAvailable` lifecycle. FavGrove persists only the pending version and detection time, shows a localized global notice, and reloads only after the user chooses to apply the downloaded update. No remote version polling or new permission was added.
 - The update notice now appears immediately if Chrome or Edge downloads an update while FavGrove is already open, and stale non-newer update records are cleared locally.
@@ -162,7 +162,7 @@ Complete the first read-only AI analysis milestone, preserve the local-first con
 - A Chrome-only installed-extension data-safety gate verifies real CRUD, bookmark/empty-folder Undo, tag-ID migration, and nested import consistency; Chrome and Edge smoke checks also verify synthetic roots are hidden and permanent roots are read-only.
 - `brace-expansion` is locked to safe `1.1.18` and `5.0.9` releases after the first remote quality run exposed a newly published high-severity development advisory.
 - Link Issues now prevents selection, URL edits, and deletion for managed/read-only bookmarks, bookmark reordering handles a missing source safely, and the process-based Vite security test has bounded timeouts that remain stable in the full suite.
-- FavGrove beta metadata is synchronized at `0.2.1`; the responsive footer displays `v0.2.1 · everettlabs · everett7623@gmail.com`, Manifest/npm metadata uses the same author identity, and active release/package references use the matching version.
+- FavGrove beta metadata is synchronized at `0.3.0`; the responsive footer displays `v0.3.0 · everettlabs · everett7623@gmail.com`, Manifest/npm metadata uses the same author identity, and active release/package references use the matching version.
 
 ## Next Step
 
@@ -172,7 +172,7 @@ Load the rebuilt `dist/` in visible Chrome and Edge, complete the checklist incl
 
 1. Run the visible Chrome and Edge checklist in `docs/release/browser-clickthrough.md`.
 2. Copy the verified public privacy policy URL and support URL into the store portals.
-3. Create the GitHub beta pre-release from `docs/release/github-prerelease-v0.2.1.md`.
+3. Prepare and create the `0.3.0` GitHub beta pre-release after the current gates pass.
 4. Upload the verified release ZIP only after the visible browser pass is recorded.
 5. Record a live-provider AI compatibility result without persisting the user-owned API key.
 
@@ -200,7 +200,7 @@ Latest verification:
 - Production extension validation: passed.
 - E2E isolation check: passed; `dist/` hashes remained unchanged.
 - Release audit rerun passed: ESLint, TypeScript, 42 Vitest tests, 7 Playwright tests, production build, extension validation, and release packaging.
-- Current release classification: `0.2.1` FavGrove beta candidate. The public `0.1.0` Markora beta remains historical; stable store publication is not yet approved.
+- Current release classification: `0.3.0` FavGrove multi-provider AI beta candidate. The public `0.1.0` Markora beta remains historical; stable store publication is not yet approved.
 - Link-check transport regression verification passed with 46 Vitest tests and 7 Playwright tests after moving HTTPS requests to the background service worker.
 - Browser-store URL protection verification passed with 48 Vitest tests and 7 Playwright tests; protected store links are skipped before `fetch`.
 - GitHub README was rebuilt for the public beta, with honest feature status, installation instructions, privacy boundaries, browser support, quality gates, and the new repository URL.
@@ -244,6 +244,7 @@ Latest verification:
 - A later 2026-07-25 registry refresh added high-severity `GHSA-qwww-vcr4-c8h2` for React Router's unstable RSC APIs, causing the production dependency gate to fail again. FavGrove has no RSC, server rendering, or action endpoints, but the release policy does not waive production-package findings. Router `8.3.0` requires React `19.2.7+`, so no stack migration or commit was made without explicit approval.
 - On 2026-07-25, the approved React `19.2.7` / React DOM `19.2.7` / React Router `8.3.0` migration replaced `react-router-dom` imports with `react-router`, added matching React 19 type packages, and patched PostCSS/Nanoid after a fresh development audit. The production dependency audit again passes with zero vulnerabilities; ESLint with 0 warnings, TypeScript strict checking, 32 Vitest files with 115 tests, the 10,000-bookmark performance gate, production extension validation and permission audit, 12 Playwright E2E tests, and isolated installed Chrome `150.0.7871.129` / Edge `150.0.4078.96` verification passed. The browser checker now waits for the lazy AI route before asserting its disabled state. Verified packaging produced a 340,358-byte ZIP with SHA-256 `c4bc13f4e6982e0811d95612ee5b63f70509035f3212784db4b45cd25a87b999`.
 - On 2026-08-04, the `0.2.1` stabilization pass fixed the installed Chrome data-safety move/delete race, converted the Vite server security child process to bounded asynchronous execution, and synchronized the responsive version/author/email attribution with Manifest/npm metadata. Production dependencies remained at zero vulnerabilities; ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension validation and permission audit, Chrome `151.0.7922.72` / Edge `151.0.4129.59` installed checks, Chrome real-data safety, and 12 Playwright E2E tests passed. Verified packaging produced a 343,770-byte ZIP with SHA-256 `4a0f56ccd57766045537bc7329e63b365b64d0fa18bcbfd0f0f97f3a907cf73f`.
+- On 2026-08-04, the `0.3.0` multi-provider AI phase added OpenAI, Claude, Gemini, Grok, and generic OpenAI-compatible adapters; fixed official endpoints; provider-aware model suggestions and previews; transient credential handling; and legacy settings migration. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 137 tests passed, production extension validation and permission audit passed, and all 12 Playwright E2E flows passed. Authenticated live-provider checks remain user-credential dependent and were not run.
 
 ## Notes
 

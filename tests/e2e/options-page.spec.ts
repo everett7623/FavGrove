@@ -7,7 +7,7 @@ test('renders all foundation navigation routes', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Local recommendations' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Start scan/ })).toBeVisible();
-  await expect(page.getByText('v0.2.1 · everettlabs · everett7623@gmail.com')).toBeVisible();
+  await expect(page.getByText('v0.3.0 · everettlabs · everett7623@gmail.com')).toBeVisible();
 
   await page.getByRole('link', { name: 'Scanner' }).click();
   await expect(page.getByRole('heading', { name: 'Scanner' })).toBeVisible();
@@ -253,8 +253,15 @@ test('requires AI opt-in and preview before returning read-only analysis', async
   const previewButton = page.getByRole('button', { name: 'Build request preview' });
   await expect(previewButton).toBeDisabled();
   await page.getByRole('checkbox', { name: /Enable AI analysis/ }).check();
-  await page.getByRole('textbox', { name: /OpenAI-compatible base URL/ }).fill('https://provider.test');
-  await page.getByRole('textbox', { name: 'Model' }).fill('test-model');
+  const providerSelect = page.getByRole('combobox', { name: 'AI provider' });
+  await expect(providerSelect).toHaveValue('openai');
+  await providerSelect.selectOption('anthropic');
+  await expect(page.getByRole('textbox', { name: /Request endpoint/ })).toHaveValue('https://api.anthropic.com/v1/messages');
+  await providerSelect.selectOption('gemini');
+  await expect(page.getByRole('textbox', { name: /Request endpoint/ })).toHaveValue(/models\/gemini-.*:generateContent/);
+  await providerSelect.selectOption('openai-compatible');
+  await page.getByRole('textbox', { name: /Request endpoint/ }).fill('https://provider.test');
+  await page.getByRole('combobox', { name: /^Model/ }).fill('test-model');
   await previewButton.click();
 
   await expect(page.getByRole('heading', { name: 'Request preview' })).toBeVisible();
@@ -282,8 +289,9 @@ test('cancels an AI request and surfaces provider failures', async ({ page }) =>
   await page.goto('/');
   await page.getByRole('link', { name: 'AI Analysis' }).click();
   await page.getByRole('checkbox', { name: /Enable AI analysis/ }).check();
-  await page.getByRole('textbox', { name: /OpenAI-compatible base URL/ }).fill('https://slow-provider.test/v1/chat/completions');
-  await page.getByRole('textbox', { name: 'Model' }).fill('test-model');
+  await page.getByRole('combobox', { name: 'AI provider' }).selectOption('openai-compatible');
+  await page.getByRole('textbox', { name: /Request endpoint/ }).fill('https://slow-provider.test/v1/chat/completions');
+  await page.getByRole('combobox', { name: /^Model/ }).fill('test-model');
   await page.getByRole('button', { name: 'Build request preview' }).click();
   await page.getByRole('button', { name: 'Confirm and analyze' }).click();
   await expect(page.getByRole('button', { name: 'Cancel analysis' })).toBeVisible();

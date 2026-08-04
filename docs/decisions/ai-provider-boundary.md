@@ -4,11 +4,14 @@ Date: 2026-07-16
 
 ## Decision
 
-FavGrove implements its first model-backed feature through a user-provided
-OpenAI-compatible Chat Completions endpoint and model name. FavGrove does not
-select a provider, bundle a provider SDK, ship a shared key, or operate a proxy.
+FavGrove implements its model-backed feature through provider-aware fetch
+adapters for OpenAI Chat Completions, Anthropic Claude Messages, Google Gemini
+`generateContent`, xAI Grok Chat Completions, and generic third-party
+OpenAI-compatible endpoints. FavGrove does not bundle provider SDKs, ship a
+shared key, or operate a proxy.
 
-Users may enter an origin, an `/v1` base URL, or a full Chat Completions path.
+Official provider endpoints are fixed in the registry. Third-party compatible
+users may enter an origin, an `/v1` base URL, or a full Chat Completions path.
 Only the unambiguous origin and `/v1` forms are completed automatically;
 custom paths remain unchanged, and the exact resolved URL is shown before the
 request is confirmed.
@@ -20,7 +23,7 @@ gates remain mandatory and are implemented with the feature.
 ## Credential And Storage Boundary
 
 - AI analysis is disabled by default.
-- Endpoint, model, enabled state, and privacy mode are stored locally.
+- Provider, endpoint, model, enabled state, and privacy mode are stored locally.
 - The API key is held only in the current options-page memory.
 - The key is sent directly to the selected endpoint through the background
   request boundary and is not logged, exported, or persisted.
@@ -33,7 +36,7 @@ Every remote request requires this sequence:
 1. The user enables AI analysis.
 2. The user selects the whole library or one folder.
 3. A Web Worker builds a local, bounded request preview.
-4. FavGrove shows the destination origin, model, scope, fields, counts, and
+4. FavGrove shows the provider, destination URL, model, scope, fields, counts, and
    estimated token size.
 5. The user confirms the request and grants optional host access for the
    selected endpoint.
@@ -73,8 +76,9 @@ output has no path to Chrome bookmark mutation APIs.
 
 ## Known Limitations
 
-- Providers must support the Chat Completions request and response shape.
+- Each official provider must use its documented protocol; third-party endpoints
+  must support the OpenAI-compatible Chat Completions request and response shape.
 - Provider retention, training, regional, pricing, and quota policies are
   controlled by the provider selected by the user.
-- Automated tests use a simulated compatible provider. A visible live-provider
-  check still requires the user's endpoint, model, and credential.
+- Automated tests cover every adapter with simulated provider responses. Visible
+  live-provider checks still require the user's model and credential.

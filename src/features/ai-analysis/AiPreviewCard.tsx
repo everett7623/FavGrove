@@ -1,10 +1,11 @@
 import { Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { AiAnalysisPreview, AiTaskStatus } from '../../shared/types';
+import type { AiAnalysisPreview, AiProvider, AiTaskStatus } from '../../shared/types';
 import { Button } from '../../shared/components/ui/Button';
 
 interface AiPreviewCardProps {
   preview: AiAnalysisPreview;
+  provider: AiProvider;
   endpointUrl: string;
   model: string;
   status: AiTaskStatus;
@@ -12,7 +13,7 @@ interface AiPreviewCardProps {
   onCancel: () => void;
 }
 
-export function AiPreviewCard({ preview, endpointUrl, model, status, onRun, onCancel }: AiPreviewCardProps) {
+export function AiPreviewCard({ preview, provider, endpointUrl, model, status, onRun, onCancel }: AiPreviewCardProps) {
   const { t } = useTranslation();
   const running = status === 'running';
 
@@ -25,6 +26,7 @@ export function AiPreviewCard({ preview, endpointUrl, model, status, onRun, onCa
       <p className="mt-1 text-sm text-slate-500">{t('ai.previewDescription')}</p>
 
       <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+        <div><dt className="text-slate-500">{t('ai.provider')}</dt><dd className="mt-1 font-medium">{t(`ai.providers.${provider}`)}</dd></div>
         <div><dt className="text-slate-500">{t('ai.resolvedEndpoint')}</dt><dd className="mt-1 break-all font-medium">{endpointUrl}</dd></div>
         <div><dt className="text-slate-500">{t('ai.model')}</dt><dd className="mt-1 break-all font-medium">{model}</dd></div>
         <div><dt className="text-slate-500">{t('ai.selectedScope')}</dt><dd className="mt-1 font-medium">{preview.scopeLabel}</dd></div>

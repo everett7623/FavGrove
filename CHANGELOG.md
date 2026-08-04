@@ -2,6 +2,18 @@
 
 All notable changes to FavGrove, formerly Markora, are documented in this file.
 
+## [0.3.0] - Unreleased
+
+### Added
+
+- Added opt-in AI adapters for OpenAI Chat Completions, Anthropic Claude Messages, Google Gemini `generateContent`, xAI Grok Chat Completions, and generic third-party OpenAI-compatible endpoints.
+- Added provider-aware model suggestions with editable model IDs, fixed official endpoints, and legacy settings migration to the third-party compatible mode.
+
+### Changed
+
+- AI request previews now identify the provider and protocol-specific resolved endpoint while keeping API keys and results transient.
+- Bumped the beta version to `0.3.0`; the author remains `everettlabs` (`everett7623@gmail.com`).
+
 ## [0.2.1] - Unreleased
 
 ### Added

@@ -21,7 +21,7 @@ It does not include:
 
 ## Local Data
 
-The extension processes bookmark data locally in the browser. Settings, scan caches, search history, tags, recent activity, backups, pending extension-update version metadata, and the optional AI endpoint/model configuration are stored with the browser extension storage API.
+The extension processes bookmark data locally in the browser. Settings, scan caches, search history, tags, recent activity, backups, pending extension-update version metadata, and the optional AI provider/endpoint/model configuration are stored with the browser extension storage API.
 
 This data remains on the user's device unless the user explicitly exports a file or confirms an optional AI analysis request as described below. AI API keys and AI results are not stored.
 
@@ -38,9 +38,9 @@ Network requests occur only for URLs selected by the broken-link scanner, browse
 
 ## Optional AI Analysis
 
-AI analysis is disabled by default. FavGrove does not include a default provider, endpoint, model, SDK, shared API key, or developer-operated proxy.
+AI analysis is disabled by default. FavGrove includes direct request adapters for OpenAI, Claude, Gemini, Grok, and generic third-party OpenAI-compatible endpoints, but no SDK, shared API key, or developer-operated proxy. Official endpoint presets are fixed; gateway and proxy URLs are available only through the third-party compatible mode.
 
-Before each AI request, FavGrove shows the selected scope, destination origin, model, fields, item counts, and estimated request size. The default domain-only mode sends hostname aggregates and counts. If the user selects metadata mode, FavGrove may send bookmark titles, hostnames, URL pathnames, folder paths, and local tags for at most 200 sample items. URL query strings and fragments are removed. Aggregate counts can cover the complete selected scope.
+Before each AI request, FavGrove shows the selected provider, scope, destination URL, model, fields, item counts, and estimated request size. The default domain-only mode sends hostname aggregates and counts. If the user selects metadata mode, FavGrove may send bookmark titles, hostnames, URL pathnames, folder paths, and local tags for at most 200 sample items. URL query strings and fragments are removed. Aggregate counts can cover the complete selected scope.
 
 FavGrove never sends bookmark page content, backups, search history, recent activity, ignored-link lists, browser history, or analytics data to the AI endpoint. The API key remains in the current page memory and is not persisted, logged, exported, or included in diagnostics. AI results are transient and read-only.
 

@@ -20,7 +20,7 @@
 - [x] Release ZIP generation is deterministic for identical production content.
 - [x] Generated ZIP entries are verified against `dist/` before the checksum is written.
 - [x] Windows GitHub Actions quality workflow is configured for the release gates.
-- [ ] The updated quality workflow passes on the pushed `0.2.1` beta commit; the prior run failed on the now-fixed `brace-expansion` advisory.
+- [ ] The quality workflow passes on the pushed `0.3.0` beta commit; local verification must pass before pushing.
 
 ## Localization
 
@@ -73,7 +73,7 @@
 
 - [x] Store description is current.
 - [x] Store portal submission field worksheet is prepared in `store/submission-fields.md`.
-- [x] GitHub pre-release draft metadata is prepared in `docs/release/github-prerelease-v0.2.1.md`.
+- [ ] Prepare `0.3.0` GitHub pre-release metadata; the previous `0.2.1` draft remains in `docs/release/github-prerelease-v0.2.1.md`.
 - [x] Privacy policy URL is publicly accessible.
 - [x] 1280x800 or 640x400 screenshots are prepared.
 - [x] 440x280 promotional tile is prepared if required.
