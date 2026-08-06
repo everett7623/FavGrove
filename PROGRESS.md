@@ -1,6 +1,6 @@
 # PROGRESS
 
-Last updated: 2026-08-04
+Last updated: 2026-08-06
 
 ## Current Project Completion
 
@@ -102,7 +102,7 @@ Last updated: 2026-08-04
 - Store listing copy, promotional SVG sources, and 1280x800 screenshots are available under `store/`.
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles and verifies enabled extension metadata, the MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
 - `npm run check:browsers:visible -- chrome|edge` provides the final human click-through pass with one official browser at a time, an isolated temporary profile, production `dist/`, and automatic profile cleanup after the window closes.
-- `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; its first remote run remains pending until these local commits are pushed.
+- `.github/workflows/quality.yml` runs the release quality gates on a Windows GitHub Actions runner for pushes, pull requests, and manual dispatches; the remote `0.3.0` quality run passed on 2026-08-04.
 - `npm run audit:dependencies` and Windows CI now gate production dependencies and reject any development advisory outside the documented Vite 5/esbuild policy.
 - Vite development and preview servers bind to `127.0.0.1`, accept only loopback Host headers, and restrict CORS to loopback or Chrome extension origins.
 - `npm run package:release` creates both the versioned ZIP and a matching SHA-256 checksum file for GitHub pre-release verification.
@@ -120,6 +120,7 @@ Last updated: 2026-08-04
 - `TASK-705` and `.codex/tasks/ai-analysis-integration-2026-07-15.md` define the first model-backed milestone as opt-in, read-only bookmark-library analysis with explicit provider, privacy, schema, cancellation, and large-library acceptance gates.
 - AI Analysis supports disabled-by-default opt-in, whole-library or folder scope, domain-only or metadata privacy modes, Web Worker preprocessing, provider-aware request previews, transient API keys/results, 60-second timeout, cancellation, strict response/evidence validation, and read-only results.
 - Provider adapters cover OpenAI Chat Completions, Anthropic Claude Messages, Google Gemini `generateContent`, xAI Grok Chat Completions, and generic third-party OpenAI-compatible endpoints. Official endpoints are fixed and legacy settings migrate to compatible mode without data loss.
+- AI evidence validation preserves sampled item hostnames outside aggregate top domains, and rejected endpoint-permission requests return a localized failure result without contacting the provider.
 - AI payloads remove URL queries and fragments, cap metadata samples at 200, and keep full-scope aggregate counts for at least 10,000 bookmarks.
 - Chrome/Edge synthetic bookmark roots are removed from the app tree; permanent roots are visible read-only destinations, and managed descendants are excluded from edits and cleanup scans.
 - Multi-step bookmark mutations reconcile the live Chrome tree after success or partial failure. Undo restores bookmarks and empty folders with new browser IDs, migrates local tags, and supports immediate follow-up edits.
@@ -133,7 +134,6 @@ Last updated: 2026-08-04
 - The full post-beta roadmap is not implemented; the completion percentage above applies only to the `0.3.0` beta scope.
 - Visible Chrome and Edge click-through checks from `dist/` remain open.
 - Store portal submission fields and GitHub pre-release metadata are prepared locally but not finalized in the portals.
-- The first remote GitHub Actions quality run failed on the now-fixed `brace-expansion` advisory; the updated workflow and Chrome data-safety gate still require a pushed rerun.
 - A visible live-provider compatibility check remains open because FavGrove intentionally bundles no provider endpoint, model, or credential; automated success/failure/cancellation coverage uses a simulated compatible provider.
 - Full destructive replacement restore remains a deferred post-beta feature and is not part of the current release path.
 
@@ -224,6 +224,7 @@ Additional verification in this Codex session on 2026-07-08:
 - On 2026-08-04, follow-up bug fixes completed the managed Link Issues mutation guard, removed a nullable bookmark-reorder path, and bounded the Vite security child process/test timeout. ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension build validation and permission audit, and 12 Playwright E2E tests passed.
 - On 2026-08-04, the `0.2.1` stabilization pass fixed the Chrome data-safety move/delete synchronization race, made the Vite security child process asynchronous with a hard timeout, and synchronized the responsive version/author/email attribution with Manifest/npm metadata. Production dependencies remained at zero vulnerabilities; ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension validation and permission audit, installed Chrome `151.0.7922.72` / Edge `151.0.4129.59` checks, Chrome real-data safety, and 12 Playwright E2E tests passed. Packaging produced a verified 343,770-byte ZIP with SHA-256 `4a0f56ccd57766045537bc7329e63b365b64d0fa18bcbfd0f0f97f3a907cf73f`.
 - On 2026-08-04, the `0.3.0` multi-provider AI phase added OpenAI, Claude, Gemini, Grok, and generic OpenAI-compatible adapters; fixed official endpoints; provider-aware model suggestions and previews; transient credential handling; and legacy settings migration. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 137 tests passed, production extension validation and permission audit passed, and all 12 Playwright E2E flows passed. Authenticated live-provider checks remain user-credential dependent and were not run.
+- On 2026-08-06, AI evidence and permission error handling were hardened. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 139 tests passed, production dependency and permission audits passed, production extension build validation passed, and all 12 Playwright E2E flows passed.
 
 ## Release Decision
 

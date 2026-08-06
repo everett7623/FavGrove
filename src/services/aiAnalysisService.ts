@@ -16,7 +16,11 @@ export const parseAiEndpoint = parseOpenAiCompatibleEndpoint;
 
 async function requestEndpointPermission(endpoint: URL): Promise<boolean> {
   if (!globalThis.chrome?.permissions?.request) return true;
-  return chrome.permissions.request({ origins: [`${endpoint.origin}/*`] });
+  try {
+    return await chrome.permissions.request({ origins: [`${endpoint.origin}/*`] });
+  } catch {
+    return false;
+  }
 }
 
 function prepareWithWorker(bookmarks: BookmarkNode[], scopeId: string | null, privacyMode: AiConnectionSettings['privacyMode']) {

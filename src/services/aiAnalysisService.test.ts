@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import i18n from '../shared/i18n';
 import type { AiAnalysisPreview, AiAnalysisResult, AiConnectionSettings } from '../shared/types';
 import { aiAnalysisService, parseAiEndpoint } from './aiAnalysisService';
 import { resolveAiEndpoint } from './aiProviderConfig';
@@ -57,6 +58,20 @@ describe('AI analysis service', () => {
     vi.stubGlobal('chrome', { permissions: { request: vi.fn().mockResolvedValue(false) }, runtime: { id: 'extension-id', sendMessage } });
     const result = await aiAnalysisService.run(settings, '', 'en', preview, new AbortController().signal);
     expect(result.success).toBe(false);
+    expect(sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('converts a permission request rejection into an actionable failure result', async () => {
+    const sendMessage = vi.fn();
+    vi.stubGlobal('chrome', {
+      permissions: { request: vi.fn().mockRejectedValue(new Error('Permission API unavailable')) },
+      runtime: { id: 'extension-id', sendMessage }
+    });
+
+    await expect(aiAnalysisService.run(settings, '', 'en', preview, new AbortController().signal)).resolves.toEqual({
+      success: false,
+      error: i18n.t('ai.errors.permissionDenied')
+    });
     expect(sendMessage).not.toHaveBeenCalled();
   });
 });

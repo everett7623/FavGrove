@@ -1,6 +1,6 @@
 # Current Session
 
-Date: 2026-08-04
+Date: 2026-08-06
 
 ## Working On
 
@@ -130,7 +130,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis milestone while prese
 - Store listing copy, promotional SVG sources, and 1280x800 page screenshots now live under `store/`.
 - `npm run check:browsers` installs `dist/` through the supported DevTools extension API in isolated official Chrome and Edge profiles, then verifies the enabled extension metadata, MV3 service worker, six primary routes, disabled AI state, zero pre-confirmation external requests, and zero page errors.
 - `npm run check:browsers:visible -- chrome|edge` launches one official browser at a time with an isolated temporary profile for the final click-through pass, then removes that profile when the browser closes.
-- A Windows GitHub Actions workflow now runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. Its first remote result remains pending until the local commits are pushed.
+- A Windows GitHub Actions workflow runs lint, type checking, unit/performance tests, production extension validation, installed Chrome/Edge verification, E2E tests, and release packaging on pushes, pull requests, and manual dispatches. The remote `0.3.0` quality run passed on 2026-08-04.
 - Dependency auditing now runs through the official npm registry in local checks and Windows CI; production must be clean, and only the documented Vite 5/esbuild development advisory IDs are allowed pending a Vite-major decision.
 - Shared Vite development and preview configuration now binds to `127.0.0.1` and restricts Host/CORS origins as defense in depth for the remaining Vite 5 advisories.
 - Release packaging writes a versioned SHA-256 file beside the ZIP and verifies both artifacts against the synchronized release version.
@@ -151,6 +151,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis milestone while prese
 - AI supports whole-library or folder scope, domain-only or redacted metadata modes, provider-aware request preview, transient API keys/results, separate endpoint permission, timeout, cancellation, provider error handling, and strict structured result validation.
 - Official provider endpoints are fixed, third-party compatible endpoints accept an origin, `/v1` base URL, or full Chat Completions URL, and legacy settings migrate without losing endpoint/model/privacy values.
 - Local AI preprocessing runs in a Worker, strips URL queries/fragments, caps samples at 200, and covers full-scope aggregates for at least 10,000 bookmarks.
+- AI evidence validation accepts sampled item hostnames as well as aggregate domains and item references, while endpoint-permission API failures now return an actionable error instead of leaving analysis in the running state.
 - Store-installed updates now use the Chrome/Edge-managed `runtime.onUpdateAvailable` lifecycle. FavGrove persists only the pending version and detection time, shows a localized global notice, and reloads only after the user chooses to apply the downloaded update. No remote version polling or new permission was added.
 - The update notice now appears immediately if Chrome or Edge downloads an update while FavGrove is already open, and stale non-newer update records are cleared locally.
 - The route-loading fallback and beta status badge now use the shared English and Chinese locale resources.
@@ -191,7 +192,7 @@ Latest verification:
 
 - ESLint: passed, 0 errors and 0 warnings.
 - TypeScript strict check: passed.
-- Vitest: passed, 26 test files and 100 tests.
+- Vitest: passed, 36 test files and 139 tests.
 - Vite production extension build, validation, and permission audit: passed.
 - Isolated installed Chrome and Edge production `dist/` verification: passed.
 - Playwright E2E: passed, 12 tests.
@@ -245,6 +246,7 @@ Latest verification:
 - On 2026-07-25, the approved React `19.2.7` / React DOM `19.2.7` / React Router `8.3.0` migration replaced `react-router-dom` imports with `react-router`, added matching React 19 type packages, and patched PostCSS/Nanoid after a fresh development audit. The production dependency audit again passes with zero vulnerabilities; ESLint with 0 warnings, TypeScript strict checking, 32 Vitest files with 115 tests, the 10,000-bookmark performance gate, production extension validation and permission audit, 12 Playwright E2E tests, and isolated installed Chrome `150.0.7871.129` / Edge `150.0.4078.96` verification passed. The browser checker now waits for the lazy AI route before asserting its disabled state. Verified packaging produced a 340,358-byte ZIP with SHA-256 `c4bc13f4e6982e0811d95612ee5b63f70509035f3212784db4b45cd25a87b999`.
 - On 2026-08-04, the `0.2.1` stabilization pass fixed the installed Chrome data-safety move/delete race, converted the Vite server security child process to bounded asynchronous execution, and synchronized the responsive version/author/email attribution with Manifest/npm metadata. Production dependencies remained at zero vulnerabilities; ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension validation and permission audit, Chrome `151.0.7922.72` / Edge `151.0.4129.59` installed checks, Chrome real-data safety, and 12 Playwright E2E tests passed. Verified packaging produced a 343,770-byte ZIP with SHA-256 `4a0f56ccd57766045537bc7329e63b365b64d0fa18bcbfd0f0f97f3a907cf73f`.
 - On 2026-08-04, the `0.3.0` multi-provider AI phase added OpenAI, Claude, Gemini, Grok, and generic OpenAI-compatible adapters; fixed official endpoints; provider-aware model suggestions and previews; transient credential handling; and legacy settings migration. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 137 tests passed, production extension validation and permission audit passed, and all 12 Playwright E2E flows passed. Authenticated live-provider checks remain user-credential dependent and were not run.
+- On 2026-08-06, AI evidence and permission error handling were hardened. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 139 tests passed, production dependency and permission audits passed, production extension build validation passed, and all 12 Playwright E2E flows passed.
 
 ## Notes
 

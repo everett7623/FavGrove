@@ -114,6 +114,30 @@ describe('AI provider service', () => {
     if (result.success) expect(result.data.warnings).toHaveLength(1);
   });
 
+  it('keeps evidence from item hostnames outside the aggregate top domains', async () => {
+    const itemRequest = request('item-hostname');
+    const supportedAnalysis = {
+      ...analysis,
+      topics: [{ ...analysis.topics[0], evidence: ['long-tail.example'] }],
+      suggestions: [{ ...analysis.suggestions[0], evidence: ['bookmark-1'] }]
+    };
+    itemRequest.payload.items = [{
+      ref: 'bookmark-1',
+      title: 'Long-tail bookmark',
+      hostname: 'long-tail.example',
+      urlPath: '/',
+      folderPath: '',
+      tags: []
+    }];
+    const response = new Response(
+      JSON.stringify({ choices: [{ message: { content: JSON.stringify(supportedAnalysis) } }] }),
+      { status: 200 }
+    );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response));
+
+    await expect(aiProviderService.run(itemRequest)).resolves.toEqual({ success: true, data: supportedAnalysis });
+  });
+
   it('rejects a result when none of its findings have request evidence', async () => {
     const unsupported = {
       ...analysis,

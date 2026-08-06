@@ -709,7 +709,7 @@ Release Build
 Status:
 
 - Implemented
-- Windows GitHub Actions release-gate workflow implemented locally; first remote run pending push
+- Windows GitHub Actions release-gate workflow implemented; the remote `0.3.0` quality run passed on 2026-08-04
 
 Acceptance:
 

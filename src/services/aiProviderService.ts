@@ -55,6 +55,7 @@ async function readProviderBody(response: Response): Promise<unknown> {
 function validateEvidence(result: AiAnalysisResult, request: AiProviderRequest): Result<AiAnalysisResult> {
   const allowed = new Map([
     ...request.payload.items.map((item) => item.ref),
+    ...request.payload.items.map((item) => item.hostname),
     ...request.payload.aggregate.topDomains.map((item) => item.value),
     ...request.payload.aggregate.topFolders.map((item) => item.value)
   ].map((item) => [item.toLowerCase(), item] as const));
