@@ -1,6 +1,6 @@
 # Current Session
 
-Date: 2026-08-06
+Date: 2026-10-13
 
 ## Working On
 
@@ -98,7 +98,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis milestone while prese
 - Related unit tests were updated to assert i18n-derived messages instead of hardcoded English strings.
 - Import/Export page fallback `defaultValue` strings were removed in favor of direct locale keys, and Settings language option labels were localized.
 - `AGENTS.md` was rewritten as the primary Codex handoff guide with project snapshot, architecture rules, workflow, verification, release rules, data safety, and performance expectations.
-- `DEVELOPMENT_GUIDE.md` was rewritten as a stable Codex/human development guide with source layout, layer responsibilities, testing strategy, and current development direction.
+- `CLAUDE.md` is the single source of truth for source layout, layer responsibilities, verification gates, coding standards, and the review checklist.
 - Shared `ConfirmDialog` and `PromptDialog` components were added on top of the existing `Dialog` primitive.
 - Dashboard statistic cards now use skeleton placeholders while bookmark data is loading.
 - Manager uses `useContainerHeight` for the virtualized list viewport instead of a fixed `620px` height.
@@ -114,7 +114,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis milestone while prese
 - `scanStore` now tracks the last scan timestamp, and `scanService.getCache` exposes scan-cache metadata for UI use.
 - Dashboard now shows a localized "Last scanned" link backed by scan-cache metadata.
 - E2E smoke coverage now checks Dashboard last-scan visibility and Manager select-all/sort/shortcut controls.
-- Legacy planning files were removed from the workspace; active handoff now lives in `AGENTS.md`, `DEVELOPMENT_GUIDE.md`, `SESSION.md`, `PROGRESS.md`, and `TASKS.md`.
+- Legacy planning files were removed from the workspace; active handoff now lives in `CLAUDE.md`, `AGENTS.md`, `SESSION.md`, `PROGRESS.md`, and `TASKS.md`.
 - Automatic daily scan is implemented with persisted `autoScan` settings, Manifest V3 `alarms` permission, background alarm registration, a Settings toggle, and a shared structural-scan utility reused by the scanner worker and background alarm.
 - Auto-scan saves duplicate bookmark, duplicate folder, and empty-folder scan results to the existing scan cache. Broken-link checks remain manual.
 - `PRIVACY.md` documents the new `alarms` permission.
@@ -162,6 +162,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis milestone while prese
 - Import uses an explicit writable target, rolls back created nodes on failure, and displays the live Chrome hierarchy immediately without requiring a reload.
 - A Chrome-only installed-extension data-safety gate verifies real CRUD, bookmark/empty-folder Undo, tag-ID migration, and nested import consistency; Chrome and Edge smoke checks also verify synthetic roots are hidden and permanent roots are read-only.
 - `brace-expansion` is locked to safe `1.1.18` and `5.0.9` releases after the first remote quality run exposed a newly published high-severity development advisory.
+- Newly published `js-yaml` and `nanoid` denial-of-service advisories are fixed by locking the existing ESLint and PostCSS dependency chains to `js-yaml` `4.3.1` and `nanoid` `3.3.18`; the dependency audit allowlist remains limited to the documented Vite 5/esbuild findings.
 - Link Issues now prevents selection, URL edits, and deletion for managed/read-only bookmarks, bookmark reordering handles a missing source safely, and the process-based Vite security test has bounded timeouts that remain stable in the full suite.
 - FavGrove beta metadata is synchronized at `0.3.0`; the responsive footer displays `v0.3.0 · everettlabs · everett7623@gmail.com`, Manifest/npm metadata uses the same author identity, and active release/package references use the matching version.
 
@@ -247,6 +248,8 @@ Latest verification:
 - On 2026-08-04, the `0.2.1` stabilization pass fixed the installed Chrome data-safety move/delete race, converted the Vite server security child process to bounded asynchronous execution, and synchronized the responsive version/author/email attribution with Manifest/npm metadata. Production dependencies remained at zero vulnerabilities; ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension validation and permission audit, Chrome `151.0.7922.72` / Edge `151.0.4129.59` installed checks, Chrome real-data safety, and 12 Playwright E2E tests passed. Verified packaging produced a 343,770-byte ZIP with SHA-256 `4a0f56ccd57766045537bc7329e63b365b64d0fa18bcbfd0f0f97f3a907cf73f`.
 - On 2026-08-04, the `0.3.0` multi-provider AI phase added OpenAI, Claude, Gemini, Grok, and generic OpenAI-compatible adapters; fixed official endpoints; provider-aware model suggestions and previews; transient credential handling; and legacy settings migration. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 137 tests passed, production extension validation and permission audit passed, and all 12 Playwright E2E flows passed. Authenticated live-provider checks remain user-credential dependent and were not run.
 - On 2026-08-06, AI evidence and permission error handling were hardened. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 139 tests passed, production dependency and permission audits passed, production extension build validation passed, and all 12 Playwright E2E flows passed.
+- On 2026-08-19, `js-yaml` was updated from `4.3.0` to `4.3.1` and `nanoid` from `3.3.16` to `3.3.18` after new development-tool advisories appeared. Production dependencies remain at zero vulnerabilities, and the full audit again reports only the documented Vite 5/esbuild findings. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 139 tests passed, production extension build validation and permission audit passed, and all 12 Playwright E2E flows passed.
+- On 2026-10-13, newly published advisories were dispositioned: Vitest was upgraded from `3.2.7` to `4.1.11`, clearing the critical `@vitest/mocker` path traversal and `tinypool` RCE findings while keeping Vite `7.3.6`; the lockfile was refreshed to `brace-expansion` `1.1.21` and `source-map-js` `1.2.2`; and the unfixable Tailwind CSS 3 toolchain findings were allowlisted as the only documented exceptions pending the Tailwind 4 migration. The export Worker test mock was updated for Vitest 4 constructor semantics. The dependency audit, ESLint with 0 warnings, TypeScript strict checking, all 36 Vitest files with 145 tests, the 10,000-bookmark benchmark, production extension build validation with permission audit, isolated installed Chrome `155.0.8059.39` / Edge `155.0.4283.45` verification, the Chrome real-data safety check, all 12 Playwright E2E flows, and release packaging passed.
 
 ## Notes
 

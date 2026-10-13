@@ -1,6 +1,6 @@
 # PROGRESS
 
-Last updated: 2026-08-06
+Last updated: 2026-10-13
 
 ## Current Project Completion
 
@@ -76,7 +76,7 @@ Last updated: 2026-08-06
 - Production build validation rejects localhost references, CRXJS/Vite development clients, missing service workers, and manifests that expose every extension resource.
 - Development environment has been restored and verified on Windows 11.
 - Versioning policy is documented. The current development version is `0.3.0`; `0.1.0` remains the historical Markora beta baseline and should not be rewritten.
-- `AGENTS.md` and `DEVELOPMENT_GUIDE.md` now provide a Codex-friendly handoff and development guide with architecture rules, verification commands, current priorities, and release constraints.
+- `CLAUDE.md` is the single source of truth for architecture rules, verification commands, coding standards, and the review checklist; `AGENTS.md` covers Codex handoff flow only.
 - Shared `Dialog`, `ConfirmDialog`, `PromptDialog`, `Skeleton`, and `useContainerHeight` primitives are available for reuse.
 - Manager virtualized list height now follows its actual container height instead of a fixed `620px` viewport.
 - Dashboard and Manager initial loading states now use skeleton placeholders.
@@ -86,7 +86,7 @@ Last updated: 2026-08-06
 - Link issue URL editing, single delete, and batch delete now use custom dialogs instead of native browser prompts/confirms.
 - Settings backup restore now requires an in-app confirmation dialog.
 - Scanner supports confirmed "Clean all duplicates" and "Delete all empty folders" batch actions through the existing backup-protected repair flow, with refreshed scan cache after repair.
-- Legacy planning files were removed; Codex handoff now uses `AGENTS.md`, `DEVELOPMENT_GUIDE.md`, `SESSION.md`, `PROGRESS.md`, and `TASKS.md`.
+- Legacy planning files were removed; Codex handoff now uses `CLAUDE.md`, `AGENTS.md`, `SESSION.md`, `PROGRESS.md`, and `TASKS.md`.
 - Automatic daily structure scan is implemented behind a Settings toggle using the Manifest V3 `alarms` permission.
 - Background auto-scan saves duplicate bookmark, duplicate folder, and empty-folder results to the existing scan cache; broken-link checks remain manual.
 - `PRIVACY.md` documents the `alarms` permission.
@@ -127,7 +127,9 @@ Last updated: 2026-08-06
 - Import targets an explicit writable folder, rolls back its created batch on failure, and presents the live nested Chrome hierarchy immediately.
 - Installed Chrome data-safety automation covers real CRUD, bookmark and empty-folder Undo, tag migration, nested import, and reload consistency; Edge retains installed-extension smoke coverage.
 - The newly published `brace-expansion` development-tool advisory is fixed through safe locked transitive releases (`1.1.18` and `5.0.9`) without widening the audit allowlist.
+- Newly published `js-yaml` and `nanoid` denial-of-service advisories are fixed through safe locked transitive releases (`4.3.1` and `3.3.18`) without widening the audit allowlist.
 - Current beta metadata is synchronized at `0.3.0`; the responsive footer shows `v0.3.0 · everettlabs · everett7623@gmail.com` without horizontal overflow at the covered 390px viewport, and Manifest/npm metadata uses the same author identity.
+- Vitest was upgraded to `4.1.11`, clearing the critical `@vitest/mocker` and `tinypool` advisories; the unfixable Tailwind CSS 3 toolchain findings are the only documented audit exceptions, pending the Tailwind 4 migration.
 
 ## Not Completed
 
@@ -225,6 +227,8 @@ Additional verification in this Codex session on 2026-07-08:
 - On 2026-08-04, the `0.2.1` stabilization pass fixed the Chrome data-safety move/delete synchronization race, made the Vite security child process asynchronous with a hard timeout, and synchronized the responsive version/author/email attribution with Manifest/npm metadata. Production dependencies remained at zero vulnerabilities; ESLint, TypeScript strict checking, 35 Vitest files with 129 tests, production extension validation and permission audit, installed Chrome `151.0.7922.72` / Edge `151.0.4129.59` checks, Chrome real-data safety, and 12 Playwright E2E tests passed. Packaging produced a verified 343,770-byte ZIP with SHA-256 `4a0f56ccd57766045537bc7329e63b365b64d0fa18bcbfd0f0f97f3a907cf73f`.
 - On 2026-08-04, the `0.3.0` multi-provider AI phase added OpenAI, Claude, Gemini, Grok, and generic OpenAI-compatible adapters; fixed official endpoints; provider-aware model suggestions and previews; transient credential handling; and legacy settings migration. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 137 tests passed, production extension validation and permission audit passed, and all 12 Playwright E2E flows passed. Authenticated live-provider checks remain user-credential dependent and were not run.
 - On 2026-08-06, AI evidence and permission error handling were hardened. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 139 tests passed, production dependency and permission audits passed, production extension build validation passed, and all 12 Playwright E2E flows passed.
+- On 2026-08-19, the lockfile was refreshed to `js-yaml` `4.3.1` and `nanoid` `3.3.18` after new development-tool advisories appeared. Production dependencies remain at zero vulnerabilities, and the development audit policy again reports only the documented Vite 5/esbuild findings. ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 139 tests passed, production extension build validation and permission audit passed, and all 12 Playwright E2E flows passed.
+- On 2026-10-13, Vitest `4.1.11`, the `brace-expansion` `1.1.21` / `source-map-js` `1.2.2` lockfile refresh, and the documented Tailwind 3 toolchain allowlist entries resolved the newly published development advisories. The dependency audit passed (production 22 packages, zero vulnerabilities), ESLint passed with 0 warnings, TypeScript strict checking passed, all 36 Vitest files with 145 tests passed, the 10,000-bookmark benchmark passed, production extension build validation and permission audit passed, isolated installed Chrome `155.0.8059.39` / Edge `155.0.4283.45` verification and the Chrome real-data safety check passed, all 12 Playwright E2E flows passed, and release packaging produced the verified ZIP.
 
 ## Release Decision
 

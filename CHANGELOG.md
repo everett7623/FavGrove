@@ -13,6 +13,12 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 
 - AI request previews now identify the provider and protocol-specific resolved endpoint while keeping API keys and results transient.
 - Bumped the beta version to `0.3.0`; the author remains `everettlabs` (`everett7623@gmail.com`).
+- Consolidated agent-facing documentation. `CLAUDE.md` is now the single source of truth for architecture, commands, coding standards, and the review checklist. `DEVELOPMENT_GUIDE.md` and `code_review.md` were merged into it and removed, `.cursorrules` and `.github/copilot-instructions.md` became pointers, and `AGENTS.md` was reduced to Codex handoff flow.
+- Upgraded Vite from `5.4.21` to `7.3.6`, which clears the previously allowlisted Vite optimized-deps path traversal, Vite Windows `server.fs.deny` bypass, and esbuild development-server advisories. Vite 7 was chosen over Vite 8 because it needs no matching `@vitejs/plugin-react` or `vitest` major upgrade.
+- Refreshed 12 development and production dependencies within their existing semver ranges.
+- Upgraded Vitest from `3.2.7` to `4.1.11`, clearing the critical `@vitest/mocker` path traversal and `tinypool` prototype-pollution advisories; the export Worker test mock was updated for Vitest 4 constructor semantics.
+- Refreshed the lockfile to `brace-expansion` `1.1.21` and `source-map-js` `1.2.2` after newly published denial-of-service advisories.
+- Allowlisted the Tailwind CSS 3 toolchain advisories (`braces`, `chokidar`, `fast-glob`, `micromatch`, `postcss-nested`, `postcss-selector-parser`, `tailwindcss`) as documented development-only exceptions pending the Tailwind 4 migration, since no fixed releases exist in the current lines.
 
 ## [0.2.1] - Unreleased
 

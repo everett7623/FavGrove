@@ -1,19 +1,51 @@
 const severityRank = { info: 0, low: 1, moderate: 2, high: 3, critical: 4 };
 
+// Entries look like { sources: [advisoryId], dependencies: ['package'], maxSeverity: 'moderate' }.
+// The Tailwind CSS 3 toolchain entries are the only exceptions in force. braces, micromatch,
+// fast-glob, and chokidar have no fixed releases in their current lines, and the
+// postcss-selector-parser fix (7.1.6) is outside the ^6 range of its parents, so no
+// non-breaking resolution exists; the eventual fix is the approved Tailwind 4 migration.
+// All findings are dev-only build-time pattern-parsing denial-of-service issues. See
+// docs/security/dependency-audit.md for the disposition history.
 export const allowedDevelopmentVulnerabilities = Object.freeze({
-  esbuild: Object.freeze({
-    sources: Object.freeze([1102341]),
+  braces: Object.freeze({
+    sources: Object.freeze([1240992]),
+    dependencies: Object.freeze([]),
+    maxSeverity: 'high'
+  }),
+  chokidar: Object.freeze({
+    sources: Object.freeze([]),
+    dependencies: Object.freeze(['braces']),
+    maxSeverity: 'high'
+  }),
+  'fast-glob': Object.freeze({
+    sources: Object.freeze([]),
+    dependencies: Object.freeze(['micromatch']),
+    maxSeverity: 'high'
+  }),
+  micromatch: Object.freeze({
+    sources: Object.freeze([]),
+    dependencies: Object.freeze(['braces']),
+    maxSeverity: 'high'
+  }),
+  'postcss-nested': Object.freeze({
+    sources: Object.freeze([]),
+    dependencies: Object.freeze(['postcss-selector-parser']),
+    maxSeverity: 'moderate'
+  }),
+  'postcss-selector-parser': Object.freeze({
+    sources: Object.freeze([1241232]),
     dependencies: Object.freeze([]),
     maxSeverity: 'moderate'
   }),
-  vite: Object.freeze({
-    sources: Object.freeze([1116229, 1120784, 1123525]),
-    dependencies: Object.freeze(['esbuild']),
+  tailwindcss: Object.freeze({
+    sources: Object.freeze([]),
+    dependencies: Object.freeze(['chokidar', 'fast-glob', 'micromatch', 'postcss-nested', 'postcss-selector-parser']),
     maxSeverity: 'high'
   })
 });
 
-export function findUnexpectedDevelopmentVulnerabilities(report) {
+export function findUnexpectedDevelopmentVulnerabilities(report, allowlist = allowedDevelopmentVulnerabilities) {
   const vulnerabilities = report?.vulnerabilities;
   if (!vulnerabilities || typeof vulnerabilities !== 'object') {
     return ['npm audit returned no vulnerability map.'];
@@ -21,7 +53,7 @@ export function findUnexpectedDevelopmentVulnerabilities(report) {
 
   const unexpected = [];
   for (const [packageName, vulnerability] of Object.entries(vulnerabilities)) {
-    const allowed = allowedDevelopmentVulnerabilities[packageName];
+    const allowed = allowlist[packageName];
     if (!allowed) {
       unexpected.push(`${packageName}: package is not in the development advisory allowlist.`);
       continue;

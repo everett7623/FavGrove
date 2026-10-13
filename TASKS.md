@@ -924,6 +924,7 @@ Status:
 - Vite development and preview servers are restricted to loopback hosts and explicit CORS origins
 - Vite 5 development-tool findings remain tracked pending an explicit Vite-major migration decision
 - `brace-expansion` `1.1.18` and `5.0.9` close the later development-tool denial-of-service advisory without a policy exception
+- `js-yaml` `4.3.1` and `nanoid` `3.3.18` close later development-tool denial-of-service advisories without policy exceptions
 
 Acceptance:
 

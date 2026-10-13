@@ -49,7 +49,11 @@ describe('exportService', () => {
       postMessage: vi.fn(),
       terminate: vi.fn()
     };
-    vi.stubGlobal('Worker', vi.fn(() => worker));
+    // A plain function is required: vi.fn's arrow implementation is not constructable under Vitest 4.
+    const WorkerMock = vi.fn(function mockWorkerConstructor() {
+      return worker;
+    });
+    vi.stubGlobal('Worker', WorkerMock);
 
     const filePromise = exportService.createFile(bookmarks, 'csv');
     expect(worker.postMessage).toHaveBeenCalledWith({ type: 'create-export', bookmarks, format: 'csv' });

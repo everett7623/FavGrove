@@ -145,7 +145,8 @@ FavGrove does not collect personal data or operate a bookmark/AI proxy service. 
 
 ## Documentation
 
-- [Development guide](DEVELOPMENT_GUIDE.md)
+- [Development guide and architecture](CLAUDE.md)
+- [Privacy policy](PRIVACY.md)
 - [Roadmap and tasks](TASKS.md)
 - [Current progress](PROGRESS.md)
 - [Release checklist](RELEASE_CHECKLIST.md)
@@ -154,9 +155,10 @@ FavGrove does not collect personal data or operate a bookmark/AI proxy service. 
 - [AI provider and data boundary](docs/decisions/ai-provider-boundary.md)
 - [Store submission fields](store/submission-fields.md)
 - [Post-beta AI roadmap](docs/roadmap/post-beta-ai.md)
+- [Provider compatibility diagnostics](docs/diagnostics/template-ai-provider-compatibility.md)
+- [Dependency audit policy](docs/security/dependency-audit.md)
 - [Version policy](VERSIONING.md)
 - [Changelog](CHANGELOG.md)
-- [Code review rules](code_review.md)
 
 ## License
 
