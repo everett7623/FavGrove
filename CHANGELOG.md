@@ -19,6 +19,7 @@ All notable changes to FavGrove, formerly Markora, are documented in this file.
 - Upgraded Vitest from `3.2.7` to `4.1.11`, clearing the critical `@vitest/mocker` path traversal and `tinypool` prototype-pollution advisories; the export Worker test mock was updated for Vitest 4 constructor semantics.
 - Refreshed the lockfile to `brace-expansion` `1.1.21` and `source-map-js` `1.2.2` after newly published denial-of-service advisories.
 - Allowlisted the Tailwind CSS 3 toolchain advisories (`braces`, `chokidar`, `fast-glob`, `micromatch`, `postcss-nested`, `postcss-selector-parser`, `tailwindcss`) as documented development-only exceptions pending the Tailwind 4 migration, since no fixed releases exist in the current lines.
+- Gave the Windows PowerShell release-archive integration tests a scoped 15-second timeout so cold GitHub-hosted runners do not fail the deterministic packaging gate at Vitest's 5-second unit-test default.
 
 ## [0.2.1] - Unreleased
 

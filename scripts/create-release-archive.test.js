@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 
 const archiveScript = path.resolve(process.cwd(), 'scripts/create-release-archive.ps1');
 const archiveVerificationScript = path.resolve(process.cwd(), 'scripts/verify-release-archive.ps1');
+const powershellIntegrationTimeout = 15_000;
 
 function createFixture(directory, reverseOrder) {
   mkdirSync(path.join(directory, 'nested'), { recursive: true });
@@ -84,7 +85,7 @@ describe.skipIf(process.platform !== 'win32')('deterministic release archive', (
     } finally {
       rmSync(tempRoot, { recursive: true, force: true });
     }
-  });
+  }, powershellIntegrationTimeout);
 
   it('rejects an archive that no longer matches its source directory', () => {
     const tempRoot = mkdtempSync(path.join(tmpdir(), 'favgrove-archive-test-'));
@@ -101,5 +102,5 @@ describe.skipIf(process.platform !== 'win32')('deterministic release archive', (
     } finally {
       rmSync(tempRoot, { recursive: true, force: true });
     }
-  });
+  }, powershellIntegrationTimeout);
 });
