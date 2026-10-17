@@ -71,6 +71,9 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   update: async (updates) => {
     const settings = normalizeSettings({ ...get().settings, ...updates });
     const saved = await persistSettings(settings);
+    // Publish the persisted settings before retention cleanup, which can fail or
+    // overlap a subsequent settings edit.
+    set(saved.success ? { settings, error: null } : { error: saved.error });
     if (saved.success && typeof updates.backupRetention === 'number') {
       const trimmed = await backupService.trimToRetention(settings.backupRetention);
       if (!trimmed.success) {
@@ -78,7 +81,6 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
         return { success: false, error: trimmed.error };
       }
     }
-    set(saved.success ? { settings, error: null } : { error: saved.error });
     return saved;
   },
   updateScanner: async (scanner) => {

@@ -1,6 +1,15 @@
 # PROGRESS
 
-Last updated: 2026-10-13
+Last updated: 2026-10-17
+
+## Latest Stabilization — 2026-10-17
+
+- Remote/local comparison: fetched `origin/main` matches local `main` at `9e39f5a4`; initial working tree was clean.
+- Settings persistence now updates in-memory state before backup retention cleanup. A cleanup failure no longer leaves the UI behind persisted settings, and delayed cleanup no longer overwrites a subsequent edit.
+- Two regression cases cover cleanup failure and overlapping settings edits.
+- Verified dependency audit (zero production vulnerabilities), lint, typecheck, 36 test files / 147 tests, production extension build, extension validation, and permission audit.
+- All 12 Playwright flows passed via `npm run test:e2e`; installed Chrome/Edge checks and release packaging were not rerun for this settings-only patch.
+- Version remains `0.3.0`; no push or publication. Visible browser click-through and authenticated provider verification remain release blockers.
 
 ## Current Project Completion
 

@@ -1,6 +1,16 @@
 # Current Session
 
-Date: 2026-10-13
+Date: 2026-10-17
+
+## Latest Review — 2026-10-17
+
+- Fetched `origin`; local `main` and `origin/main` both pointed to `9e39f5a4`, with a clean working tree before this phase.
+- Reviewed scanner orchestration, local storage, backup retention, and settings persistence.
+- Fixed settings state drift when retention cleanup fails after settings have already been saved. Persisted settings now become visible before cleanup starts, while cleanup failures still surface as errors.
+- Fixed pending retention cleanup overwriting a later settings edit; added regression coverage for both failure and delayed-cleanup paths.
+- Passed dependency audit (zero production vulnerabilities), lint, typecheck, all 36 Vitest files / 147 tests, and `build:extension` including extension validation and permission audit.
+- `npm run test:e2e` passed all 12 browser flows. Installed Chrome/Edge checks and release packaging were not rerun for this settings-only patch.
+- No version change, commit, push, or publication was performed. Existing visible-browser and authenticated AI-provider release checks remain open.
 
 ## Working On
 
