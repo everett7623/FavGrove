@@ -73,13 +73,13 @@ npm install
 npm run build:extension
 ```
 
-In Chrome or Edge, select **Load unpacked** and choose the generated `dist/` directory:
+In Chrome or Edge, select **Load unpacked** and choose the generated `dist/chrome-mv3/` directory:
 
 ```text
-D:\EvenFrank\Workspace\Plugins\Google\FavGrove\dist
+D:\EvenFrank\Workspace\Plugins\Google\FavGrove\dist\chrome-mv3
 ```
 
-Do **not** choose the project root (`FavGrove/`) or `.crx-dev/`. The root contains source files, while `.crx-dev/` is development-server output. Only `dist/` is the validated unpacked extension.
+The release ZIP sits beside it as `dist/favgrove-v<version>-chrome.zip`. Do **not** choose the project root (`FavGrove/`), `dist/` itself, or `.crx-dev/`. Only `dist/chrome-mv3/` is the validated unpacked extension.
 
 ## Development
 
@@ -97,7 +97,7 @@ npm run package:release
 The release package is generated at:
 
 ```text
-release/favgrove-v0.3.0.zip
+dist/favgrove-v0.3.0-chrome.zip
 ```
 
 ## Quality
@@ -156,7 +156,7 @@ FavGrove does not collect personal data or operate a bookmark/AI proxy service. 
 - [Store submission fields](store/submission-fields.md)
 - [Provider compatibility diagnostics](docs/diagnostics/template-ai-provider-compatibility.md)
 - [Dependency audit policy](docs/security/dependency-audit.md)
-- [Version policy](VERSIONING.md)
+- [Release checklist and versioning](RELEASE_CHECKLIST.md)
 - [Changelog](CHANGELOG.md)
 
 ## License

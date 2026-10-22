@@ -17,15 +17,15 @@ npm run check:browsers:visible -- chrome
 npm run check:browsers:visible -- edge
 ```
 
-The visible runner uses a temporary browser profile, loads `dist/` through the DevTools extension API, opens the FavGrove options page, and removes the profile after the browser closes. It does not use or modify the normal Chrome or Edge profile. The runner opening the initial options tab does not replace the separate action-button check below.
+The visible runner uses a temporary browser profile, loads `dist/chrome-mv3/` through the DevTools extension API, opens the FavGrove options page, and removes the profile after the browser closes. It does not use or modify the normal Chrome or Edge profile. The runner opening the initial options tab does not replace the separate action-button check below.
 
 Load only:
 
 ```text
-D:\EvenFrank\Workspace\Plugins\Google\FavGrove\dist
+D:\EvenFrank\Workspace\Plugins\Google\FavGrove\dist\chrome-mv3
 ```
 
-Do not load the project root or `.crx-dev`.
+Do not load the project root, `dist/` itself, or `.crx-dev`.
 
 ## Result Log
 
@@ -36,7 +36,7 @@ Do not load the project root or `.crx-dev`.
 
 ## Required Checks
 
-- Load `dist/` as an unpacked extension with no manifest warnings.
+- Load `dist/chrome-mv3/` as an unpacked extension with no manifest warnings.
 - Confirm the extension action opens the full-screen FavGrove options page.
 - Open Dashboard, Scanner, Manager, Import / Export, AI Analysis, and Settings from the built extension.
 - Confirm broken-link scanning requests optional `<all_urls>` host access only after the user starts a link scan.

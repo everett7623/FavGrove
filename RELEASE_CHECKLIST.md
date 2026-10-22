@@ -1,5 +1,26 @@
 # Release Checklist
 
+## Versioning
+
+FavGrove follows Semantic Versioning while the product is below `1.0.0`.
+
+Current version: `0.3.0` (multi-provider AI beta candidate). The published `0.1.0` Markora beta must not be rewritten or retagged.
+
+Release stages:
+
+- `0.1.0`: historical Markora public beta
+- `0.2.x`: FavGrove rebrand and beta stabilization
+- `0.3.x`: opt-in multi-provider AI analysis
+- `0.9.x`: release candidates after performance, manual browser, privacy, and store checks pass
+- `1.0.0`: first stable Chrome and Edge store release
+
+Rules:
+
+- Increment PATCH for compatible bug fixes; MINOR for new features or meaningful workflow changes.
+- Keep `package.json`, `manifest.json`, the UI footer, and release package filename synchronized.
+- Use Git tags in the form `v<version>`; mark GitHub releases as pre-release until `1.0.0`.
+- Do not publish `1.0.0` while required items below remain incomplete.
+
 ## Quality Gates
 
 - [x] `npm install`
@@ -18,7 +39,7 @@
 - [x] `npm run package:release`
 - [x] Release packaging creates a SHA-256 checksum file beside the ZIP.
 - [x] Release ZIP generation is deterministic for identical production content.
-- [x] Generated ZIP entries are verified against `dist/` before the checksum is written.
+- [x] Generated ZIP entries are verified against `dist/chrome-mv3/` before the checksum is written.
 - [x] Windows GitHub Actions quality workflow is configured for the release gates.
 - [ ] The quality workflow passes on the pushed `0.3.0` beta commit; local verification must pass before pushing.
 
@@ -57,9 +78,9 @@
 
 ## Manual Extension Checks
 
-- [x] Isolated installed Chrome and Edge profiles load `dist/` through the supported DevTools extension API with the MV3 service worker, all primary routes, AI disabled, and no pre-confirmation external requests.
+- [x] Isolated installed Chrome and Edge profiles load `dist/chrome-mv3/` through the supported DevTools extension API with the MV3 service worker, all primary routes, AI disabled, and no pre-confirmation external requests.
 - [x] Visible Chrome and Edge click-through checklist is prepared in `docs/release/browser-clickthrough.md`.
-- [ ] Load `dist/` as an unpacked extension without manifest warnings in visible Chrome and Edge.
+- [ ] Load `dist/chrome-mv3/` as an unpacked extension without manifest warnings in visible Chrome and Edge.
 - [ ] Clicking the extension action opens the full-screen options page.
 - [x] Dashboard, Scanner, Manager, Import / Export, AI Analysis, and Settings routes open.
 - [ ] Broken-link permission is requested only after starting a scan.
@@ -86,11 +107,12 @@
 
 ## Release Artifacts
 
-The packaging command creates:
+The packaging command creates artifacts beside the unpacked build:
 
 ```txt
-release/favgrove-v<version>.zip
-release/favgrove-v<version>.sha256
+dist/chrome-mv3/                    # load unpacked
+dist/favgrove-v<version>-chrome.zip
+dist/favgrove-v<version>-chrome.sha256
 ```
 
 Upload the generated ZIP to the Chrome Web Store or Microsoft Edge Add-ons portal. Attach both files to the matching GitHub pre-release.

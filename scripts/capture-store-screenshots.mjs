@@ -3,9 +3,10 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 import { chromium, expect } from '@playwright/test';
 import { findChromiumExecutable } from './browser-paths.mjs';
+import { extensionDistDir } from './extension-paths.mjs';
 
 const root = process.cwd();
-const distDir = path.join(root, 'dist');
+const distDir = extensionDistDir(root);
 const screenshotDir = path.join(root, 'store', 'screenshots');
 mkdirSync(screenshotDir, { recursive: true });
 

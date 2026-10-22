@@ -1,9 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { extensionDistDir } from './extension-paths.mjs';
 import { assertReleaseVersionConsistency } from './release-version.mjs';
 
 const root = process.cwd();
-const distDir = resolve(root, 'dist');
+const distDir = extensionDistDir(root);
 const manifestPath = resolve(distDir, 'manifest.json');
 const sourceManifestPath = resolve(root, 'manifest.json');
 const packagePath = resolve(root, 'package.json');
@@ -12,7 +13,7 @@ const sourceLicensePath = resolve(root, 'LICENSE');
 const builtLicensePath = resolve(distDir, 'LICENSE');
 
 if (!existsSync(manifestPath)) {
-  throw new Error('Missing dist/manifest.json. Run npm run build first.');
+  throw new Error('Missing dist/chrome-mv3/manifest.json. Run npm run build first.');
 }
 
 if (!existsSync(sourceLicensePath) || !existsSync(builtLicensePath)) {
@@ -36,7 +37,7 @@ const versions = {
   'package-lock.json': packageLock.version,
   'package-lock.json packages[""]': packageLock.packages?.['']?.version,
   'manifest.json': sourceManifest.version,
-  'dist/manifest.json': manifest.version
+  'dist/chrome-mv3/manifest.json': manifest.version
 };
 assertReleaseVersionConsistency(versions);
 

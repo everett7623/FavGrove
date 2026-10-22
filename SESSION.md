@@ -25,7 +25,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis beta while preserving
 
 ## Open Work
 
-1. Load rebuilt `dist/` in visible Chrome and Edge; complete `docs/release/browser-clickthrough.md` (including AI disabled / preview / cancel).
+1. Load rebuilt `dist/chrome-mv3/` in visible Chrome and Edge; complete `docs/release/browser-clickthrough.md` (including AI disabled / preview / cancel).
 2. Run one disposable live-provider compatibility check with user-owned credentials; do not persist the key.
 3. Copy verified privacy policy and support URLs plus `store/submission-fields.md` into the store portals.
 4. Finalize and publish the `0.3.0` GitHub beta pre-release from `docs/release/github-prerelease-v0.3.0.md`; upload the verified ZIP only after the visible browser pass.
@@ -37,7 +37,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis beta while preserving
 
 - Suitable as a `0.3.0` FavGrove beta candidate after the open work above.
 - Not ready for Chrome Web Store / Edge Add-ons stable publication.
-- Do not label the current build `1.0.0`. See `VERSIONING.md` and `RELEASE_CHECKLIST.md`.
+- Do not label the current build `1.0.0`. See `RELEASE_CHECKLIST.md` (Versioning).
 
 ## Design Notes / Pending Decisions
 
@@ -47,7 +47,7 @@ Complete and verify the `0.3.0` multi-provider AI analysis beta while preserving
 - Folder merge keeps the first duplicate folder as the target, moves all source children, and creates a backup first.
 - Bookmark drag/drop ordering before a target row is supported; folder ordering polish can wait for E2E coverage.
 - A saved setting is not considered complete until its service behavior uses it.
-- Manual unpacked-extension testing must load `dist/`; do not load `.crx-dev`.
+- Manual unpacked-extension testing must load `dist/chrome-mv3/`; do not load `dist/` itself or `.crx-dev`.
 
 ## Handoff Notes
 

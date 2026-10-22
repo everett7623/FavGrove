@@ -3,14 +3,15 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { findBrowserExecutable } from './browser-paths.mjs';
+import { extensionDistDir } from './extension-paths.mjs';
 
 const root = process.cwd();
-const distDir = path.join(root, 'dist');
+const distDir = extensionDistDir(root);
 const manifestPath = path.join(distDir, 'manifest.json');
 const routes = ['/', '/scanner', '/manager', '/import-export', '/ai-analysis', '/settings'];
 
 if (!existsSync(manifestPath)) {
-  throw new Error('dist/manifest.json is missing. Run npm run build:extension first.');
+  throw new Error('dist/chrome-mv3/manifest.json is missing. Run npm run build:extension first.');
 }
 
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
@@ -119,4 +120,4 @@ for (const name of ['chrome', 'edge']) {
   await verifyBrowser(name, executable);
 }
 
-console.log('Chrome and Edge loaded the production dist/ extension successfully in isolated profiles.');
+console.log('Chrome and Edge loaded the production dist/chrome-mv3 extension successfully in isolated profiles.');

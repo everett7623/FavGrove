@@ -7,8 +7,8 @@
 - Release title: `FavGrove v0.3.0 Beta`
 - Mark as pre-release: yes
 - Attach assets:
-  - `release/favgrove-v0.3.0.zip`
-  - `release/favgrove-v0.3.0.sha256`
+  - `dist/favgrove-v0.3.0-chrome.zip`
+  - `dist/favgrove-v0.3.0-chrome.sha256`
 
 ## Summary
 

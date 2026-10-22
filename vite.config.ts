@@ -1,4 +1,4 @@
-import { copyFileSync } from 'node:fs';
+import { copyFileSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { crx } from '@crxjs/vite-plugin';
 import react from '@vitejs/plugin-react';
@@ -10,6 +10,18 @@ const developmentCorsOrigins = [
   /^http:\/\/localhost(?::\d+)?$/,
   /^chrome-extension:\/\/[a-p]{32}$/
 ];
+
+const productionOutDir = 'dist/chrome-mv3';
+
+function cleanProductionDist(): Plugin {
+  return {
+    name: 'clean-production-dist',
+    apply: 'build',
+    buildStart() {
+      rmSync(resolve('dist'), { recursive: true, force: true });
+    }
+  };
+}
 
 function copyLicense(): Plugin {
   return {
@@ -23,7 +35,11 @@ function copyLicense(): Plugin {
 }
 
 export default defineConfig(({ command }) => ({
-  plugins: [react(), crx({ manifest }), copyLicense()],
+  plugins: [
+    react(),
+    crx({ manifest }),
+    ...(command === 'build' ? [cleanProductionDist(), copyLicense()] : [])
+  ],
   server: {
     host: '127.0.0.1',
     allowedHosts: ['127.0.0.1', 'localhost'],
@@ -37,7 +53,7 @@ export default defineConfig(({ command }) => ({
     strictPort: true
   },
   build: {
-    outDir: command === 'serve' ? '.crx-dev' : 'dist',
+    outDir: command === 'serve' ? '.crx-dev' : productionOutDir,
     emptyOutDir: true
   }
 }));

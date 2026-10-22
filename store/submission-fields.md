@@ -42,9 +42,9 @@ The extension does not request the `tabs` permission.
 - Store listing draft: `store/listing.md`
 - Screenshots: `store/screenshots/`
 - Promotional assets: `store/assets/`
-- Extension package: `release/favgrove-v0.2.1.zip`
-- Extension package checksum: `release/favgrove-v0.2.1.sha256`
+- Extension package: `dist/favgrove-v0.3.0-chrome.zip`
+- Extension package checksum: `dist/favgrove-v0.3.0-chrome.sha256`
 
 ## Beta Notes
 
-Use `v0.2.1` as a beta or pre-release label. Do not present this build as stable `1.0.0` until the visible browser checks, portal review, and final publication gates are complete.
+Use `v0.3.0` as a beta or pre-release label. Do not present this build as stable `1.0.0` until the visible browser checks, portal review, and final publication gates are complete.

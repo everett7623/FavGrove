@@ -10,7 +10,7 @@ FavGrove 是面向 Chrome/Edge 的本地优先书签管理扩展，采用 Manife
 
 **技术栈已锁定**：未经用户批准，不得引入 Redux、MobX、Angular、Vue、Webpack、jQuery、popup 页面或新的 UI 组件库。
 
-版本号必须在 `package.json`、`manifest.json`、UI footer、release ZIP 文件名之间保持同步（见 `VERSIONING.md`），发布脚本会强制校验。
+版本号必须在 `package.json`、`manifest.json`、UI footer、release ZIP 文件名之间保持同步（见 `RELEASE_CHECKLIST.md` 的 Versioning 节），发布脚本会强制校验。
 
 ## 核心架构
 
@@ -43,12 +43,11 @@ src/
 │   ├── types/        # index.ts（通用）+ ai.ts（AI 子系统）
 │   └── utils/
 ├── features/         # dashboard、scanner、manager、import-export、ai-analysis、settings
-├── router/           # routes.ts 中的 ROUTES 常量当前无任何引用，且缺 ai-analysis
 ├── styles/
 └── test/setup.ts     # Vitest 全局 setup
 ```
 
-路由的真实定义在 `src/App.tsx`（`lazy()` + `<Route>`），`src/router/routes.ts` 已与之脱节，改路由不要只改后者。
+路由的真实定义在 `src/App.tsx`（`lazy()` + `<Route>`）；新增页面在这里挂载，不要另建平行路由表。
 
 ### 关键跨层模式
 
@@ -93,18 +92,18 @@ npm run test
 npm run build
 ```
 
-`lint` 使用 `--max-warnings 0`，必须 0 errors 0 warnings；`build` 输出到 `dist/`。
+`lint` 使用 `--max-warnings 0`，必须 0 errors 0 warnings；`build` 输出到 `dist/chrome-mv3/`。
 
 ### 扩展与发布
 
 | 命令 | 说明 |
 |------|------|
 | `npm run build:extension` | build + validate:extension + audit:permissions |
-| `npm run validate:extension` | 验证 `dist/` 的扩展结构与版本一致性 |
+| `npm run validate:extension` | 验证 `dist/chrome-mv3/` 的扩展结构与版本一致性 |
 | `npm run audit:permissions` | 检查 manifest 与隐私文档的权限一致性 |
-| `npm run package:release` | 生成 `release/favgrove-v<version>.zip`（含 `.sha256`，确定性打包） |
+| `npm run package:release` | 在 `dist/` 旁生成 `favgrove-v<version>-chrome.zip`（含 `.sha256`，确定性打包） |
 | `npm run audit:dependencies` | 通过官方 npm registry 审计依赖，生产依赖必须干净 |
-| `npm run check:browsers` | 在隔离 profile 中安装 `dist/` 到 Chrome/Edge 并验证 |
+| `npm run check:browsers` | 在隔离 profile 中安装 `dist/chrome-mv3/` 到 Chrome/Edge 并验证 |
 | `npm run check:browser-data-safety` | 校验安装过程未触碰真实浏览器用户数据 |
 | `npm run check:browsers:visible -- chrome` | 可见浏览器逐一点击测试（也可传 `edge`） |
 | `npm run capture:store-screenshots` | 生成商店 1280x800 截图 |
@@ -119,13 +118,13 @@ npm run test:e2e
 
 ### 浏览器测试
 
-手动加载扩展时，**必须**选择 `dist/` 目录：
+手动加载扩展时，**必须**选择 `dist/chrome-mv3/` 目录：
 
 ```
-D:\EvenFrank\Workspace\Plugins\Google\FavGrove\dist
+D:\EvenFrank\Workspace\Plugins\Google\FavGrove\dist\chrome-mv3
 ```
 
-**不要**加载项目根目录或 `.crx-dev/`（开发服务器输出）。
+发布 ZIP 在同级：`dist/favgrove-v<version>-chrome.zip`。**不要**加载项目根目录、`dist/` 本身或 `.crx-dev/`（开发服务器输出）。
 
 ## Chrome 扩展规则
 
@@ -319,8 +318,8 @@ Test status:
 - `README.md`：面向用户的产品介绍与安装说明
 - `AGENTS.md`：Codex 会话的交接流程与收尾清单
 - `SESSION.md`：当前工作上下文、开放事项、发布决策（唯一开发状态入口）
-- `RELEASE_CHECKLIST.md`：商店和制品发布门禁
-- `VERSIONING.md` / `CHANGELOG.md`：版本阶段规则与变更记录
+- `RELEASE_CHECKLIST.md`：版本策略 + 商店和制品发布门禁
+- `CHANGELOG.md`：已发布变更记录
 - `PRIVACY.md`：权限和网络详情，改权限时必须同步
 - `docs/decisions/`：架构决策记录（restore-strategy、ai-provider-boundary）
 - `docs/diagnostics/`：疑难问题案例与排查模板（AI provider 兼容性、导出主线程卡顿）
@@ -337,7 +336,7 @@ Test status:
 
 v0.3.0 多供应商 AI beta 候选，近期优先级（详见 `SESSION.md` 的 Open Work）：
 
-1. 在可见 Chrome/Edge 中加载重建的 `dist/`，完成点击测试清单（含 AI 关闭/预览/取消状态）
+1. 在可见 Chrome/Edge 中加载重建的 `dist/chrome-mv3/`，完成点击测试清单（含 AI 关闭/预览/取消状态）
 2. 用用户自有凭据做一次性 live provider 兼容性验证，且不持久化该 key
 3. 将验证过的隐私政策与支持 URL 连同准备好的提交字段复制到商店门户
 4. 现有门禁通过后创建 `0.3.0` GitHub beta pre-release，并上传验证过的 release ZIP
