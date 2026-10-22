@@ -43,7 +43,7 @@ Browser bookmark managers become difficult to use once a collection grows into t
 | AI analysis | Disabled by default; OpenAI, Claude, Gemini, Grok, and third-party OpenAI-compatible analysis with provider-aware request previews, URL redaction, cancellation, and read-only structured results |
 | Privacy | Local storage by default; no analytics, telemetry, shared AI key, developer-controlled bookmark server, or AI proxy |
 
-The remaining roadmap is tracked in [TASKS.md](TASKS.md) and [PROGRESS.md](PROGRESS.md). Known gaps include final visible browser click-through checks, live-provider compatibility testing with user-owned credentials, store portal submission, and later automatic recommendation work. Full destructive replacement restore is documented as deferred.
+The remaining roadmap is tracked in [SESSION.md](SESSION.md) and [docs/roadmap/post-beta-ai.md](docs/roadmap/post-beta-ai.md). Known gaps include final visible browser click-through checks, live-provider compatibility testing with user-owned credentials, store portal submission, and later automatic recommendation work. Full destructive replacement restore is documented as deferred.
 
 ## Link Scanner
 
@@ -147,14 +147,13 @@ FavGrove does not collect personal data or operate a bookmark/AI proxy service. 
 
 - [Development guide and architecture](CLAUDE.md)
 - [Privacy policy](PRIVACY.md)
-- [Roadmap and tasks](TASKS.md)
-- [Current progress](PROGRESS.md)
+- [Current session and open work](SESSION.md)
+- [Post-beta AI roadmap](docs/roadmap/post-beta-ai.md)
 - [Release checklist](RELEASE_CHECKLIST.md)
 - [Browser click-through checklist](docs/release/browser-clickthrough.md)
 - [Restore strategy decision](docs/decisions/restore-strategy.md)
 - [AI provider and data boundary](docs/decisions/ai-provider-boundary.md)
 - [Store submission fields](store/submission-fields.md)
-- [Post-beta AI roadmap](docs/roadmap/post-beta-ai.md)
 - [Provider compatibility diagnostics](docs/diagnostics/template-ai-provider-compatibility.md)
 - [Dependency audit policy](docs/security/dependency-audit.md)
 - [Version policy](VERSIONING.md)

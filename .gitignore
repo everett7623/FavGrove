@@ -5,6 +5,7 @@ coverage/
 playwright-report/
 test-results/
 /release/
+.codebuddy/
 .env
 .env.*
 !.env.example

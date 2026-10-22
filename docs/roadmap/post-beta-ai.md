@@ -1,6 +1,6 @@
 # Post-Beta AI Analysis And Local Recommendation Roadmap
 
-The first read-only AI analysis milestone was implemented on 2026-07-16 after explicit user direction to continue before the earlier release-gate sequence was complete. Later automatic recommendation and mutation work remains post-beta.
+The first read-only AI analysis milestone was implemented after explicit user direction. Later automatic recommendation and mutation work remains post-beta. Current beta status and open release gates live in `SESSION.md`.
 
 ## Release Gates Before Starting
 
@@ -26,23 +26,11 @@ The first read-only AI analysis milestone was implemented on 2026-07-16 after ex
 - Search ranking improvements based on local usage and recency.
 - Optional future model integration only if privacy, consent, and data-boundary requirements are explicitly approved.
 
-## First AI Milestone
+## First AI Milestone (shipped in 0.3.0)
 
-The first model-backed feature is `TASK-705 AI Bookmark Library Analysis`.
-Its implementation specification is recorded in
-`.codex/tasks/ai-analysis-integration-2026-07-15.md`.
+Opt-in, read-only bookmark-library analysis with provider-aware adapters (OpenAI, Claude, Gemini, Grok, OpenAI-compatible), privacy redaction, scoped samples, cancellation, and strict evidence validation. Architecture and privacy boundary: `docs/decisions/ai-provider-boundary.md` and `CLAUDE.md`.
 
-The milestone is intentionally read-only. It analyzes a user-selected scope,
-returns provider-neutral structured findings, and does not directly delete,
-move, merge, or tag bookmarks.
-
-## Implemented First-Milestone Sequence
-
-1. Provider-aware adapters and transient-key execution selected for OpenAI, Claude, Gemini, Grok, and third-party compatible endpoints.
-2. Versioned request/response schema and local preprocessing contract implemented.
-3. Opt-in scope preview, URL redaction, token estimation, timeout, and cancellation implemented.
-4. Provider-neutral service/background boundary and structured result UI implemented.
-5. Privacy, store disclosure, unit, performance, and E2E validation updated.
+The milestone is intentionally read-only. It analyzes a user-selected scope, returns provider-neutral structured findings, and does not directly delete, move, merge, or tag bookmarks.
 
 No provider SDK, shared credential, or developer-operated AI proxy is bundled. Official endpoint presets remain disabled until the user opts in and confirms a request.
 

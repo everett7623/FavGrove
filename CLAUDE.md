@@ -318,15 +318,14 @@ Test status:
 
 - `README.md`：面向用户的产品介绍与安装说明
 - `AGENTS.md`：Codex 会话的交接流程与收尾清单
-- `SESSION.md`：当前工作上下文和下一步
-- `PROGRESS.md`：项目整体进度和发布决策
-- `TASKS.md`：长期路线图和功能审计
+- `SESSION.md`：当前工作上下文、开放事项、发布决策（唯一开发状态入口）
 - `RELEASE_CHECKLIST.md`：商店和制品发布门禁
 - `VERSIONING.md` / `CHANGELOG.md`：版本阶段规则与变更记录
 - `PRIVACY.md`：权限和网络详情，改权限时必须同步
 - `docs/decisions/`：架构决策记录（restore-strategy、ai-provider-boundary）
 - `docs/diagnostics/`：疑难问题案例与排查模板（AI provider 兼容性、导出主线程卡顿）
 - `docs/release/`：浏览器点击测试清单、GitHub pre-release 稿
+- `docs/roadmap/post-beta-ai.md`：beta 之后的 AI / 推荐路线
 - `docs/security/dependency-audit.md`：依赖审计策略与历史公告处置记录
 - `store/`：商店提交文案、截图与宣传素材
 
@@ -336,7 +335,7 @@ Test status:
 
 ## 当前开发方向
 
-v0.3.0 多供应商 AI beta 候选，近期优先级（详见 `SESSION.md` 的 Next Step）：
+v0.3.0 多供应商 AI beta 候选，近期优先级（详见 `SESSION.md` 的 Open Work）：
 
 1. 在可见 Chrome/Edge 中加载重建的 `dist/`，完成点击测试清单（含 AI 关闭/预览/取消状态）
 2. 用用户自有凭据做一次性 live provider 兼容性验证，且不持久化该 key
@@ -344,4 +343,4 @@ v0.3.0 多供应商 AI beta 候选，近期优先级（详见 `SESSION.md` 的 N
 4. 现有门禁通过后创建 `0.3.0` GitHub beta pre-release，并上传验证过的 release ZIP
 5. 完整替换恢复功能延后，除非单独的安全设计获批
 
-开始新任务前，**务必**检查 `SESSION.md` 和 `PROGRESS.md`。
+开始新任务前，**务必**检查 `SESSION.md`。
